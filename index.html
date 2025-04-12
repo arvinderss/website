@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="description" content="Arvinder Singh's professional cybersecurity resume.">
-<meta property="og:title" content="Arvinder Singh – Cybersecurity Resume">
-<meta property="og:image" content="path-to-image.jpg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta property="og:title" content="Arvinder Singh – Cybersecurity Resume">
+  <meta property="og:image" content="path-to-image.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arvinder Singh – Cybersecurity Resume</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -14,11 +15,13 @@
       --text: #111;
       --accent: #004085;
     }
+
     body.dark {
       --bg: #1e1e1e;
       --text: #f0f0f0;
       --accent: #66aaff;
     }
+
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       line-height: 1.6;
@@ -28,55 +31,68 @@
       padding: 2rem;
       transition: background-color 0.3s, color 0.3s;
     }
+
     header {
       text-align: center;
       margin-bottom: 2rem;
     }
+
     h1 {
       color: var(--accent);
     }
+
     a {
       color: var(--accent);
     }
+
     section {
       margin-bottom: 2rem;
     }
+
     h2 {
       border-bottom: 2px solid #ccc;
       padding-bottom: 0.5rem;
       font-size: 1.5rem;
       margin-top: 2rem;
     }
+
     .icon {
       margin-right: 0.5rem;
     }
+
     .job-title {
       font-weight: bold;
     }
+
     .company {
       font-style: italic;
     }
+
     .date {
       float: right;
       color: gray;
     }
+
     .toggle-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
     }
+
     .toggle-switch {
       position: relative;
       display: inline-block;
       width: 60px;
       height: 34px;
     }
+
     .toggle-switch input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .slider {
       position: absolute;
       cursor: pointer;
@@ -88,6 +104,7 @@
       bottom: 0;
       transition: 0.4s;
     }
+
     .slider:before {
       content: "";
       position: absolute;
@@ -101,25 +118,31 @@
     }
 
     .slider:after {
-  content: "🌞"; /* Default light mode icon */
-  position: absolute;
-  right: 10px;
-  bottom: 5px;
-}
-input:checked + .slider:after {
-  content: "🌙"; /* Dark mode icon */
-}
-    
-    input:checked + .slider {
+      content: "🌞";
+      /* Default light mode icon */
+      position: absolute;
+      right: 10px;
+      bottom: 5px;
+    }
+
+    input:checked+.slider:after {
+      content: "🌙";
+      /* Dark mode icon */
+    }
+
+    input:checked+.slider {
       background-color: #2196F3;
     }
-    input:checked + .slider:before {
+
+    input:checked+.slider:before {
       transform: translateX(26px);
     }
+
     select {
       padding: 6px;
       font-size: 1rem;
     }
+
     @media (max-width: 600px) {
       .date {
         float: none;
@@ -128,11 +151,12 @@ input:checked + .slider:after {
     }
   </style>
 </head>
+
 <body>
   <div class="toggle-container">
     <label>
       🌗 Dark Mode
-     <label class="toggle-switch" aria-label="Dark mode toggle">
+      <label class="toggle-switch" aria-label="Dark mode toggle">
         <input type="checkbox" id="themeToggle">
         <span class="slider"></span>
       </label>
@@ -153,24 +177,30 @@ input:checked + .slider:after {
   <header>
     <h1 id="name">Arvinder Singh</h1>
     <p><i class="fas fa-envelope icon"></i><span id="email">arvinder1984@gmail.com</span></p>
-    <p><i class="fab fa-linkedin icon"></i><a id="linkedin" href="https://www.linkedin.com/in/arvinderss/">linkedin.com/in/arvinderss</a></p>
+    <p><i class="fab fa-linkedin icon"></i><a id="linkedin"
+        href="https://www.linkedin.com/in/arvinderss/">linkedin.com/in/arvinderss</a></p>
     <p><i class="fas fa-map-marker-alt icon"></i><span id="location">Noida, Uttar Pradesh, India</span></p>
   </header>
 
   <section>
     <h2><i class="fas fa-user icon"></i>Profile</h2>
     <p id="summary">
-      Cybersecurity and IT service delivery leader with over 17 years of experience. Proven ability to drive security strategy, optimize operations, and lead high-impact teams across global enterprises.
+      Cybersecurity and IT service delivery leader with over 17 years of experience. Proven ability to drive security
+      strategy, optimize operations, and lead high-impact teams across global enterprises.
     </p>
   </section>
 
   <section>
     <h2><i class="fas fa-briefcase icon"></i>Experience</h2>
     <ul id="experience">
-      <li><span class="job-title">Delivery Partner</span> – <span class="company">TCS</span> <span class="date">2024–Present</span>
-        <p>Managing cybersecurity service delivery, client engagement, and large-scale team leadership.</p></li>
-      <li><span class="job-title">Security Delivery Manager</span> – <span class="company">Accenture</span> <span class="date">2020–2024</span>
-        <p>Led MSS and PAM/IAM projects, improving security automation and team performance.</p></li>
+      <li><span class="job-title">Delivery Partner</span> – <span class="company">TCS</span> <span
+          class="date">2024–Present</span>
+        <p>Managing cybersecurity service delivery, client engagement, and large-scale team leadership.</p>
+      </li>
+      <li><span class="job-title">Security Delivery Manager</span> – <span class="company">Accenture</span> <span
+          class="date">2020–2024</span>
+        <p>Led MSS and PAM/IAM projects, improving security automation and team performance.</p>
+      </li>
     </ul>
   </section>
 
@@ -212,67 +242,67 @@ input:checked + .slider:after {
     const libreUrl = "https://libretranslate.de/translate";
     const translatableIds = ["name", "email", "linkedin", "location", "summary", "experience", "education", "certifications", "skills", "languages"];
 
-document.getElementById("languageSelect").addEventListener("change", async (e) => {
-  const lang = e.target.value;
-  const select = e.target;
-  select.disabled = true; // Disable while fetching
-  if (lang === "en") {
-    location.reload();
-    return;
-  }
+    document.getElementById("languageSelect").addEventListener("change", async (e) => {
+      const lang = e.target.value;
+      const select = e.target;
+      select.disabled = true; // Disable while fetching
+      if (lang === "en") {
+        location.reload();
+        return;
+      }
 
-  try {
-    for (const id of translatableIds)    
- {
-        const el = document.getElementById(id);
-        if (!el) continue;
+      try {
+        for (const id of translatableIds) {
+          const el = document.getElementById(id);
+          if (!el) continue;
 
-        let text = el.innerText || el.textContent;
-        if (el.tagName === "UL") {
-          for (let li of el.querySelectorAll("li")) {
-            const res = await translateText(li.innerText, lang);
-            li.innerText = res;
+          let text = el.innerText || el.textContent;
+          if (el.tagName === "UL") {
+            for (let li of el.querySelectorAll("li")) {
+              const res = await translateText(li.innerText, lang);
+              li.innerText = res;
+            }
+          } else {
+            const res = await translateText(text, lang);
+            el.innerText = res;
           }
-        } else {
-          const res = await translateText(text, lang);
-          el.innerText = res;
         }
       }
-    }
-  finally {
-    select.disabled = false; // Re-enable after fetching
-  }
-});
-
-/*    async function translateText(text, target) {
-      const res = await fetch(libreUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ q: text, source: "en", target: target, format: "text" })
-      });
-      const data = await res.json();
-      return data.translatedText;
-    }
-*/
-  async function translateText(text, target) {
-  try {
-    const res = await fetch(libreUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ q: text, source: "en", target: target, format: "text" }),
+      finally {
+        select.disabled = false; // Re-enable after fetching
+      }
     });
-    if (!res.ok) throw new Error("Translation failed");
-    const data = await res.json();
-    return data.translatedText;
-  } catch (err) {
-    console.error(err);
-    return text; // Fallback to original text
-  }
-}
+
+    /*    async function translateText(text, target) {
+          const res = await fetch(libreUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ q: text, source: "en", target: target, format: "text" })
+          });
+          const data = await res.json();
+          return data.translatedText;
+        }
+    */
+    async function translateText(text, target) {
+      try {
+        const res = await fetch(libreUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ q: text, source: "en", target: target, format: "text" }),
+        });
+        if (!res.ok) throw new Error("Translation failed");
+        const data = await res.json();
+        return data.translatedText;
+      } catch (err) {
+        console.error(err);
+        return text; // Fallback to original text
+      }
+    }
   </script>
 </body>
+
 </html>
