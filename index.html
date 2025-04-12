@@ -1,10 +1,234 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Arvinder Singh</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Arvinder Singh – Cybersecurity Resume</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f9f9f9;
+      --text: #222;
+      --accent: #004085;
+    }
+    body.dark {
+      --bg: #1e1e1e;
+      --text: #f0f0f0;
+      --accent: #66aaff;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 2rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      color: var(--accent);
+    }
+    a {
+      color: var(--accent);
+    }
+    section {
+      margin-bottom: 2rem;
+    }
+    h2 {
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 0.5rem;
+      font-size: 1.5rem;
+      margin-top: 2rem;
+    }
+    .icon {
+      margin-right: 0.5rem;
+    }
+    .job-title {
+      font-weight: bold;
+    }
+    .company {
+      font-style: italic;
+    }
+    .date {
+      float: right;
+      color: gray;
+    }
+    .toggle-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #ccc;
+      border-radius: 34px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: 0.4s;
+    }
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.4s;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    select {
+      padding: 6px;
+      font-size: 1rem;
+    }
+    @media (max-width: 600px) {
+      .date {
+        float: none;
+        display: block;
+      }
+    }
+  </style>
 </head>
 <body>
-<h1>Arvinder Singh</h1>
-<p>This is my about page where I keep my online profile updated. I believe this is better than a CV.</p>
+  <div class="toggle-container">
+    <label>
+      🌗 Dark Mode
+      <label class="toggle-switch">
+        <input type="checkbox" id="themeToggle">
+        <span class="slider"></span>
+      </label>
+    </label>
+    <label>
+      🌍 Language:
+      <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+        <option value="es">Español</option>
+        <option value="de">Deutsch</option>
+        <option value="hi">हिन्दी</option>
+        <option value="zh">中文</option>
+      </select>
+    </label>
+  </div>
+
+  <header>
+    <h1 id="name">Arvinder Singh</h1>
+    <p><i class="fas fa-envelope icon"></i><span id="email">arvinder1984@gmail.com</span></p>
+    <p><i class="fab fa-linkedin icon"></i><a id="linkedin" href="https://www.linkedin.com/in/arvinderss/">linkedin.com/in/arvinderss</a></p>
+    <p><i class="fas fa-map-marker-alt icon"></i><span id="location">Noida, Uttar Pradesh, India</span></p>
+  </header>
+
+  <section>
+    <h2><i class="fas fa-user icon"></i>Profile</h2>
+    <p id="summary">
+      Cybersecurity and IT service delivery leader with over 17 years of experience. Proven ability to drive security strategy, optimize operations, and lead high-impact teams across global enterprises.
+    </p>
+  </section>
+
+  <section>
+    <h2><i class="fas fa-briefcase icon"></i>Experience</h2>
+    <ul id="experience">
+      <li><span class="job-title">Delivery Partner</span> – <span class="company">TCS</span> <span class="date">2024–Present</span>
+        <p>Managing cybersecurity service delivery, client engagement, and large-scale team leadership.</p></li>
+      <li><span class="job-title">Security Delivery Manager</span> – <span class="company">Accenture</span> <span class="date">2020–2024</span>
+        <p>Led MSS and PAM/IAM projects, improving security automation and team performance.</p></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><i class="fas fa-graduation-cap icon"></i>Education</h2>
+    <ul id="education">
+      <li>B.Sc. Computer Science – Punjab Technical University (2008–2011)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><i class="fas fa-certificate icon"></i>Certifications</h2>
+    <ul id="certifications">
+      <li>Certified in Cybersecurity</li>
+      <li>Microsoft Certified: Security, Compliance & Identity Fundamentals</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><i class="fas fa-tools icon"></i>Skills</h2>
+    <ul id="skills">
+      <li>Cybersecurity Strategy, IAM/PAM, SOC Ops, SIEM</li>
+      <li>Cloud Security, Compliance, Risk Management</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><i class="fas fa-language icon"></i>Languages</h2>
+    <ul id="languages">
+      <li>English, Hindi, Punjabi</li>
+    </ul>
+  </section>
+
+  <script>
+    document.getElementById("themeToggle").addEventListener("change", () => {
+      document.body.classList.toggle("dark");
+    });
+
+    const libreUrl = "https://libretranslate.de/translate";
+    const translatableIds = ["name", "email", "linkedin", "location", "summary", "experience", "education", "certifications", "skills", "languages"];
+
+    document.getElementById("languageSelect").addEventListener("change", async (e) => {
+      const lang = e.target.value;
+      if (lang === "en") return location.reload();
+
+      for (const id of translatableIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+
+        let text = el.innerText || el.textContent;
+        if (el.tagName === "UL") {
+          for (let li of el.querySelectorAll("li")) {
+            const res = await translateText(li.innerText, lang);
+            li.innerText = res;
+          }
+        } else {
+          const res = await translateText(text, lang);
+          el.innerText = res;
+        }
+      }
+    });
+
+    async function translateText(text, target) {
+      const res = await fetch(libreUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ q: text, source: "en", target: target, format: "text" })
+      });
+      const data = await res.json();
+      return data.translatedText;
+    }
+  </script>
 </body>
 </html>
