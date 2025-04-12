@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="description" content="Arvinder Singh's professional cybersecurity resume.">
+<meta property="og:title" content="Arvinder Singh – Cybersecurity Resume">
+<meta property="og:image" content="path-to-image.jpg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Arvinder Singh – Cybersecurity Resume</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
     :root {
       --bg: #f9f9f9;
-      --text: #222;
+      --text: #111;
       --accent: #004085;
     }
     body.dark {
@@ -17,7 +20,8 @@
       --accent: #66aaff;
     }
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
       background-color: var(--bg);
       color: var(--text);
       margin: 0;
@@ -95,6 +99,17 @@
       border-radius: 50%;
       transition: 0.4s;
     }
+
+    .slider:after {
+  content: "🌞"; /* Default light mode icon */
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+}
+input:checked + .slider:after {
+  content: "🌙"; /* Dark mode icon */
+}
+    
     input:checked + .slider {
       background-color: #2196F3;
     }
@@ -117,7 +132,7 @@
   <div class="toggle-container">
     <label>
       🌗 Dark Mode
-      <label class="toggle-switch">
+     <label class="toggle-switch" aria-label="Dark mode toggle">
         <input type="checkbox" id="themeToggle">
         <span class="slider"></span>
       </label>
@@ -197,11 +212,18 @@
     const libreUrl = "https://libretranslate.de/translate";
     const translatableIds = ["name", "email", "linkedin", "location", "summary", "experience", "education", "certifications", "skills", "languages"];
 
-    document.getElementById("languageSelect").addEventListener("change", async (e) => {
-      const lang = e.target.value;
-      if (lang === "en") return location.reload();
+document.getElementById("languageSelect").addEventListener("change", async (e) => {
+  const lang = e.target.value;
+  const select = e.target;
+  select.disabled = true; // Disable while fetching
+  if (lang === "en") {
+    location.reload();
+    return;
+  }
 
-      for (const id of translatableIds) {
+  try {
+    for (const id of translatableIds)    
+ {
         const el = document.getElementById(id);
         if (!el) continue;
 
@@ -216,9 +238,13 @@
           el.innerText = res;
         }
       }
-    });
+    }
+  finally {
+    select.disabled = false; // Re-enable after fetching
+  }
+});
 
-    async function translateText(text, target) {
+/*    async function translateText(text, target) {
       const res = await fetch(libreUrl, {
         method: "POST",
         headers: {
@@ -229,6 +255,24 @@
       const data = await res.json();
       return data.translatedText;
     }
+*/
+  async function translateText(text, target) {
+  try {
+    const res = await fetch(libreUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ q: text, source: "en", target: target, format: "text" }),
+    });
+    if (!res.ok) throw new Error("Translation failed");
+    const data = await res.json();
+    return data.translatedText;
+  } catch (err) {
+    console.error(err);
+    return text; // Fallback to original text
+  }
+}
   </script>
 </body>
 </html>
