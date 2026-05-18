@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<!--
+  Animal Dice Adventure! — v2 "Table Edition"
+  Purpose : Multi-player kids dice game. Lay device flat on a table — players sit
+            around it with rotated cards facing them. Dice centred, tap to roll.
+  Author  : [placeholder]
+  Created : 2026
+  Deps    : Google Fonts (Boogaloo, Nunito) — degrades gracefully if unavailable.
+  Security: No external API calls. State in memory + localStorage (history only).
+            localStorage is wrapped in try/catch for private-browsing safety.
+  Config  : Adjust HISTORY_KEY if sharing an origin with other games.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>🎲 Animal Dice Adventure!</title>
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════ RESET & BASE ═══════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cy:#FFCE47; --co:#FF8C42; --cr:#FF4E6A; --cg:#3DD68C;
+  --ct:#2EC4B6; --cp:#9B5DE5; --ck:#FF85C8; --cb:#4A90E2;
+  --bg1:#1A0533; --bg2:#2D1052; --bg3:#0E2A5C;
+  --tl:rgba(255,255,255,.85); --tm:rgba(255,255,255,.50);
+  --rxl:28px; --rlg:20px; --rmd:14px; --rfl:9999px;
+  --sh:0 8px 32px rgba(0,0,0,.40);
+  --fd:'Boogaloo','Comic Sans MS',cursive;
+  --fb:'Nunito','Trebuchet MS',sans-serif;
+}
+html{height:100%}
+body{
+  font-family:var(--fb); font-weight:600;
+  min-height:100%;
+  background:linear-gradient(145deg,var(--bg1) 0%,var(--bg2) 40%,var(--bg3) 100%) fixed;
+  color:#fff; overflow-x:hidden; position:relative;
+}
+body::before{
+  content:''; position:fixed; inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.8) 1px,transparent 1px),
+                   radial-gradient(circle,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:80px 80px,40px 40px; background-position:0 0,20px 20px;
+  opacity:.15; pointer-events:none; z-index:0;
+}
+
+/* ═══════════════ SCREENS ═══════════════ */
+.screen{
+  display:none; min-height:100vh; min-height:100dvh;
+  flex-direction:column; align-items:center; justify-content:center;
+  position:relative; z-index:1;
+  padding:24px 16px 36px; overflow-y:auto;
+}
+.screen.active{display:flex}
+#screen-game{padding:0; overflow:hidden}
+
+/* ═══════════════ CARD ═══════════════ */
+.card{
+  background:rgba(255,255,255,.12); backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border:1.5px solid rgba(255,255,255,.22);
+  border-radius:var(--rxl); padding:30px 26px;
+  width:100%; max-width:600px; box-shadow:var(--sh);
+}
+
+/* ═══════════════ TYPE ═══════════════ */
+.title-glow{
+  font-family:var(--fd); font-size:clamp(2.8rem,10vw,4.4rem);
+  text-align:center; line-height:1.1;
+  background:linear-gradient(135deg,var(--cy),var(--co),var(--cr));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; filter:drop-shadow(0 0 26px rgba(255,180,0,.5));
+}
+.section-label{font-family:var(--fd); font-size:1.4rem; color:var(--cy); margin-bottom:12px}
+.subtitle{text-align:center; color:var(--tl); font-size:1.1rem}
+
+/* ═══════════════ BUTTONS ═══════════════ */
+.btn{
+  font-family:var(--fd); font-size:1.4rem;
+  border:none; border-radius:var(--rfl);
+  padding:14px 30px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  -webkit-tap-highlight-color:transparent; user-select:none;
+  position:relative; overflow:hidden; transition:transform .1s,box-shadow .1s;
+}
+.btn::after{content:''; position:absolute; inset:0; background:rgba(255,255,255,0); transition:background .15s; border-radius:inherit}
+.btn:hover::after{background:rgba(255,255,255,.12)}
+.btn:active{transform:translateY(4px)}
+.btn-red   {background:linear-gradient(135deg,#FF4E6A,#FF2D4E);color:#fff; box-shadow:0 6px 0 #b01c31}
+.btn-yellow{background:linear-gradient(135deg,#FFCE47,#FFB020);color:#3a2000;box-shadow:0 6px 0 #c07800}
+.btn-green {background:linear-gradient(135deg,#3DD68C,#22B870);color:#fff; box-shadow:0 6px 0 #148050}
+.btn-purple{background:linear-gradient(135deg,#9B5DE5,#7A3CCB);color:#fff; box-shadow:0 6px 0 #4a1a90}
+.btn-teal  {background:linear-gradient(135deg,#2EC4B6,#1AA39A);color:#fff; box-shadow:0 6px 0 #0e7070}
+.btn-ghost {background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.25);box-shadow:none}
+.btn-full{width:100%} .btn-lg{font-size:1.9rem;padding:18px 40px}
+.btn-sm{font-size:1.05rem;padding:9px 20px} .btn-xs{font-size:.9rem;padding:7px 14px}
+.btn-icon{
+  background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.25);
+  border-radius:var(--rfl); font-size:1.4rem; width:46px; height:46px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+}
+
+/* ═══════════════ SETUP ═══════════════ */
+#screen-setup .card{text-align:center}
+.player-counter{display:flex;align-items:center;justify-content:center;gap:36px;margin:16px 0 34px}
+.counter-btn{
+  width:72px;height:72px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,var(--cy),var(--co));
+  color:#3a1a00;font-size:2.6rem;font-family:var(--fd);
+  cursor:pointer;box-shadow:0 6px 0 #a05000;
+  transition:transform .1s,box-shadow .1s;
+  display:flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.counter-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #a05000}
+.counter-num{
+  font-family:var(--fd);font-size:5.5rem;color:var(--cy);
+  min-width:80px;line-height:1;text-shadow:0 0 24px rgba(255,206,71,.7);
+}
+.dice-choice{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0 30px}
+.dice-card{
+  border:3px solid rgba(255,255,255,.2);border-radius:var(--rlg);
+  padding:24px 14px;cursor:pointer;background:rgba(255,255,255,.07);
+  transition:all .2s;-webkit-tap-highlight-color:transparent;
+}
+.dice-card.selected{
+  border-color:var(--cy);background:rgba(255,206,71,.18);
+  transform:scale(1.04);box-shadow:0 0 24px rgba(255,206,71,.35);
+}
+.dice-card .dc-icon {font-size:4rem;display:block;margin-bottom:10px}
+.dice-card .dc-label{font-family:var(--fd);font-size:1.3rem;display:block}
+.dice-card .dc-sub  {font-size:.9rem;color:var(--tm);margin-top:4px;display:block}
+.setup-actions{display:flex;flex-direction:column;gap:12px}
+
+/* ═══════════════ NAMES ═══════════════ */
+.player-rows{display:flex;flex-direction:column;gap:14px;margin-bottom:26px}
+.player-row{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.08);border-radius:var(--rmd);
+  padding:12px 16px;border:1.5px solid rgba(255,255,255,.12);
+}
+.p-badge{
+  font-family:var(--fd);font-size:1.1rem;color:#fff;background:var(--cp);
+  border-radius:50%;width:36px;height:36px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 #5a1aaa;
+}
+.avatar-pick{
+  width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.25);
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:2.4rem;background:rgba(255,255,255,.1);
+  transition:border-color .2s,transform .15s;-webkit-tap-highlight-color:transparent;
+}
+.avatar-pick:hover{border-color:var(--cy);transform:scale(1.1)}
+input.name-input{
+  flex:1;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);
+  border-radius:var(--rmd);padding:13px 16px;color:#fff;
+  font-family:var(--fb);font-size:1.1rem;font-weight:800;
+  outline:none;transition:border-color .2s;
+}
+input.name-input::placeholder{color:rgba(255,255,255,.35)}
+input.name-input:focus{border-color:var(--cy)}
+
+/* ═══════════════ AVATAR MODAL ═══════════════ */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(10,0,25,.75);z-index:300;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:linear-gradient(145deg,#2D1052,#1A0533);
+  border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rxl);
+  padding:28px;width:100%;max-width:440px;max-height:80vh;overflow-y:auto;
+}
+.modal-title{font-family:var(--fd);font-size:1.9rem;color:var(--cy);text-align:center;margin-bottom:20px}
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.av-option{
+  aspect-ratio:1;border-radius:50%;border:3px solid rgba(255,255,255,.15);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:2.1rem;background:rgba(255,255,255,.07);transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.av-option:hover{border-color:var(--cy);transform:scale(1.14)}
+.av-option.chosen{border-color:var(--cy);background:rgba(255,206,71,.22);transform:scale(1.1)}
+
+/* ═══════════════ GAME ARENA (TABLE LAYOUT) ═══════════════ */
+.game-arena{
+  position:relative;width:100%;
+  height:100vh;height:100dvh;overflow:hidden;
+}
+.game-topbar{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;z-index:50;
+  background:linear-gradient(to bottom,rgba(26,5,51,.88) 0%,transparent 100%);
+  pointer-events:none;
+}
+.game-topbar>*{pointer-events:auto}
+.topbar-right{display:flex;gap:10px;align-items:center}
+.round-pill{
+  background:rgba(255,206,71,.2);border:1.5px solid var(--cy);color:var(--cy);
+  font-family:var(--fd);font-size:1.1rem;padding:6px 18px;border-radius:var(--rfl);
+}
+
+/* Player cards container — fills arena */
+#playersGrid{position:absolute;inset:0;pointer-events:none}
+
+/* Individual player card — all dimensions set by JS */
+.p-card{
+  position:absolute;border-radius:var(--rlg);
+  background:rgba(255,255,255,.10);border:2.5px solid rgba(255,255,255,.22);
+  padding:10px 8px;text-align:center;pointer-events:auto;
+  transition:background .3s,border-color .3s,box-shadow .3s;
+}
+.p-card.is-active{
+  background:rgba(255,206,71,.22);border-color:var(--cy);
+  box-shadow:0 0 30px rgba(255,206,71,.55),0 0 70px rgba(255,206,71,.18);
+}
+.p-card.is-quit{opacity:.35;filter:grayscale(80%)}
+.quit-x{
+  position:absolute;top:-10px;right:-10px;
+  width:32px;height:32px;border-radius:50%;
+  background:var(--cr);border:2px solid rgba(255,255,255,.4);
+  color:#fff;font-size:.9rem;font-weight:900;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  z-index:2;transition:transform .15s;-webkit-tap-highlight-color:transparent;
+}
+.quit-x:hover{transform:scale(1.2)}
+.pc-avatar{display:block;line-height:1.1;margin-bottom:4px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+.pc-name  {font-family:var(--fd);color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.pc-score {font-family:var(--fd);color:var(--cy);display:block;line-height:1}
+.pc-last  {color:var(--tm);margin-top:3px;display:block}
+.pc-score.score-pop{animation:scorePop .45s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes scorePop{
+  0%  {transform:scale(1)}
+  50% {transform:scale(1.6);color:#FFD700}
+  100%{transform:scale(1)}
+}
+
+/* ═══════════════ DICE CENTER ═══════════════ */
+.turn-pointer{
+  position:absolute;top:50%;left:50%;width:0;height:0;
+  transform:translate(-50%,-50%) rotate(0deg);
+  transition:transform .65s cubic-bezier(.34,1.56,.64,1);
+  z-index:5;pointer-events:none;
+}
+.pointer-arrow{
+  position:absolute;top:-130px;/* set by JS */
+  left:0;transform:translateX(-50%);
+  font-size:3rem;line-height:1;color:var(--cy);
+  animation:ptrBounce .8s ease-in-out infinite alternate;
+  user-select:none;
+}
+@keyframes ptrBounce{
+  from{opacity:.7;transform:translateX(-50%) translateY(0) scale(1)}
+  to  {opacity:1; transform:translateX(-50%) translateY(-10px) scale(1.15);filter:drop-shadow(0 0 18px rgba(255,206,71,1))}
+}
+
+/* Virtual dice wrapper */
+.dice-center-wrap{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:10;text-align:center;
+}
+/* The big dice — dimensions set by JS */
+.virtual-dice{
+  background:linear-gradient(145deg,#fff,#ddd);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;line-height:1;
+  border:3px solid rgba(255,255,255,.9);
+  transition:transform .1s;
+  -webkit-tap-highlight-color:transparent;user-select:none;
+  position:relative;z-index:1;
+}
+.virtual-dice:active{transform:translateY(8px) !important}
+.virtual-dice.rolling{animation:rollShake .95s ease-in-out;cursor:default;pointer-events:none}
+@keyframes rollShake{
+  0%  {transform:rotate(0deg)  scale(1)  }
+  12% {transform:rotate(-22deg)scale(.86) }
+  28% {transform:rotate(22deg) scale(1.14)}
+  44% {transform:rotate(-16deg)scale(.91) }
+  60% {transform:rotate(16deg) scale(1.09)}
+  76% {transform:rotate(-8deg) scale(.96) }
+  90% {transform:rotate(8deg)  scale(1.04)}
+  100%{transform:rotate(0deg)  scale(1)  }
+}
+.dice-tap-hint{font-family:var(--fd);color:var(--tm);margin-top:10px;user-select:none}
+
+/* ═══════════════ PHYSICAL PICK PANEL ═══════════════ */
+.phys-pick-panel{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:min(90vw,380px);z-index:10;
+  background:rgba(20,5,50,.93);border:2px solid rgba(255,255,255,.22);
+  border-radius:var(--rxl);padding:18px;
+  backdrop-filter:blur(14px);box-shadow:var(--sh);
+}
+.pick-label{
+  font-family:var(--fd);font-size:1.15rem;
+  color:var(--cy);text-align:center;margin-bottom:14px;
+}
+.animal-pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.animal-btn{
+  background:rgba(255,255,255,.10);border:2px solid rgba(255,255,255,.18);
+  border-radius:var(--rmd);padding:14px 8px;cursor:pointer;text-align:center;
+  transition:all .15s;-webkit-tap-highlight-color:transparent;
+}
+.animal-btn:hover{
+  border-color:var(--cy);background:rgba(255,206,71,.15);
+  transform:translateY(-3px) scale(1.05);box-shadow:0 8px 20px rgba(0,0,0,.3);
+}
+.ab-emoji{font-size:2.6rem;display:block}
+.ab-name {font-family:var(--fd);font-size:.9rem;color:#fff;display:block;margin-top:3px}
+.ab-score{font-family:var(--fd);font-size:1rem;color:var(--cy);display:block}
+.animal-btn:disabled{opacity:.35;cursor:default;transform:none}
+
+/* ═══════════════ RESULT FLASH ═══════════════ */
+.result-flash{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.3);
+  width:min(90vw,400px);opacity:0;
+  background:linear-gradient(135deg,var(--co),var(--cr));
+  border-radius:var(--rxl);padding:26px 28px;text-align:center;
+  z-index:25;pointer-events:none;
+  box-shadow:0 10px 50px rgba(255,78,106,.55),0 0 100px rgba(255,140,66,.22);
+}
+.result-flash.show{
+  pointer-events:auto;
+  animation:flashPop .4s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes flashPop{to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.rf-emoji{font-size:clamp(3.5rem,13vmin,6rem);line-height:1;display:block}
+.rf-text {font-family:var(--fd);font-size:clamp(1.2rem,4vmin,1.9rem);color:#fff;margin:8px 0 4px}
+.rf-pts  {font-family:var(--fd);font-size:clamp(2.8rem,10vmin,4.5rem);color:#fff;line-height:1}
+.next-area{margin-top:16px;text-align:center}
+.auto-next-bar{height:8px;background:rgba(255,255,255,.25);border-radius:var(--rfl);overflow:hidden;margin-bottom:8px}
+.auto-next-fill{
+  height:100%;width:100%;
+  background:linear-gradient(90deg,#fff,rgba(255,255,255,.6));
+  border-radius:var(--rfl);transform-origin:left;
+  animation:drainBar 2.5s linear forwards;
+}
+@keyframes drainBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.auto-next-label{font-family:var(--fd);font-size:1.05rem;color:rgba(255,255,255,.8);margin-bottom:10px}
+
+/* ═══════════════ CONFIRM MODALS ═══════════════ */
+.confirm-modal{
+  display:none;position:fixed;inset:0;background:rgba(10,0,25,.8);z-index:400;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);
+}
+.confirm-modal.open{display:flex}
+.confirm-box{
+  background:linear-gradient(145deg,#2D1052,#1A0533);
+  border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rxl);
+  padding:36px 30px;max-width:380px;width:100%;text-align:center;
+  box-shadow:var(--sh);animation:popIn .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.confirm-icon {font-size:4.5rem;margin-bottom:10px;display:block}
+.confirm-title{font-family:var(--fd);font-size:2rem;color:#fff;margin-bottom:10px}
+.confirm-body {color:var(--tl);font-size:1rem;margin-bottom:28px;line-height:1.6}
+.confirm-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ═══════════════ LEADERBOARD ═══════════════ */
+#screen-leaderboard{justify-content:flex-start;padding-top:24px}
+.lb-card{
+  background:rgba(255,255,255,.10);backdrop-filter:blur(16px);
+  border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rxl);
+  padding:30px 24px;width:100%;max-width:560px;box-shadow:var(--sh);
+}
+.lb-title{
+  font-family:var(--fd);font-size:clamp(2.2rem,8vw,3.2rem);text-align:center;
+  background:linear-gradient(135deg,var(--cy),var(--co));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:20px;
+}
+.winner-pod{
+  background:linear-gradient(135deg,rgba(255,206,71,.28),rgba(255,140,66,.28));
+  border:2.5px solid var(--cy);border-radius:var(--rxl);
+  padding:26px 20px;text-align:center;margin-bottom:22px;
+  box-shadow:0 0 40px rgba(255,206,71,.35);
+}
+.winner-tag  {font-family:var(--fd);font-size:1.1rem;color:var(--cy);letter-spacing:3px;margin-bottom:8px;display:block}
+.winner-ava  {font-size:6rem;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));display:block}
+.winner-name {font-family:var(--fd);font-size:2.4rem;color:#fff;margin-top:8px;display:block}
+.winner-score{font-family:var(--fd);font-size:1.4rem;color:var(--cy);display:block}
+.rank-rows{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.rank-row{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,.07);border-radius:var(--rmd);
+  padding:14px 16px;border:1.5px solid rgba(255,255,255,.10);
+}
+.rank-row.gold  {background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(255,165,0,.25));border-color:#FFD700}
+.rank-row.silver{background:linear-gradient(135deg,rgba(192,192,192,.2),rgba(160,160,160,.2));border-color:#C0C0C0}
+.rank-row.bronze{background:linear-gradient(135deg,rgba(205,127,50,.2),rgba(139,90,43,.2));border-color:#CD7F32}
+.rank-row.quit-row{opacity:.42}
+.rank-medal{font-size:1.7rem;width:36px;text-align:center;flex-shrink:0;font-family:var(--fd);color:var(--tm)}
+.rank-ava  {font-size:2.4rem;flex-shrink:0}
+.rank-name {font-family:var(--fd);font-size:1.15rem;color:#fff;flex:1}
+.rank-pts  {font-family:var(--fd);font-size:1.4rem;color:var(--cy)}
+.rank-quit-tag{font-size:.75rem;color:var(--cr);display:block;line-height:1.2}
+.lb-actions{display:flex;flex-direction:column;gap:12px}
+
+/* ═══════════════ HISTORY ═══════════════ */
+#screen-history{justify-content:flex-start;padding-top:24px}
+.history-card{
+  background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);
+  border-radius:var(--rlg);padding:16px;margin-bottom:14px;
+  transition:border-color .2s;
+}
+.history-card:hover{border-color:rgba(255,255,255,.3)}
+.hc-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.hc-winner{display:flex;align-items:center;gap:10px}
+.hc-ava   {font-size:2.4rem}
+.hc-name  {font-family:var(--fd);font-size:1.2rem;color:#fff}
+.hc-score {font-family:var(--fd);font-size:1rem;color:var(--cy)}
+.hc-meta  {font-size:.82rem;color:var(--tm);text-align:right;line-height:1.6}
+.hc-players{display:flex;flex-wrap:wrap;gap:8px}
+.hc-p{font-size:.85rem;color:var(--tl);background:rgba(255,255,255,.08);padding:4px 10px;border-radius:var(--rfl)}
+.history-empty{text-align:center;padding:60px 0;color:var(--tm)}
+.history-empty .he-icon{font-size:5rem;display:block;margin-bottom:16px}
+.history-empty .he-text{font-family:var(--fd);font-size:1.5rem;color:var(--tl)}
+.history-empty .he-sub {font-size:.95rem;margin-top:8px}
+
+/* ═══════════════ FLOAT POP ═══════════════ */
+.float-pop{
+  position:fixed;pointer-events:none;z-index:500;
+  font-family:var(--fd);font-size:2.5rem;
+  color:var(--cy);text-shadow:0 2px 10px rgba(0,0,0,.6);
+  animation:floatAway 1.7s ease-out forwards;
+}
+@keyframes floatAway{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-110px) scale(1.6)}}
+
+/* ═══════════════ CONFETTI ═══════════════ */
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:600;overflow:hidden}
+.confetti-bit{position:absolute;border-radius:3px;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(-40px) rotate(0deg)}100%{opacity:0;transform:translateY(110vh) rotate(900deg)}}
+</style>
+</head>
+<body>
+
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<!-- ═══ SCREEN 1 — SETUP ═══ -->
+<div id="screen-setup" class="screen active">
+  <div style="margin-bottom:22px;text-align:center">
+    <h1 class="title-glow">🎲 Animal Dice<br>Adventure! 🐯</h1>
+    <p class="subtitle" style="margin-top:10px">Roll animals · Rack up points · WIN! 🏆</p>
+  </div>
+  <div class="card">
+    <p class="section-label">👥 How many players?</p>
+    <div class="player-counter">
+      <button class="counter-btn" onclick="changeCount(-1)">−</button>
+      <span class="counter-num" id="countDisp">2</span>
+      <button class="counter-btn" onclick="changeCount(+1)">+</button>
+    </div>
+    <p class="section-label">🎲 Which kind of dice?</p>
+    <div class="dice-choice">
+      <div class="dice-card selected" id="dc-virtual" onclick="chooseDice('virtual')">
+        <span class="dc-icon">📱</span>
+        <span class="dc-label">Virtual Dice</span>
+        <span class="dc-sub">Tap to roll!</span>
+      </div>
+      <div class="dice-card" id="dc-physical" onclick="chooseDice('physical')">
+        <span class="dc-icon">🎲</span>
+        <span class="dc-label">Physical Dice</span>
+        <span class="dc-sub">Pick the face</span>
+      </div>
+    </div>
+    <div class="setup-actions">
+      <button class="btn btn-yellow btn-full btn-lg" onclick="goNames()">Next ➡️</button>
+      <button class="btn btn-ghost btn-full" onclick="showHistory()">📜 Game History</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 2 — PLAYER NAMES ═══ -->
+<div id="screen-names" class="screen">
+  <div style="margin-bottom:18px;text-align:center">
+    <h1 class="title-glow" style="font-size:clamp(2rem,8vw,3.2rem)">👤 Who's Playing?</h1>
+    <p class="subtitle">Tap the circle to pick your avatar!</p>
+  </div>
+  <div class="card">
+    <div class="player-rows" id="playerRows"></div>
+    <div style="display:flex;gap:14px">
+      <button class="btn btn-ghost" onclick="sndClick();showScreen('screen-setup')" style="flex:1">← Back</button>
+      <button class="btn btn-green btn-lg" onclick="startGame()" style="flex:2">🎮 Let's Play!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 3 — GAME (TABLE LAYOUT) ═══ -->
+<div id="screen-game" class="screen">
+  <div class="game-arena" id="gameArena">
+
+    <!-- Topbar floats over arena -->
+    <div class="game-topbar">
+      <span class="round-pill" id="roundPill">Round 1</span>
+      <div class="topbar-right">
+        <button class="btn-icon" id="soundToggle" onclick="toggleSound()" title="Toggle sound">🔊</button>
+        <button class="btn btn-red btn-sm" onclick="promptStop()">🛑 Stop</button>
+      </div>
+    </div>
+
+    <!-- Player cards (absolutely positioned radially by JS) -->
+    <div id="playersGrid"></div>
+
+    <!-- Rotating arrow pointer — points at active player -->
+    <div class="turn-pointer" id="turnPointer">
+      <div class="pointer-arrow" id="pointerArrow">▲</div>
+    </div>
+
+    <!-- Virtual dice (centred) -->
+    <div class="dice-center-wrap" id="vDiceWrap">
+      <div class="virtual-dice" id="vDice" onclick="rollVirtual()">🎲</div>
+      <div class="dice-tap-hint" id="diceTapHint">Tap to roll!</div>
+    </div>
+
+    <!-- Physical pick panel (centred, replaces dice) -->
+    <div class="phys-pick-panel" id="pDiceWrap" style="display:none">
+      <p class="pick-label" id="pickLabel">Which animal came up? 👇</p>
+      <div class="animal-pick-grid" id="animalGrid"></div>
+    </div>
+
+    <!-- Result flash (centred overlay) -->
+    <div class="result-flash" id="resultFlash">
+      <div class="rf-emoji" id="rfEmoji">🐯</div>
+      <div class="rf-text"  id="rfText">Tiger!</div>
+      <div class="rf-pts"   id="rfPts">+200 pts</div>
+      <div class="next-area" id="nextArea" style="display:none">
+        <div class="auto-next-bar"><div class="auto-next-fill" id="autoFill"></div></div>
+        <div class="auto-next-label" id="autoLabel">Next player in 3…</div>
+        <button class="btn btn-ghost btn-xs" style="margin-top:8px" onclick="nextTurn()">Skip ▶</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SCREEN 4 — LEADERBOARD ═══ -->
+<div id="screen-leaderboard" class="screen">
+  <div class="lb-card">
+    <div class="lb-title">🏆 Final Scores!</div>
+    <div class="winner-pod" id="winnerPod"></div>
+    <div class="rank-rows" id="rankRows"></div>
+    <div class="lb-actions">
+      <button class="btn btn-purple btn-full btn-lg" onclick="resetGame()">🔄 Play Again!</button>
+      <button class="btn btn-ghost btn-full" onclick="showHistory()">📜 View History</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 5 — HISTORY ═══ -->
+<div id="screen-history" class="screen">
+  <div class="card" style="max-width:560px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+      <h2 style="font-family:var(--fd);font-size:2.2rem;color:var(--cy)">📜 History</h2>
+      <button class="btn btn-ghost btn-sm" onclick="sndClick();showScreen('screen-setup')">← Back</button>
+    </div>
+    <div id="historyList" style="max-height:62vh;overflow-y:auto"></div>
+    <button class="btn btn-red btn-full btn-sm" style="margin-top:18px" onclick="clearHistory()">🗑️ Clear All History</button>
+  </div>
+</div>
+
+<!-- AVATAR MODAL -->
+<div class="modal-overlay" id="avatarModal">
+  <div class="modal-box">
+    <div class="modal-title">🎭 Pick Your Avatar!</div>
+    <div class="avatar-grid" id="avatarGrid"></div>
+    <button class="btn btn-yellow btn-full" onclick="closeAvatarModal()">Done ✓</button>
+  </div>
+</div>
+
+<!-- STOP MODAL -->
+<div class="confirm-modal" id="stopModal">
+  <div class="confirm-box">
+    <span class="confirm-icon">🛑</span>
+    <div class="confirm-title">Stop the Game?</div>
+    <div class="confirm-body">This will end the game for everyone and show the final scores!</div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeModal('stopModal')">Keep Playing!</button>
+      <button class="btn btn-red" onclick="endGame()">Yes, Stop!</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIT PLAYER MODAL -->
+<div class="confirm-modal" id="quitModal">
+  <div class="confirm-box">
+    <span class="confirm-icon">😢</span>
+    <div class="confirm-title">Leave the Game?</div>
+    <div class="confirm-body" id="quitBody">This player will leave.</div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeModal('quitModal')">Stay!</button>
+      <button class="btn btn-red" onclick="doQuitPlayer()">Leave 👋</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/*
+  Animal Dice Adventure v2 — Game Logic
+  ─────────────────────────────────────
+  All mutable state lives in a single `G` object.
+  Game history stored in localStorage under HISTORY_KEY.
+  Sound synthesised via Web Audio API — no external assets.
+  Player cards positioned radially around the centred dice
+  so a device on a table works for all players simultaneously.
+*/
+
+// ─── CONSTANTS ───────────────────────────────────────────────
+const ANIMALS = [
+  { name:'Tiger',    emoji:'🐯', score:200 },
+  { name:'Elephant', emoji:'🐘', score:150 },
+  { name:'Cow',      emoji:'🐄', score:100 },
+  { name:'Pig',      emoji:'🐷', score: 50 },
+  { name:'Duck',     emoji:'🦆', score: 30 },
+  { name:'Monkey',   emoji:'🐵', score: 10 },
+];
+
+const AVATARS = [
+  '🦁','🐺','🦊','🐻','🐼','🐨','🐸','🐧','🦋','🐬',
+  '🦄','🐙','🐠','🦉','🦖','🐳','🦓','🦒','🦘','🐊',
+  '🦝','🦙','🐏','🐦','🦀','🐝','🐢','🐍','🦜','🐞',
+];
+
+/**
+ * Clockwise angle (degrees from top) for each player slot.
+ * Index = playerCount - 2.
+ */
+const PLAYER_ANGLES = [
+  [0, 180],                    // 2
+  [0, 120, 240],               // 3
+  [0, 90, 180, 270],           // 4
+  [0, 72, 144, 216, 288],      // 5
+  [0, 60, 120, 180, 240, 300], // 6
+];
+
+const HISTORY_KEY = 'animalDiceHistory_v1';
+
+// ─── GAME STATE ──────────────────────────────────────────────
+let G = {
+  playerCount:   2,
+  diceType:      'virtual',
+  players:       [],
+  activeIndex:   0,
+  round:         1,
+  waiting:       false,   // true while showing result
+  quitTarget:    null,
+  avatarTarget:  null,
+  pendingAvatar: null,
+};
+
+// ─── SOUND ENGINE ────────────────────────────────────────────
+/*
+  All sounds synthesised via Web Audio API.
+  ensureAudio() lazily creates the AudioContext on first user gesture
+  (required by browsers) and resumes it if suspended.
+  soundEnabled flag lets the player mute everything.
+*/
+let audioCtx     = null;
+let soundEnabled = true;
+
+/**
+ * Returns a ready AudioContext, or null if sound is off/unavailable.
+ * @returns {AudioContext|null}
+ */
+function ensureAudio() {
+  if (!soundEnabled) return null;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  } catch(e) { soundEnabled = false; return null; }
+}
+
+/** Short UI click. */
+function sndClick() {
+  const ctx = ensureAudio(); if (!ctx) return;
+  const t = ctx.currentTime;
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = 'square';
+  o.frequency.setValueAtTime(700, t);
+  o.frequency.exponentialRampToValueAtTime(250, t + .06);
+  g.gain.setValueAtTime(.07, t); g.gain.exponentialRampToValueAtTime(.001, t + .07);
+  o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + .07);
+}
+
+/** Single tick used during roll animation. */
+function sndTick() {
+  const ctx = ensureAudio(); if (!ctx) return;
+  const t = ctx.currentTime;
+  const sz = Math.floor(ctx.sampleRate * .035);
+  const buf = ctx.createBuffer(1, sz, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < sz; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource(), flt = ctx.createBiquadFilter(), gn = ctx.createGain();
+  src.buffer = buf; flt.type = 'bandpass';
+  flt.frequency.value = 500 + Math.random() * 1000; flt.Q.value = 4;
+  gn.gain.setValueAtTime(.14, t); gn.gain.exponentialRampToValueAtTime(.001, t + .04);
+  src.connect(flt); flt.connect(gn); gn.connect(ctx.destination);
+  src.start(t); src.stop(t + .04);
+}
+
+/** Dice roll initiation — pitch sweep + noise burst. */
+function sndRoll() {
+  const ctx = ensureAudio(); if (!ctx) return;
+  const t = ctx.currentTime;
+  const o = ctx.createOscillator(), go = ctx.createGain();
+  o.type = 'sawtooth';
+  o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(680, t + .28);
+  go.gain.setValueAtTime(.12, t); go.gain.exponentialRampToValueAtTime(.001, t + .32);
+  o.connect(go); go.connect(ctx.destination); o.start(t); o.stop(t + .32);
+  const sz = Math.floor(ctx.sampleRate * .32), buf = ctx.createBuffer(1, sz, ctx.sampleRate);
+  const d = buf.getChannelData(0); for (let i = 0; i < sz; i++) d[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource(), flt = ctx.createBiquadFilter(), gn = ctx.createGain();
+  src.buffer = buf; flt.type = 'highpass'; flt.frequency.value = 150;
+  gn.gain.setValueAtTime(.18, t); gn.gain.exponentialRampToValueAtTime(.001, t + .3);
+  src.connect(flt); flt.connect(gn); gn.connect(ctx.destination);
+  src.start(t); src.stop(t + .32);
+}
+
+/**
+ * Score reveal chord — pitch cluster scales with score value.
+ * @param {number} points - One of 10, 30, 50, 100, 150, 200.
+ */
+function sndScore(points) {
+  const ctx = ensureAudio(); if (!ctx) return;
+  const t = ctx.currentTime;
+  const chords = {
+    10: [261,329,392], 30: [329,415,523], 50: [349,440,587],
+    100:[392,494,659], 150:[440,554,740], 200:[523,659,784,1047],
+  };
+  const freqs = chords[points] || [440];
+  freqs.forEach((freq, i) => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'triangle'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, t + i * .07);
+    g.gain.linearRampToValueAtTime(.15, t + i * .07 + .03);
+    g.gain.exponentialRampToValueAtTime(.001, t + i * .07 + .55);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t + i * .07); o.stop(t + i * .07 + .6);
+  });
+  if (points === 200) { // Tiger sparkle arpeggio
+    [1047,1319,1568,2093].forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(.08, t + .32 + i * .09);
+      g.gain.exponentialRampToValueAtTime(.001, t + .32 + i * .09 + .22);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t + .32 + i * .09); o.stop(t + .32 + i * .09 + .25);
+    });
+  }
+}
+
+/** Win fanfare — ascending melody. */
+function sndWin() {
+  const ctx = ensureAudio(); if (!ctx) return;
+  const t = ctx.currentTime;
+  const notes = [523,659,784,659,784,1047,784,1047,1568];
+  const durs  = [.14,.1,.1,.1,.1,.14,.1,.14,.45];
+  let off = 0;
+  notes.forEach((freq, i) => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'triangle'; o.frequency.value = freq;
+    g.gain.setValueAtTime(.18, t + off);
+    g.gain.exponentialRampToValueAtTime(.001, t + off + durs[i] * .88);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t + off); o.stop(t + off + durs[i]);
+    off += durs[i] * .82;
+  });
+}
+
+/** Toggle sound on/off. */
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('soundToggle');
+  if (btn) btn.textContent = soundEnabled ? '🔊' : '🔇';
+  if (soundEnabled) sndClick();
+}
+
+// ─── HISTORY ENGINE ──────────────────────────────────────────
+/**
+ * Loads game history from localStorage.
+ * @returns {Array<Object>} Newest-first array of game records.
+ */
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+  catch { return []; }
+}
+
+/**
+ * Serialises the current game result and prepends it to history.
+ * Players sorted by score descending before saving.
+ * Keeps max 50 records to avoid excessive storage usage.
+ */
+function saveGameToHistory() {
+  const sorted = [...G.players].sort((a, b) => b.score - a.score);
+  const record = {
+    date:     new Date().toISOString(),
+    diceType: G.diceType,
+    rounds:   G.round,
+    players:  sorted.map(p => ({ name:p.name, avatar:p.avatar, score:p.score, active:p.active })),
+  };
+  const hist = loadHistory();
+  hist.unshift(record);
+  if (hist.length > 50) hist.length = 50;
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(hist)); }
+  catch(e) { console.warn('History save failed (storage quota or private mode):', e); }
+}
+
+/** Clears all history after a native confirm dialog. */
+function clearHistory() {
+  if (!confirm('Clear all game history? This cannot be undone.')) return;
+  try { localStorage.removeItem(HISTORY_KEY); } catch(e) {}
+  buildHistoryScreen();
+  sndClick();
+}
+
+/** Navigates to and renders the history screen. */
+function showHistory() {
+  buildHistoryScreen();
+  showScreen('screen-history');
+  sndClick();
+}
+
+/** Renders history entries into #historyList. */
+function buildHistoryScreen() {
+  const list = document.getElementById('historyList');
+  const hist = loadHistory();
+  if (!hist.length) {
+    list.innerHTML = `<div class="history-empty">
+      <span class="he-icon">📭</span>
+      <div class="he-text">No games yet!</div>
+      <div class="he-sub">Play your first game to see history here.</div>
+    </div>`;
+    return;
+  }
+  list.innerHTML = '';
+  hist.forEach(game => {
+    const d    = new Date(game.date);
+    const dStr = d.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+    const tStr = d.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+    const w    = game.players[0];
+    const el   = document.createElement('div');
+    el.className = 'history-card';
+    el.innerHTML = `
+      <div class="hc-header">
+        <div class="hc-winner">
+          <span class="hc-ava">${w.avatar}</span>
+          <div>
+            <div class="hc-name">🏆 ${w.name}</div>
+            <div class="hc-score">${w.score} pts</div>
+          </div>
+        </div>
+        <div class="hc-meta">
+          <div>${dStr} ${tStr}</div>
+          <div>${game.players.length} players · Rd ${game.rounds} · ${game.diceType==='virtual'?'📱 Virtual':'🎲 Physical'}</div>
+        </div>
+      </div>
+      <div class="hc-players">
+        ${game.players.map(p=>`<span class="hc-p">${p.avatar} ${p.name}: ${p.score}</span>`).join('')}
+      </div>`;
+    list.appendChild(el);
+  });
+}
+
+// ─── SCREEN MANAGEMENT ───────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── LAYOUT ENGINE ───────────────────────────────────────────
+/**
+ * Computes arena-relative sizes for dice, player cards, and pointer arrow.
+ * All values derived from the smaller viewport dimension so the layout
+ * works in both portrait and landscape orientations.
+ *
+ * @returns {{ diceSize, cardWidth, radius, arrowDist, cx, cy }}
+ */
+function calcLayout() {
+  const arena  = document.getElementById('gameArena');
+  const W      = (arena && arena.clientWidth)  || window.innerWidth;
+  const H      = (arena && arena.clientHeight) || window.innerHeight;
+  const minDim = Math.min(W, H);
+  const diceSize  = Math.max(110, Math.min(minDim * .23, 260));
+  const cardWidth = Math.max(90,  Math.min(minDim * .25, 155));
+  const radius    = minDim * .42 - cardWidth * .5;
+  const arrowDist = diceSize * .5 + 36;
+  return { diceSize, cardWidth, radius, arrowDist, cx: W / 2, cy: H / 2 };
+}
+
+/**
+ * Applies computed sizes to the dice DOM element and supporting labels.
+ * Also updates the pointer-arrow offset so it sits just outside the dice.
+ */
+function applyDiceSize() {
+  const { diceSize, arrowDist } = calcLayout();
+  const dice = document.getElementById('vDice');
+  if (dice) {
+    dice.style.width        = diceSize + 'px';
+    dice.style.height       = diceSize + 'px';
+    dice.style.fontSize     = (diceSize * .55) + 'px';
+    dice.style.borderRadius = (diceSize * .17) + 'px';
+    dice.style.boxShadow    = `0 ${Math.round(diceSize*.05)}px 0 #999,0 ${Math.round(diceSize*.06)}px ${Math.round(diceSize*.18)}px rgba(0,0,0,.45)`;
+  }
+  const hint = document.getElementById('diceTapHint');
+  if (hint) hint.style.fontSize = Math.max(.9, Math.min(diceSize * .075, 1.35)) + 'rem';
+
+  const arrow = document.getElementById('pointerArrow');
+  if (arrow) arrow.style.top = `-${arrowDist}px`;
+
+  // Scale animal button emojis if physical panel is visible
+  const panelW = Math.min(window.innerWidth * .9, 380);
+  document.querySelectorAll('.ab-emoji').forEach(el => {
+    el.style.fontSize = Math.max(2, Math.min(panelW * .084, 3)) + 'rem';
+  });
+}
+
+/**
+ * Rotates the turn-pointer arrow to point at the active player's slot.
+ */
+function updateDicePointer() {
+  const angles  = PLAYER_ANGLES[G.playerCount - 2];
+  if (!angles) return;
+  const angle   = angles[G.activeIndex] ?? 0;
+  const ptr     = document.getElementById('turnPointer');
+  if (ptr) ptr.style.transform = `translate(-50%,-50%) rotate(${angle}deg)`;
+}
+
+// ─── SETUP ───────────────────────────────────────────────────
+function changeCount(delta) {
+  G.playerCount = Math.max(2, Math.min(6, G.playerCount + delta));
+  document.getElementById('countDisp').textContent = G.playerCount;
+  sndClick();
+}
+
+function chooseDice(type) {
+  G.diceType = type;
+  document.getElementById('dc-virtual').classList.toggle('selected', type === 'virtual');
+  document.getElementById('dc-physical').classList.toggle('selected', type === 'physical');
+  sndClick();
+}
+
+function goNames() {
+  while (G.players.length < G.playerCount) {
+    const i = G.players.length;
+    G.players.push({
+      name:       `Player ${i + 1}`,
+      avatar:     AVATARS[Math.floor(Math.random() * AVATARS.length)],
+      score:      0, active: true, lastAnimal: null,
+    });
+  }
+  G.players = G.players.slice(0, G.playerCount);
+  buildNameRows();
+  showScreen('screen-names');
+  sndClick();
+}
+
+// ─── NAMES SCREEN ────────────────────────────────────────────
+function buildNameRows() {
+  const container = document.getElementById('playerRows');
+  container.innerHTML = '';
+  for (let i = 0; i < G.playerCount; i++) {
+    const p   = G.players[i];
+    const row = document.createElement('div');
+    row.className = 'player-row';
+    row.innerHTML = `
+      <div class="p-badge">${i + 1}</div>
+      <div class="avatar-pick" id="avPick${i}" onclick="openAvatarModal(${i})">${p.avatar}</div>
+      <input class="name-input" id="nameInp${i}" type="text"
+             placeholder="Player ${i + 1}" value="${p.name}" maxlength="12">`;
+    container.appendChild(row);
+  }
+}
+
+// ─── AVATAR MODAL ────────────────────────────────────────────
+function openAvatarModal(idx) {
+  G.avatarTarget  = idx;
+  G.pendingAvatar = G.players[idx].avatar;
+  const grid = document.getElementById('avatarGrid');
+  grid.innerHTML = '';
+  AVATARS.forEach(av => {
+    const el = document.createElement('div');
+    el.className = 'av-option' + (av === G.pendingAvatar ? ' chosen' : '');
+    el.textContent = av;
+    el.onclick = () => {
+      document.querySelectorAll('.av-option').forEach(a => a.classList.remove('chosen'));
+      el.classList.add('chosen');
+      G.pendingAvatar = av;
+      sndClick();
+    };
+    grid.appendChild(el);
+  });
+  document.getElementById('avatarModal').classList.add('open');
+  sndClick();
+}
+
+function closeAvatarModal() {
+  const i = G.avatarTarget;
+  if (i !== null && G.pendingAvatar) {
+    G.players[i].avatar = G.pendingAvatar;
+    document.getElementById(`avPick${i}`).textContent = G.pendingAvatar;
+  }
+  document.getElementById('avatarModal').classList.remove('open');
+  sndClick();
+}
+
+// ─── START GAME ──────────────────────────────────────────────
+function startGame() {
+  for (let i = 0; i < G.playerCount; i++) {
+    const inp       = document.getElementById(`nameInp${i}`);
+    G.players[i].name      = inp ? (inp.value.trim() || `Player ${i + 1}`) : `Player ${i + 1}`;
+    G.players[i].score     = 0;
+    G.players[i].active    = true;
+    G.players[i].lastAnimal= null;
+  }
+  G.round       = 1;
+  G.waiting     = false;
+  G.activeIndex = firstActiveIndex(0);
+
+  showScreen('screen-game');
+  // Defer layout until the arena element has rendered dimensions
+  requestAnimationFrame(() => { applyDiceSize(); buildGameScreen(); });
+  sndClick();
+}
+
+// ─── GAME SCREEN ─────────────────────────────────────────────
+function buildGameScreen() {
+  renderPlayerCards();
+  renderDiceArea();
+  updateTurnLabel();
+  document.getElementById('roundPill').textContent = `Round ${G.round}`;
+  document.getElementById('resultFlash').classList.remove('show');
+  document.getElementById('nextArea').style.display = 'none';
+}
+
+/**
+ * Renders player cards at radial positions around the arena centre.
+ * Each card is rotated by (angle + 180°) so its text faces outward
+ * toward the player sitting at that edge of the table.
+ * Card dimensions and layout radius are computed via calcLayout().
+ */
+function renderPlayerCards() {
+  const { cardWidth, radius, cx, cy } = calcLayout();
+  const angles = PLAYER_ANGLES[G.playerCount - 2];
+  const grid   = document.getElementById('playersGrid');
+  grid.innerHTML = '';
+
+  G.players.forEach((p, i) => {
+    const isActive = (i === G.activeIndex) && p.active;
+    const angle    = angles[i];
+    const rad      = angle * Math.PI / 180;
+    const x        = cx + radius * Math.sin(rad);
+    const y        = cy - radius * Math.cos(rad);
+    const rotation = angle + 180; // face the player sitting outside
+    const scale    = isActive ? 1.09 : 1;
+
+    // Scale typography with card width
+    const avFS  = Math.max(1.8,  Math.min(cardWidth * .21,  3.0));
+    const nmFS  = Math.max(.75,  Math.min(cardWidth * .086, 1.0));
+    const scFS  = Math.max(1.3,  Math.min(cardWidth * .16,  2.0));
+    const ltFS  = Math.max(.6,   Math.min(cardWidth * .07,  .8));
+
+    const card = document.createElement('div');
+    card.className = `p-card${isActive?' is-active':''}${!p.active?' is-quit':''}`;
+    card.id = `pCard${i}`;
+    card.style.cssText = `left:${x}px;top:${y}px;width:${cardWidth}px;` +
+      `transform:translate(-50%,-50%) rotate(${rotation}deg) scale(${scale});`;
+
+    card.innerHTML = `
+      ${p.active ? `<button class="quit-x" onclick="promptQuit(${i})" aria-label="Quit ${p.name}">✕</button>` : ''}
+      <span class="pc-avatar" style="font-size:${avFS}rem">${p.avatar}</span>
+      <span class="pc-name"   style="font-size:${nmFS}rem">${p.name}</span>
+      <span class="pc-score"  style="font-size:${scFS}rem" id="pScore${i}">${p.score}</span>
+      <span class="pc-last"   style="font-size:${ltFS}rem">${p.lastAnimal ? p.lastAnimal.emoji+' '+p.lastAnimal.name : '—'}</span>`;
+
+    grid.appendChild(card);
+  });
+
+  updateDicePointer();
+}
+
+function renderDiceArea() {
+  const isVirtual = G.diceType === 'virtual';
+  document.getElementById('vDiceWrap').style.display = isVirtual ? '' : 'none';
+  document.getElementById('pDiceWrap').style.display = isVirtual ? 'none' : '';
+  if (isVirtual) {
+    const vd = document.getElementById('vDice');
+    if (vd) { vd.textContent = '🎲'; vd.classList.remove('rolling'); }
+  } else {
+    buildAnimalGrid();
+    applyDiceSize();
+  }
+}
+
+function buildAnimalGrid() {
+  const grid = document.getElementById('animalGrid');
+  grid.innerHTML = '';
+  ANIMALS.forEach(animal => {
+    const btn = document.createElement('button');
+    btn.className = 'animal-btn';
+    btn.disabled  = G.waiting;
+    btn.innerHTML = `
+      <span class="ab-emoji">${animal.emoji}</span>
+      <span class="ab-name">${animal.name}</span>
+      <span class="ab-score">+${animal.score}</span>`;
+    btn.onclick = () => { sndClick(); applyScore(animal); };
+    grid.appendChild(btn);
+  });
+}
+
+function updateTurnLabel() {
+  const p = G.players[G.activeIndex];
+  if (!p) return;
+  const hint = document.getElementById('diceTapHint');
+  if (hint && G.diceType === 'virtual') hint.textContent = `${p.avatar} ${p.name} — tap!`;
+  const pl = document.getElementById('pickLabel');
+  if (pl) pl.innerHTML = `${p.avatar} <strong>${p.name}</strong> — which animal? 👇`;
+}
+
+// ─── VIRTUAL DICE ROLL ───────────────────────────────────────
+let rolling = false;
+
+function rollVirtual() {
+  if (rolling || G.waiting) return;
+  rolling = true;
+  sndRoll();
+
+  const dice = document.getElementById('vDice');
+  dice.classList.add('rolling');
+  const hint = document.getElementById('diceTapHint');
+  if (hint) hint.textContent = 'Rolling…';
+
+  let ticks = 0;
+  const maxTicks = 14;
+  const interval = setInterval(() => {
+    dice.textContent = ANIMALS[Math.floor(Math.random() * ANIMALS.length)].emoji;
+    sndTick();
+    if (++ticks >= maxTicks) {
+      clearInterval(interval);
+      dice.classList.remove('rolling');
+      const result = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+      dice.textContent = result.emoji;
+      rolling = false;
+      updateTurnLabel();
+      applyScore(result);
+    }
+  }, 75);
+}
+
+// ─── APPLY SCORE ─────────────────────────────────────────────
+let autoNextTimer = null;
+
+/**
+ * Records the rolled animal against the current player, updates state,
+ * shows the result flash, plays the score sound, and starts the
+ * auto-advance countdown.
+ * @param {{ name:string, emoji:string, score:number }} animal
+ */
+function applyScore(animal) {
+  if (G.waiting) return;
+  const p      = G.players[G.activeIndex];
+  p.score     += animal.score;
+  p.lastAnimal = animal;
+  G.waiting    = true;
+
+  document.getElementById('rfEmoji').textContent = animal.emoji;
+  document.getElementById('rfText').textContent  = `${p.name} got ${animal.name}!`;
+  document.getElementById('rfPts').textContent   = `+${animal.score} pts`;
+  document.getElementById('resultFlash').classList.add('show');
+
+  sndScore(animal.score);
+  spawnFloatPop(animal.emoji, animal.score);
+  document.querySelectorAll('.animal-btn').forEach(b => { b.disabled = true; });
+  renderPlayerCards();
+
+  // Animate the updated score on the player's card
+  requestAnimationFrame(() => {
+    const sc = document.getElementById(`pScore${G.activeIndex}`);
+    if (sc) { sc.classList.remove('score-pop'); void sc.offsetWidth; sc.classList.add('score-pop'); }
+  });
+
+  // Start drain-bar countdown
+  const fillEl  = document.getElementById('autoFill');
+  const labelEl = document.getElementById('autoLabel');
+  fillEl.style.animation = 'none';
+  void fillEl.offsetHeight; // force reflow
+  fillEl.style.animation = 'drainBar 2.5s linear forwards';
+  document.getElementById('nextArea').style.display = '';
+
+  let secs = 3;
+  labelEl.textContent = `Next player in ${secs}…`;
+  const tick = setInterval(() => {
+    secs--;
+    labelEl.textContent = secs > 0 ? `Next player in ${secs}…` : 'Here we go! 🎲';
+    if (secs <= 0) clearInterval(tick);
+  }, 1000);
+
+  clearTimeout(autoNextTimer);
+  autoNextTimer = setTimeout(() => { clearInterval(tick); nextTurn(); }, 2500);
+}
+
+function spawnFloatPop(emoji, pts) {
+  const el = document.createElement('div');
+  el.className   = 'float-pop';
+  el.textContent = `${emoji} +${pts}`;
+  el.style.left  = `${38 + Math.random() * 24}%`;
+  el.style.top   = '50%';
+  el.style.transform = 'translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1800);
+}
+
+// ─── NEXT TURN ───────────────────────────────────────────────
+function nextTurn() {
+  clearTimeout(autoNextTimer);
+  G.waiting = false;
+  document.getElementById('resultFlash').classList.remove('show');
+  document.getElementById('nextArea').style.display = 'none';
+
+  const prevIdx = G.activeIndex;
+  let nextIdx   = (G.activeIndex + 1) % G.playerCount;
+  let safety    = 0;
+  while (!G.players[nextIdx].active) {
+    nextIdx = (nextIdx + 1) % G.playerCount;
+    if (++safety > G.playerCount) { endGame(); return; }
+  }
+
+  // Detect wrap-around (went from a higher to a lower index)
+  if (nextIdx < prevIdx) {
+    G.round++;
+    document.getElementById('roundPill').textContent = `Round ${G.round}`;
+  }
+
+  G.activeIndex = nextIdx;
+  renderPlayerCards();
+  renderDiceArea();
+  updateTurnLabel();
+  sndClick();
+}
+
+// ─── QUIT PLAYER ─────────────────────────────────────────────
+function promptQuit(idx) {
+  G.quitTarget = idx;
+  const p = G.players[idx];
+  document.getElementById('quitBody').textContent =
+    `${p.avatar} ${p.name} will leave. Their score won't count toward the winner!`;
+  openModal('quitModal');
+  sndClick();
+}
+
+function doQuitPlayer() {
+  const i = G.quitTarget;
+  if (i === null) return;
+  G.players[i].active = false;
+  closeModal('quitModal');
+  sndClick();
+
+  const active = G.players.filter(p => p.active);
+  if (active.length === 0) { endGame(); return; }
+
+  if (i === G.activeIndex) {
+    G.waiting = false;
+    document.getElementById('resultFlash').classList.remove('show');
+    document.getElementById('nextArea').style.display = 'none';
+    G.activeIndex = firstActiveIndex((G.activeIndex + 1) % G.playerCount);
+    renderPlayerCards(); renderDiceArea(); updateTurnLabel();
+  } else {
+    renderPlayerCards();
+  }
+  G.quitTarget = null;
+}
+
+// ─── STOP / END ──────────────────────────────────────────────
+function promptStop() { openModal('stopModal'); sndClick(); }
+
+function endGame() {
+  closeModal('stopModal');
+  saveGameToHistory();
+  buildLeaderboard();
+  showScreen('screen-leaderboard');
+  fireConfetti();
+  sndWin();
+}
+
+// ─── LEADERBOARD ─────────────────────────────────────────────
+function buildLeaderboard() {
+  const active  = G.players.filter(p => p.active).sort((a, b) => b.score - a.score);
+  const quit    = G.players.filter(p => !p.active).sort((a, b) => b.score - a.score);
+  const sorted  = [...active, ...quit];
+  const pod     = document.getElementById('winnerPod');
+
+  if (active.length > 0) {
+    const w = active[0];
+    pod.innerHTML = `
+      <span class="winner-tag">🏆 WINNER 🏆</span>
+      <span class="winner-ava">${w.avatar}</span>
+      <span class="winner-name">${w.name}</span>
+      <span class="winner-score">${w.score} points</span>`;
+  } else {
+    pod.innerHTML = `<span class="winner-name">Everyone left 😅</span>`;
+  }
+
+  const rows    = document.getElementById('rankRows');
+  rows.innerHTML = '';
+  const medals  = ['🥇','🥈','🥉'];
+  const classes = ['gold','silver','bronze'];
+  sorted.forEach(p => {
+    const ar  = active.indexOf(p);
+    const row = document.createElement('div');
+    row.className = `rank-row ${ar >= 0 && ar < 3 ? classes[ar] : ''} ${!p.active ? 'quit-row' : ''}`;
+    const medal = !p.active ? '❌' : ar < 3 ? medals[ar] : `#${ar + 1}`;
+    row.innerHTML = `
+      <div class="rank-medal">${medal}</div>
+      <div class="rank-ava">${p.avatar}</div>
+      <div class="rank-name">${p.name}${!p.active ? '<span class="rank-quit-tag">left the game</span>' : ''}</div>
+      <div class="rank-pts">${p.score} pts</div>`;
+    rows.appendChild(row);
+  });
+}
+
+// ─── CONFETTI ────────────────────────────────────────────────
+function fireConfetti() {
+  const colours = ['#FF4E6A','#FFCE47','#3DD68C','#4A90E2','#9B5DE5','#FF85C8','#FF8C42'];
+  const wrap    = document.getElementById('confettiWrap');
+  for (let i = 0; i < 100; i++) {
+    setTimeout(() => {
+      const b = document.createElement('div');
+      b.className                = 'confetti-bit';
+      b.style.left               = Math.random() * 100 + 'vw';
+      b.style.width              = (Math.random() * 10 + 6) + 'px';
+      b.style.height             = (Math.random() * 10 + 6) + 'px';
+      b.style.background         = colours[Math.floor(Math.random() * colours.length)];
+      b.style.borderRadius       = Math.random() > .5 ? '50%' : '2px';
+      b.style.animationDuration  = (Math.random() * 2.5 + 2) + 's';
+      wrap.appendChild(b);
+      setTimeout(() => b.remove(), 5500);
+    }, i * 26);
+  }
+}
+
+// ─── RESET ───────────────────────────────────────────────────
+function resetGame() {
+  G = {
+    playerCount:2, diceType:'virtual', players:[],
+    activeIndex:0, round:1, waiting:false,
+    quitTarget:null, avatarTarget:null, pendingAvatar:null,
+  };
+  document.getElementById('countDisp').textContent = '2';
+  chooseDice('virtual');
+  showScreen('screen-setup');
+  sndClick();
+}
+
+// ─── MODAL HELPERS ───────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open');    }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─── UTILITY ─────────────────────────────────────────────────
+/**
+ * Returns the index of the first active player at or after startIdx,
+ * wrapping around the array if necessary.
+ * @param {number} startIdx
+ * @returns {number}
+ */
+function firstActiveIndex(startIdx) {
+  for (let i = 0; i < G.playerCount; i++) {
+    const idx = (startIdx + i) % G.playerCount;
+    if (G.players[idx].active) return idx;
+  }
+  return 0; // fallback; caller should check active count first
+}
+
+// ─── RESIZE / ORIENTATION ────────────────────────────────────
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  if (!document.getElementById('screen-game').classList.contains('active')) return;
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { applyDiceSize(); renderPlayerCards(); }, 150);
+});
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    if (document.getElementById('screen-game').classList.contains('active')) {
+      applyDiceSize(); renderPlayerCards();
+    }
+  }, 350);
+});
+</script>
+</body>
+</html>
