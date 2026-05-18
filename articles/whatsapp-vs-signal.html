@@ -1,1 +1,1053 @@
+<!DOCTYPE html>
+<!--
+  Title:   The Illusion of Privacy: WhatsApp vs Signal
+  Purpose: Long-form editorial article on messaging privacy standards
+  Author:  [Author Placeholder]
+  Date:    [Publication Date Placeholder]
+  Deps:    Google Fonts (Playfair Display, JetBrains Mono, Crimson Pro) — requires internet
+-->
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Illusion of Privacy: What WhatsApp Doesn't Tell You</title>
+<meta name="description" content="A technical and legal analysis of how WhatsApp's privacy claims diverge from Signal's architecturally enforced protections — and why the distinction matters." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
+<style>
+/* ═══════════════════════════════════════════════
+   THEME TOKENS
+═══════════════════════════════════════════════ */
+:root, :root[data-theme="dark"] {
+  --bg-primary:     #0A0C10;
+  --bg-secondary:   #111318;
+  --bg-surface:     #181C23;
+  --bg-elevated:    #1E232C;
+  --border:         #2A2F3A;
+  --border-subtle:  #1E2330;
+  --text-primary:   #E8EAF0;
+  --text-secondary: #8A93A8;
+  --text-muted:     #4A5168;
+  --accent:         #C8962A;
+  --accent-hover:   #E0AA38;
+  --accent-dim:     rgba(200,150,42,0.12);
+  --success:        #3DB868;
+  --success-dim:    rgba(61,184,104,0.10);
+  --error:          #E8534A;
+  --error-dim:      rgba(232,83,74,0.10);
+  --warn:           #D4892A;
+  --warn-dim:       rgba(212,137,42,0.10);
+  --link:           #C8962A;
+  --code-bg:        #141820;
+  --pull-quote-bar: #C8962A;
+  --table-header:   #13161E;
+  --table-alt:      #0E1118;
+  --progress-bar:   #C8962A;
+  --tag-bg:         rgba(200,150,42,0.15);
+  --tag-border:     rgba(200,150,42,0.35);
+}
+
+:root[data-theme="light"] {
+  --bg-primary:     #F5F2EC;
+  --bg-secondary:   #FFFDF8;
+  --bg-surface:     #EDEAE2;
+  --bg-elevated:    #E5E1D7;
+  --border:         #C8C2B4;
+  --border-subtle:  #DDD8CE;
+  --text-primary:   #1A1612;
+  --text-secondary: #5A5248;
+  --text-muted:     #9A9288;
+  --accent:         #8B5A1A;
+  --accent-hover:   #A06820;
+  --accent-dim:     rgba(139,90,26,0.10);
+  --success:        #1E7A3C;
+  --success-dim:    rgba(30,122,60,0.10);
+  --error:          #B83030;
+  --error-dim:      rgba(184,48,48,0.10);
+  --warn:           #9A5A10;
+  --warn-dim:       rgba(154,90,16,0.10);
+  --link:           #8B5A1A;
+  --code-bg:        #EAE6DC;
+  --pull-quote-bar: #8B5A1A;
+  --table-header:   #E0DCD2;
+  --table-alt:      #EDEAE2;
+  --progress-bar:   #8B5A1A;
+  --tag-bg:         rgba(139,90,26,0.12);
+  --tag-border:     rgba(139,90,26,0.30);
+}
+
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 18px; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Crimson Pro', 'Georgia', serif;
+  font-weight: 300;
+  line-height: 1.8;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════
+   READING PROGRESS BAR
+═══════════════════════════════════════════════ */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--progress-bar);
+  z-index: 1000;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 12px var(--accent);
+}
+
+/* ═══════════════════════════════════════════════
+   STICKY HEADER / NAV
+═══════════════════════════════════════════════ */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  background: rgba(10,12,16,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 clamp(1rem, 5vw, 4rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  transition: background 0.3s;
+}
+
+[data-theme="light"] .site-nav {
+  background: rgba(245,242,236,0.92);
+}
+
+.nav-brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.nav-right { display: flex; align-items: center; gap: 1.5rem; }
+
+.nav-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Theme switcher */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+.theme-switch:hover { border-color: var(--accent); color: var(--accent); }
+.theme-switch svg { width: 13px; height: 13px; fill: currentColor; }
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+.article-wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 5vw, 3rem);
+}
+
+/* ═══════════════════════════════════════════════
+   HERO / HEADER
+═══════════════════════════════════════════════ */
+.article-hero {
+  padding: 5rem 0 3.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  opacity: 0;
+  transform: translateY(24px);
+  animation: fadeUp 0.8s ease 0.1s forwards;
+}
+
+.article-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--tag-border);
+  border-radius: 3px;
+  padding: 5px 12px;
+  margin-bottom: 2rem;
+}
+.article-category::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+h1.article-title {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+h1.article-title em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.article-deck {
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  max-width: 680px;
+  margin-bottom: 2.5rem;
+}
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.meta-item { display: flex; align-items: center; gap: 6px; }
+.meta-dot {
+  width: 3px; height: 3px;
+  background: var(--border);
+  border-radius: 50%;
+}
+
+/* ═══════════════════════════════════════════════
+   ARTICLE BODY TYPOGRAPHY
+═══════════════════════════════════════════════ */
+.article-body {
+  padding: 3.5rem 0 5rem;
+}
+
+.article-body p {
+  margin-bottom: 1.6rem;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  font-weight: 300;
+}
+
+.article-body p:first-of-type::first-letter {
+  font-family: 'Playfair Display', serif;
+  font-size: 4.2rem;
+  font-weight: 900;
+  line-height: 0.82;
+  float: left;
+  margin: 0.08em 0.1em 0 0;
+  color: var(--accent);
+}
+
+/* Section headings */
+.article-body h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.55rem, 3.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+  margin: 3.5rem 0 1.2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.article-body h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--text-primary);
+  margin: 2.5rem 0 0.9rem;
+}
+
+/* Inline code / technical terms */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82em;
+  background: var(--code-bg);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+
+/* Strong */
+strong { font-weight: 600; color: var(--text-primary); }
+
+/* ═══════════════════════════════════════════════
+   PULL QUOTES
+═══════════════════════════════════════════════ */
+.pull-quote {
+  margin: 3rem -1.5rem;
+  padding: 1.8rem 2.2rem;
+  border-left: 4px solid var(--pull-quote-bar);
+  background: var(--bg-surface);
+  position: relative;
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.pull-quote.visible { opacity: 1; transform: translateX(0); }
+
+.pull-quote::before {
+  content: '\201C';
+  font-family: 'Playfair Display', serif;
+  font-size: 5rem;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.25;
+  position: absolute;
+  top: -0.5rem;
+  left: 1rem;
+}
+
+.pull-quote p {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin-bottom: 0 !important;
+}
+
+.pull-quote p::first-letter { all: unset; }
+
+/* ═══════════════════════════════════════════════
+   CALLOUT BOXES
+═══════════════════════════════════════════════ */
+.callout {
+  margin: 2.5rem 0;
+  padding: 1.4rem 1.8rem;
+  border-radius: 4px;
+  border-left: 3px solid;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.callout.visible { opacity: 1; transform: translateY(0); }
+
+.callout-warn {
+  background: var(--warn-dim);
+  border-color: var(--warn);
+}
+.callout-info {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+.callout-danger {
+  background: var(--error-dim);
+  border-color: var(--error);
+}
+
+.callout-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+.callout-warn .callout-label  { color: var(--warn); }
+.callout-info .callout-label  { color: var(--accent); }
+.callout-danger .callout-label{ color: var(--error); }
+
+.callout p {
+  font-size: 0.95rem !important;
+  margin-bottom: 0 !important;
+  color: var(--text-secondary) !important;
+}
+.callout p::first-letter { all: unset; }
+
+/* ═══════════════════════════════════════════════
+   COMPARISON TABLE
+═══════════════════════════════════════════════ */
+.table-wrap {
+  margin: 3rem -1rem;
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.table-wrap.visible { opacity: 1; transform: translateY(0); }
+
+.table-title {
+  background: var(--table-header);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+thead tr {
+  background: var(--table-header);
+}
+
+thead th {
+  padding: 0.9rem 1.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+
+thead th:not(:first-child) { text-align: center; }
+
+tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.15s;
+}
+tbody tr:nth-child(even) { background: var(--table-alt); }
+tbody tr:hover { background: var(--bg-elevated); }
+tbody tr:last-child { border-bottom: none; }
+
+td {
+  padding: 0.9rem 1.2rem;
+  color: var(--text-secondary);
+  font-family: 'Crimson Pro', serif;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+td:first-child { color: var(--text-primary); font-weight: 400; }
+td:not(:first-child) { text-align: center; }
+
+.tick, .cross, .warn-cell {
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.tick  { color: var(--success); }
+.cross { color: var(--error); }
+.warn-cell { color: var(--warn); font-size: 0.8rem; }
+
+/* ═══════════════════════════════════════════════
+   THREAT MODEL TABLE
+═══════════════════════════════════════════════ */
+.threat-table table { font-size: 0.85rem; }
+.risk-high   { color: var(--error);   font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em; }
+.risk-med    { color: var(--warn);    font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em; }
+.risk-low    { color: var(--success); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em; }
+
+/* ═══════════════════════════════════════════════
+   RECOMMENDATION BLOCKS
+═══════════════════════════════════════════════ */
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.2rem;
+  margin: 2.5rem 0;
+}
+
+.rec-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1.4rem 1.6rem;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+}
+.rec-card.visible { opacity: 1; transform: translateY(0); }
+.rec-card:hover { border-color: var(--accent); }
+
+.rec-number {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: var(--accent);
+  opacity: 0.25;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+
+.rec-card h4 {
+  font-family: 'Crimson Pro', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.rec-card p {
+  font-size: 0.88rem !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.6;
+  margin-bottom: 0 !important;
+}
+.rec-card p::first-letter { all: unset; }
+
+/* ═══════════════════════════════════════════════
+   SECTION FADE-IN (scroll triggered)
+═══════════════════════════════════════════════ */
+.fade-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.fade-section.visible { opacity: 1; transform: translateY(0); }
+
+/* Staggered children */
+.stagger > * { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.stagger.visible > *:nth-child(1) { opacity:1; transform:none; transition-delay: 0.05s; }
+.stagger.visible > *:nth-child(2) { opacity:1; transform:none; transition-delay: 0.15s; }
+.stagger.visible > *:nth-child(3) { opacity:1; transform:none; transition-delay: 0.25s; }
+.stagger.visible > *:nth-child(4) { opacity:1; transform:none; transition-delay: 0.35s; }
+.stagger.visible > *:nth-child(5) { opacity:1; transform:none; transition-delay: 0.45s; }
+.stagger.visible > *:nth-child(6) { opacity:1; transform:none; transition-delay: 0.55s; }
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+.article-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: 3rem 0 4rem;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+.footer-disclaimer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+}
+
+.footer-sources h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  margin-top: 2.5rem;
+}
+
+.sources-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sources-list li {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  padding-left: 1.2rem;
+  position: relative;
+  line-height: 1.7;
+}
+.sources-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .pull-quote { margin-left: 0; margin-right: 0; }
+  .table-wrap { margin-left: 0; margin-right: 0; }
+  .article-body p:first-of-type::first-letter { font-size: 3.2rem; }
+  .rec-grid { grid-template-columns: 1fr; }
+  .nav-tag { display: none; }
+}
+
+/* ═══════════════════════════════════════════════
+   HORIZONTAL RULE
+═══════════════════════════════════════════════ */
+.section-rule {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 3rem 0;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+}
+.section-rule::before, .section-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- NAV -->
+<nav class="site-nav">
+  <span class="nav-brand">Privacy Intelligence</span>
+  <div class="nav-right">
+    <span class="nav-tag">Security Analysis</span>
+    <button class="theme-switch" onclick="toggleTheme()" aria-label="Toggle theme">
+      <svg id="theme-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+      <span id="theme-label">Light</span>
+    </button>
+  </div>
+</nav>
+
+<main class="article-wrap">
+
+  <!-- HERO -->
+  <header class="article-hero">
+    <div class="article-category">Privacy &amp; Security Analysis</div>
+    <h1 class="article-title">The <em>Illusion</em> of&nbsp;Privacy: What WhatsApp Doesn't Tell&nbsp;You</h1>
+    <p class="article-deck">End-to-end encryption on your messages is real — but it is also, for most practical purposes, beside the point. A technical and legal analysis of how WhatsApp's privacy promises diverge from Signal's architecturally enforced protections, and what that gap costs the one billion users who have never noticed it.</p>
+    <div class="article-meta">
+      <span class="meta-item">Cybersecurity Analysis</span>
+      <span class="meta-dot"></span>
+      <span class="meta-item">Privacy Law</span>
+      <span class="meta-dot"></span>
+      <span class="meta-item">20 min read</span>
+      <span class="meta-dot"></span>
+      <span class="meta-item">Covers: GDPR · NIST · ISO 27001 · Signal Protocol</span>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <article class="article-body">
+
+    <p>In 2016, WhatsApp announced with considerable fanfare that it had implemented end-to-end encryption across its platform, using the same Signal Protocol that underpins Signal itself. The announcement was technically accurate. It was also, in the way that technically accurate statements can be, profoundly misleading. The message content travelling between your phone and a contact's is genuinely encrypted in transit — Meta cannot read it. Everything else about your communication, however, is another matter entirely.</p>
+
+    <p>The distinction between content privacy and metadata privacy is not a technical nicety. It is the operational core of modern surveillance. The NSA's metadata collection programmes, revealed by Edward Snowden in 2013, were built on exactly this premise: that knowing <em>who talks to whom, when, how often, and from where</em> is often more analytically valuable than knowing what was said. WhatsApp gives Meta precisely this picture, at scale, for every message sent through its platform.</p>
+
+    <div class="pull-quote fade-section">
+      <p>The question was never whether your messages could be read. The question was whether your entire communication graph was being mapped, correlated, and sold. It was. It still is.</p>
+    </div>
+
+    <h2>What Is Actually Being Collected</h2>
+
+    <p>Meta's own privacy policy and a series of regulatory enforcement disclosures provide the complete inventory. WhatsApp collects the identity of every person you contact, when you contacted them, how frequently, and for how long. It collects your device fingerprint — manufacturer, model, operating system version, battery level, signal strength, mobile carrier, and unique device identifiers. It collects your IP address at the time of connection, which in most cases maps directly to a geographic location. It collects your contact list, uploaded to Meta's servers as a matter of course upon installation, regardless of whether those contacts have ever consented to having their information processed by Meta.</p>
+
+    <p>Instagram and Facebook — linked to the same underlying identity through Meta's infrastructure since the 2021 policy change — go considerably further. Every post you pause on generates a dwell-time signal. Every third-party website carrying a Meta Pixel tracker reports your off-platform browsing behaviour back to Meta, whether or not you are logged in at the time. From these inputs, Meta constructs inferred attributes: political affiliation, religious identity, health conditions, financial situation, and relationship status, not from what you have told them, but from what your behaviour implies. You do not need to have disclosed any of these things. The inference engine makes them legible anyway.</p>
+
+    <div class="callout callout-danger fade-section">
+      <div class="callout-label">Enforcement Record</div>
+      <p>The 2021 WhatsApp policy update giving users a binary choice — accept data sharing with Meta or lose access — was found by Ireland's Data Protection Commission to violate GDPR's consent requirements. The resulting fine was €225 million. The data sharing continued.</p>
+    </div>
+
+    <p>The cross-platform correlation is the mechanism that elevates this from ordinary advertising data collection to something qualitatively different. Meta's infrastructure links your WhatsApp number, your Instagram account, and your Facebook profile into a single behavioural graph. Your messaging patterns on WhatsApp inform the advertising model built on Facebook. The 2021 policy update that forced this linkage was blocked by European regulators under GDPR — European WhatsApp users have somewhat stronger protections as a result. For the approximately 800 million users outside that jurisdiction, the linkage is in effect.</p>
+
+    <h2>The Threat Model: Who Is Actually Watching</h2>
+
+    <p>Privacy analysis that skips threat modelling is security theatre. The relevant question is not whether data exists in principle, but who can access it, under what circumstances, and to what consequence for which users. The answers vary considerably depending on your situation.</p>
+
+    <div class="table-wrap threat-table fade-section">
+      <div class="table-title">Threat Actor Analysis — WhatsApp Users</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Threat Actor</th>
+            <th>Risk Level</th>
+            <th>Mechanism</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Commercial advertisers &amp; data brokers</td>
+            <td><span class="risk-high">HIGH · CERTAIN</span></td>
+            <td>This is the product. Behavioural metadata sold and licensed at scale.</td>
+          </tr>
+          <tr>
+            <td>Law enforcement (domestic)</td>
+            <td><span class="risk-med">MEDIUM–HIGH</span></td>
+            <td>Meta complies with government data requests. Metadata graph sufficient for social network mapping without message content.</td>
+          </tr>
+          <tr>
+            <td>Foreign intelligence services</td>
+            <td><span class="risk-med">MEDIUM</span></td>
+            <td>Relevant primarily for journalists, activists, government officials, and security professionals operating in sensitive contexts.</td>
+          </tr>
+          <tr>
+            <td>Intimate partner surveillance</td>
+            <td><span class="risk-high">HIGH · CONTEXT-DEPENDENT</span></td>
+            <td>Online status, read receipts, last seen, and location-sharing features are designed for transparency — and can be weaponised in coercive relationships.</td>
+          </tr>
+          <tr>
+            <td>Account takeover / credential theft</td>
+            <td><span class="risk-med">MEDIUM</span></td>
+            <td>Large attack surface, SMS-based OTP verification is phishable. SIM-swap attacks documented.</td>
+          </tr>
+          <tr>
+            <td>Competitive intelligence</td>
+            <td><span class="risk-med">MEDIUM · PROFESSIONAL</span></td>
+            <td>For senior professionals, the communication graph — who you know, who you contact before key decisions — is commercially sensitive data.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The advertising risk is not theoretical or future-facing — it is the present operational reality for every WhatsApp user. For most people this is an acceptable trade-off made with varying degrees of awareness. The law enforcement risk depends heavily on jurisdiction and what governments consider acceptable grounds for requesting data. In liberal democracies with strong judicial oversight, the practical risk to ordinary users is low. In jurisdictions where political dissent, religious minority status, or sexual orientation create legal exposure, it is material.</p>
+
+    <div class="pull-quote fade-section">
+      <p>For a senior professional in cybersecurity, the communication graph is itself a sensitive asset. Who you contact before a major decision, which clients you speak to, how frequently — this is intelligence with commercial value, independent of anything that was actually said.</p>
+    </div>
+
+    <h2>The Cryptographic Layer: Where WhatsApp Is Genuine</h2>
+
+    <p>It is worth being precise about what WhatsApp's encryption actually delivers, because the implementation is technically sound within its scope. The Signal Protocol — a combination of the Double Ratchet Algorithm and the X3DH (Extended Triple Diffie-Hellman) key exchange — provides strong cryptographic guarantees for message content in transit. Each message in a conversation derives its encryption key from the previous one, meaning that compromising a single session key does not expose the broader conversation history. This is forward secrecy, and it works.</p>
+
+    <p>The encryption covers individual messages, group messages, voice calls, and video calls. When WhatsApp says these are end-to-end encrypted, the claim is verifiable and accurate. The protocol is the same one Signal uses. The implementation is not open to public audit — more on this shortly — but there is no strong evidence that Meta has weakened the underlying cryptography.</p>
+
+    <div class="callout callout-info fade-section">
+      <div class="callout-label">Technical Note</div>
+      <p>Forward secrecy means past messages remain secure even if your current encryption keys are compromised. Both WhatsApp and Signal implement this via the Double Ratchet Algorithm. The guarantee holds — unless your messages are backed up to cloud storage without independent encryption, at which point the cryptographic property is entirely negated.</p>
+    </div>
+
+    <p>The critical boundary is between what the protocol protects and what the application does outside the protocol. The Signal Protocol encrypts the message payload. It says nothing about what the application does with the metadata surrounding that payload, who stores your contact list, whether your conversation history is retained in plaintext in a cloud backup, or how the closed binary relates to any audited source code. These are application-layer decisions, made by a company whose commercial interests are structurally opposed to data minimisation.</p>
+
+    <h2>The Standards Gap: A Clause-by-Clause Failure</h2>
+
+    <p>The divergence between WhatsApp and Signal is not a matter of policy commitment or corporate intent. It is architectural. Signal was designed without a monetisation model that requires data. WhatsApp was acquired by a company whose core business is data. The privacy failures that follow are not accidents — they are features of a system designed to extract value from user behaviour. Regulatory frameworks have been largely consistent in identifying this.</p>
+
+    <h3>GDPR — The Purpose Limitation Failure</h3>
+
+    <p>Article 5(1)(b) of the GDPR requires that personal data be collected for specified, explicit, and legitimate purposes and not further processed in a manner incompatible with those purposes. Messaging metadata collected for "service delivery" cannot, under this requirement, be used for commercial behavioural profiling without a separate lawful basis. The 2021 WhatsApp policy update attempted to manufacture this basis through a consent mechanism that Ireland's DPC found did not meet the standard of freely given consent under Article 4(11), given that the only alternative to acceptance was ceasing to use the service.</p>
+
+    <p>Article 5(1)(c) — data minimisation — requires that data be adequate, relevant, and limited to what is necessary for the stated purpose. Battery level, signal strength, and device carrier are not necessary for message delivery. Uploading the entire contact lists of users, including the data of people who have never agreed to Meta's terms, is not minimised data collection. Signal collects a phone number and a timestamp of last connection. That is the operational minimum. WhatsApp collects an order of magnitude more.</p>
+
+    <h3>Article 25: Privacy by Design Is Not Optional</h3>
+
+    <p>Article 25 of the GDPR — one of the regulation's most technically demanding requirements — mandates that privacy be implemented by design and by default, not added later as a compliance layer. The default settings of a service must reflect the most privacy-protective configuration available. WhatsApp's cloud backup was unencrypted by default for years, storing message histories in Google Drive or iCloud where keys were held by the cloud provider, not the user. End-to-end encrypted backup was eventually introduced as an opt-in feature. By definition, an opt-in privacy protection is not privacy by default — it is privacy available to users who know to look for it, which is not what Article 25 requires.</p>
+
+    <p>Signal's architecture takes a structurally different approach. The design goal has been to make meaningful data collection technically difficult for Signal itself, not merely policy-prohibited. The distinction matters because policy commitments can change with business conditions, leadership, acquisition, or regulatory capture. Architectural constraints cannot be removed without rebuilding the system. Article 25 is designed to enforce this difference. GDPR regulators have consistently found WhatsApp's compliance inadequate.</p>
+
+    <h3>The Audit Gap: Trusting Attestation vs. Verifying Code</h3>
+
+    <p>Signal's complete codebase — client applications, server infrastructure, and protocol implementation — is publicly available under open-source licences and has been independently audited by NCC Group, Cure53, and iSEC Partners, with findings and remediations published. Any technically capable party can review the source code, compile it, and compare the resulting binary against what is distributed through app stores. This property — reproducible builds — provides a verifiable chain between audited source code and the software running on a user's device. Signal for Android has offered this since 2016.</p>
+
+    <p>WhatsApp is a closed-source application. Internal security reviews are conducted, but their scope, methodology, and findings are not public. There is no independent audit of the implementation. Users cannot verify that the Signal Protocol has been implemented correctly, that no additional data exfiltration code has been inserted, or that the binary delivered through app stores corresponds to any reviewed codebase. This is not an accusation — it is a description of the information available. In any serious security framework, an unverifiable trust claim is not equivalent to a verifiable one. Under NIST SP 800-53 control SA-11 (Developer Testing and Evaluation) and CIS Control 16 (Application Software Security), the absence of independent audit and reproducible builds represents a meaningful gap.</p>
+
+    <h3>The Sealed Sender Problem: Metadata Is the Message</h3>
+
+    <p>Signal implements a protocol called Sealed Sender in which the server processes message delivery without knowing who sent the message to whom. The sender's identity is encrypted to the recipient's key and is not visible to Signal's infrastructure. This is a direct technical implementation of the principle that communications metadata is itself sensitive data that a service provider should not possess if it can be designed away.</p>
+
+    <p>WhatsApp has no equivalent. Meta's servers see every sender-recipient pair for every message sent through the platform. This is the mechanism that generates the communication graph that is central to Meta's commercial value. There is no engineering fix available within WhatsApp's current architecture because the business model depends on this data. Sealed Sender is not a feature that can be bolted onto a monetisation model — it requires that the platform have no commercial interest in the metadata it is being asked not to see.</p>
+
+    <div class="pull-quote fade-section">
+      <p>Sealed Sender is not a feature that can be bolted onto a monetisation model. It requires that the platform have no commercial interest in the metadata it is being asked not to see. WhatsApp's commercial model makes this structurally impossible.</p>
+    </div>
+
+    <h3>Private Contact Discovery: The Consent of Non-Users</h3>
+
+    <p>WhatsApp's contact discovery process operates by uploading a user's entire phone contact list to Meta's servers and identifying which of those contacts are WhatsApp users. This is done without the knowledge or consent of the contacts themselves — third parties who may never have used WhatsApp and who certainly never agreed to have their data processed by Meta. Germany's Hamburg DPA issued enforcement orders specifically targeting this practice.</p>
+
+    <p>Signal designed a Private Contact Discovery mechanism using Intel SGX secure enclaves to perform contact matching without exposing the contact list to Signal's servers as readable data. The SGX implementation has been debated among cryptographers — SGX is not a perfect security primitive — but the design intent is architecturally sound: contact discovery should be possible without the service provider building a map of users' social networks. WhatsApp's contact discovery is, again, not a technical oversight. It is the foundation of Meta's social graph.</p>
+
+    <h2>The Backup Problem: Where Forward Secrecy Dies</h2>
+
+    <p>The Double Ratchet's forward secrecy guarantee — that past session keys are deleted after use — is a meaningful protection against key compromise. It holds in transit. It does not survive storage.</p>
+
+    <p>If a WhatsApp user's messages are backed up to Google Drive or iCloud — which is the default behaviour and which most users have enabled — those messages are stored at rest with encryption keys held by the cloud provider, not the user. A Google Drive backup of WhatsApp messages is readable by Google. It is also subject to a lawful government request directed at Google, a considerably more straightforward legal mechanism than attempting to compel Meta to produce encrypted message content. The forward secrecy property that applies to message transmission is entirely nullified by the backup architecture.</p>
+
+    <div class="callout callout-warn fade-section">
+      <div class="callout-label">Immediate Action Required</div>
+      <p>WhatsApp users who have not explicitly enabled End-to-End Encrypted Backup (Settings → Chats → Chat Backup → End-to-end Encrypted Backup) have years of conversation history stored in plaintext-accessible cloud storage. This is the default for most users. Rectifying this requires manual action and does not retroactively encrypt historical backups already uploaded.</p>
+    </div>
+
+    <p>Under NIST SP 800-57 guidance on key management, a backup architecture in which the cloud provider holds decryption keys for sensitive communications represents a failure of key custody and separation of duties. Signal's approach — where encrypted backups derive their encryption from a user-controlled key that never leaves the user's possession — satisfies this requirement. WhatsApp's opt-in E2EE backup, introduced in 2021, addresses the problem in principle but requires deliberate user action that most users have not taken.</p>
+
+    <h2>The Full Comparison</h2>
+
+    <div class="table-wrap fade-section">
+      <div class="table-title">WhatsApp vs Signal — Privacy &amp; Security Standards Matrix</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:54%">Standard / Property</th>
+            <th style="width:23%">WhatsApp</th>
+            <th style="width:23%">Signal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>E2EE message content (in transit)</td>
+            <td><span class="tick">✓</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>Metadata minimisation (sender, recipient, timing)</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>Sealed sender — server cannot see sender identity</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>Key transparency / user-verifiable key exchange</td>
+            <td><span class="warn-cell">✗ Buried</span></td>
+            <td><span class="tick">✓ Prominent</span></td>
+          </tr>
+          <tr>
+            <td>Open-source codebase + independent public audit</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>Reproducible builds (audited source = shipped binary)</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓ Android</span></td>
+          </tr>
+          <tr>
+            <td>E2EE cloud backup — enabled by default</td>
+            <td><span class="warn-cell">✗ Opt-in only</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>GDPR Art. 25 — privacy by design and by default</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>GDPR Art. 5(1)(c) — data minimisation</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>GDPR Art. 5(1)(b) — purpose limitation</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>Private contact discovery (no social graph upload)</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓ By design</span></td>
+          </tr>
+          <tr>
+            <td>No commercial data monetisation model</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+          <tr>
+            <td>Cross-platform identity correlation prevented</td>
+            <td><span class="cross">✗ Feeds Meta graph</span></td>
+            <td><span class="tick">✓ Structurally impossible</span></td>
+          </tr>
+          <tr>
+            <td>NIST SP 800-57 — key custody and separation of duties</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="tick">✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Alternatives: An Honest Assessment</h2>
+
+    <p>The recommendation to switch to Signal is straightforward. The obstacles are social, not technical. WhatsApp's billion-user network effect means that a unilateral switch requires either convincing your contacts to follow, or accepting a fragmented communication setup. This is a real cost and should not be dismissed. The answer for most users is not wholesale replacement but deliberate segmentation: using Signal for conversations that carry genuine risk, and WhatsApp for social communication where the metadata exposure is an acceptable trade-off.</p>
+
+    <p>Telegram is frequently cited as an alternative and should be addressed directly. Regular Telegram conversations are not end-to-end encrypted. They are server-encrypted, meaning Telegram holds the decryption keys and can access message content. Only Telegram's "Secret Chats" feature provides E2EE, and this is not the default mode, does not support group chats, and is not available on the desktop application. Recommending Telegram as a privacy tool, as is commonly done, reflects a misunderstanding of how the product actually works. For most use cases, Telegram offers weaker content privacy than WhatsApp, combined with equally poor metadata protection.</p>
+
+    <div class="callout callout-danger fade-section">
+      <div class="callout-label">Common Misconception</div>
+      <p>Telegram is not a private messaging application in any meaningful technical sense for standard conversations. Default Telegram chats are server-encrypted — Telegram reads them. Only Secret Chats provide E2EE, and these cannot be used in groups, are unavailable on desktop, and are not the default. The application's popularity as a "secure" alternative reflects marketing success, not cryptographic reality.</p>
+    </div>
+
+    <p>iMessage provides E2EE within the Apple ecosystem and Apple's privacy posture is materially better than Meta's. The significant caveat is iCloud backup: unless Advanced Data Protection is explicitly enabled, iMessage backups in iCloud are not E2EE and Apple holds the decryption keys. The pattern of a strong transit encryption guarantee undermined by an insecure default backup architecture is identical to WhatsApp's — it simply comes from a company with a less predatory relationship with its users' data.</p>
+
+    <p>For technically sophisticated users operating in genuinely high-risk contexts — journalists, activists, security professionals handling sensitive client matters — Element/Matrix with self-hosted infrastructure provides the strongest available guarantee, at the cost of significant operational complexity. The Signal Protocol's Olm/Megolm implementation in Matrix is sound; the management overhead is not trivial.</p>
+
+    <h2>What You Should Actually Do</h2>
+
+    <p>The practical recommendations separate into two categories: actions you can take today that meaningfully reduce your existing exposure, and structural changes to how you segment your communications going forward.</p>
+
+    <div class="rec-grid stagger">
+      <div class="rec-card">
+        <div class="rec-number">01</div>
+        <h4>Enable E2EE Backup in WhatsApp Now</h4>
+        <p>Settings → Chats → Chat Backup → End-to-end Encrypted Backup. This protects future backups. Historical backups already in Google Drive or iCloud remain accessible unless you delete them manually from those services.</p>
+      </div>
+      <div class="rec-card">
+        <div class="rec-number">02</div>
+        <h4>Install Signal and Migrate Sensitive Conversations</h4>
+        <p>Professional contacts, client discussions, anything you would classify as confidential should move to Signal. Personal social chat can stay on WhatsApp. The segmentation is the strategy.</p>
+      </div>
+      <div class="rec-card">
+        <div class="rec-number">03</div>
+        <h4>Enable Disappearing Messages</h4>
+        <p>In WhatsApp: Settings → Privacy → Default Message Timer. Set to 7 days for general use, 24 hours for sensitive conversations. Reduces the durable record even though metadata remains with Meta.</p>
+      </div>
+      <div class="rec-card">
+        <div class="rec-number">04</div>
+        <h4>Audit Contact Upload Permissions</h4>
+        <p>On Android, you can revoke WhatsApp's contact permission after installation. The app will still function for existing contacts. This limits future social graph data being uploaded, though historical data has already been transmitted.</p>
+      </div>
+      <div class="rec-card">
+        <div class="rec-number">05</div>
+        <h4>Separate Your Browsing from Meta Sessions</h4>
+        <p>Use a dedicated browser profile or browser for Meta-authenticated sessions. This prevents Meta Pixel tracking from correlating your general browsing behaviour with your messaging identity across sessions.</p>
+      </div>
+      <div class="rec-card">
+        <div class="rec-number">06</div>
+        <h4>Treat Instagram and Facebook as Public Infrastructure</h4>
+        <p>Never share anything on Meta-owned platforms that you would object to a data broker retaining indefinitely. The data minimisation principle applies to what you voluntarily disclose, not just what is inferred.</p>
+      </div>
+    </div>
+
+    <div class="section-rule">Analysis</div>
+
+    <h2>The Structural Conclusion</h2>
+
+    <p>The argument that WhatsApp is "good enough" because it encrypts message content conflates two different things: the security of a communication channel and the privacy of the communications infrastructure it sits within. WhatsApp provides the former. It structurally cannot provide the latter, because the metadata that constitutes the privacy failure is the same data that constitutes Meta's core commercial asset.</p>
+
+    <p>This is not a criticism that can be addressed by better privacy policies, larger fines, or more transparent terms of service. It is a criticism of the business model itself. A company that earns revenue by profiling human behaviour for advertising cannot simultaneously design its infrastructure to prevent that profiling. The incentives are not aligned. The architecture follows the incentives.</p>
+
+    <p>Signal's privacy properties exist because Signal was built without that conflict. The nonprofit model removes the commercial pressure to monetise attention. The open-source architecture removes the ability to obscure what the software actually does. The sealed sender protocol removes the infrastructure's capacity to build a communication graph even if it wanted to. These are design choices — specific, deliberate, and irreversible without rebuilding the system from scratch. They are not policy commitments vulnerable to a future acquisition or a change in business conditions.</p>
+
+    <p>For the majority of users with no particular threat profile, WhatsApp's message content encryption is adequate for their actual risk. The metadata exposure is a real cost, but it is a cost many people will reasonably accept in exchange for network access to their social and family connections. That is a defensible position, made with clear information.</p>
+
+    <p>For anyone whose professional role, political context, or personal circumstances create a genuine privacy requirement, the technical and legal analysis is unambiguous. WhatsApp is not a private communication platform. The encryption of message content does not change this. The platform is designed, audited, and regulated as a component of an advertising intelligence system. Signal is not. The difference is architectural, not aspirational — and architecture, unlike policy, does not lie.</p>
+
+  </article>
+
+  <!-- FOOTER -->
+  <footer class="article-footer">
+    <div class="footer-sources">
+      <h3>Primary Sources &amp; References</h3>
+      <ul class="sources-list">
+        <li>Ireland Data Protection Commission — WhatsApp Ireland Ltd. Decision (DPC, September 2021). Fine: €225 million. Basis: GDPR Articles 5, 12, 13, 14.</li>
+        <li>Hamburg Commissioner for Data Protection — WhatsApp Contact Import Enforcement Order (2021). Basis: GDPR Art. 6 — lawful basis for processing third-party contact data.</li>
+        <li>Signal Protocol Technical Documentation — Open Whisper Systems. Double Ratchet Algorithm (Trevor Perrin, Moxie Marlinspike, 2016).</li>
+        <li>NCC Group — Cryptographic Review of Signal Protocol (2016). Public audit findings available at nccgroup.com.</li>
+        <li>Cure53 — Signal Desktop Application Security Audit (2018). Public report.</li>
+        <li>NIST SP 800-57 — Recommendation for Key Management (Rev. 5, 2020). Key custody and separation of duties requirements.</li>
+        <li>NIST SP 800-53 Rev. 5 — Security and Privacy Controls. SA-11 (Developer Testing), CA-7 (Continuous Monitoring).</li>
+        <li>GDPR — Regulation (EU) 2016/679. Articles 5, 7, 25 cited directly.</li>
+        <li>Meta Privacy Policy (current) — Data collected across WhatsApp, Instagram, Facebook.</li>
+        <li>Signal Private Contact Discovery — Joshua Lund, Signal Blog (2017). SGX-based contact discovery architecture.</li>
+        <li>Snowden Archive — NSA Metadata Collection Programmes, PRISM Documentation (2013). Published via The Guardian and Washington Post.</li>
+      </ul>
+    </div>
+    <div style="margin-top: 2.5rem">
+      <p class="footer-disclaimer">
+        This article represents analytical opinion based on publicly available technical documentation, regulatory decisions, and enforcement records. It does not constitute legal advice. Regulatory positions, platform features, and enforcement outcomes referenced reflect the state of public record at time of writing and are subject to change. Readers in specific jurisdictions should consult qualified legal counsel on privacy law obligations applicable to their circumstances.
+      </p>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+/* ── Reading progress bar ─────────────────────────────────────────── */
+const bar = document.getElementById('progress-bar');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docH = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.width = (docH > 0 ? (scrollTop / docH) * 100 : 0) + '%';
+}, { passive: true });
+
+/* ── Intersection Observer for scroll-triggered animations ────────── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll(
+  '.fade-section, .pull-quote, .callout, .table-wrap, .rec-card, .stagger'
+).forEach(el => observer.observe(el));
+
+/* ── Theme switcher ───────────────────────────────────────────────── */
+const html        = document.documentElement;
+const themeLabel  = document.getElementById('theme-label');
+const themeIcon   = document.getElementById('theme-icon');
+
+const sunPath  = 'M12 3v1m0 16v1M4.22 4.22l.71.71m12.02 12.02.71.71M3 12H2m20 0h-1M4.22 19.78l.71-.71M18.95 5.05l.71-.71M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z';
+const moonPath = 'M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z';
+
+function toggleTheme() {
+  const current = html.getAttribute('data-theme');
+  if (current === 'dark') {
+    html.setAttribute('data-theme', 'light');
+    themeLabel.textContent = 'Dark';
+    themeIcon.innerHTML = `<path d="${sunPath}" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>`;
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    themeLabel.textContent = 'Light';
+    themeIcon.innerHTML = `<path d="${moonPath}"/>`;
+  }
+}
+</script>
+</body>
+</html>
