@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sikh History & Rehit Maryada Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --deep: #0d1f3c;
+    --gold: #c9922a;
+    --gold-light: #e8b84b;
+    --gold-pale: #f5e0a0;
+    --steel: #2a3f5f;
+    --cream: #fdf6e3;
+    --text: #f0e6cc;
+    --muted: #8a9bb5;
+    --correct: #2e7d52;
+    --correct-light: #4caf80;
+    --wrong: #8b2020;
+    --wrong-light: #e05050;
+    --card-bg: rgba(13, 31, 60, 0.85);
+    --border: rgba(201, 146, 42, 0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(201,146,42,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(42,63,95,0.5) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9922a' fill-opacity='0.04'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* KHANDA SVG Header */
+  .header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    position: relative;
+  }
+
+  .khanda-symbol {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 20px rgba(201,146,42,0.6));
+    animation: glow 3s ease-in-out infinite;
+  }
+
+  @keyframes glow {
+    0%, 100% { filter: drop-shadow(0 0 15px rgba(201,146,42,0.5)); }
+    50% { filter: drop-shadow(0 0 30px rgba(232,184,75,0.9)); }
+  }
+
+  .header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    text-shadow: 0 0 40px rgba(201,146,42,0.4);
+  }
+
+  .header .subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .divider {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 20px auto;
+  }
+
+  /* START SCREEN */
+  #start-screen {
+    text-align: center;
+    padding: 20px;
+  }
+
+  .start-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 30px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,146,42,0.2);
+  }
+
+  .start-card p {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--gold-pale);
+    margin-bottom: 16px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .info-item {
+    background: rgba(201,146,42,0.08);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .info-item .num {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    color: var(--gold-light);
+    font-weight: 600;
+  }
+
+  .info-item .lbl {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-block;
+    padding: 14px 40px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy);
+    box-shadow: 0 4px 20px rgba(201,146,42,0.4);
+  }
+
+  .btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(201,146,42,0.6);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+  }
+
+  .btn-outline:hover {
+    background: rgba(201,146,42,0.1);
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    background: rgba(255,255,255,0.06);
+    border-radius: 20px;
+    height: 6px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 20px;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(201,146,42,0.5);
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
+  }
+
+  .score-badge {
+    background: rgba(201,146,42,0.15);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    color: var(--gold-light);
+    font-size: 0.9rem;
+  }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: fadeUp 0.4s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-number {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .q-text {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--gold-pale);
+    margin-bottom: 28px;
+    font-weight: 600;
+  }
+
+  /* OPTIONS */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,146,42,0.2);
+    border-radius: 10px;
+    padding: 14px 20px;
+    color: var(--text);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--gold);
+    transform: scaleY(0);
+    transition: transform 0.2s;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    background: rgba(201,146,42,0.1);
+    border-color: var(--gold);
+    transform: translateX(4px);
+  }
+
+  .option-btn:hover:not(:disabled)::before {
+    transform: scaleY(1);
+  }
+
+  .option-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gold);
+    min-width: 22px;
+    height: 22px;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .option-btn.correct {
+    background: rgba(46,125,82,0.2);
+    border-color: var(--correct-light);
+    color: #a8f0c6;
+  }
+
+  .option-btn.correct .option-label {
+    background: var(--correct);
+    border-color: var(--correct-light);
+    color: white;
+  }
+
+  .option-btn.wrong {
+    background: rgba(139,32,32,0.2);
+    border-color: var(--wrong-light);
+    color: #f0a8a8;
+  }
+
+  .option-btn.wrong .option-label {
+    background: var(--wrong);
+    border-color: var(--wrong-light);
+    color: white;
+  }
+
+  .option-btn:disabled { cursor: default; transform: none; }
+
+  /* EXPLANATION BOX */
+  .explanation {
+    margin-top: 20px;
+    padding: 18px 20px;
+    border-radius: 10px;
+    font-size: 1rem;
+    line-height: 1.7;
+    display: none;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .explanation.correct-exp {
+    background: rgba(46,125,82,0.15);
+    border: 1px solid rgba(76,175,128,0.4);
+    color: #b8f0d0;
+  }
+
+  .explanation.wrong-exp {
+    background: rgba(139,32,32,0.15);
+    border: 1px solid rgba(224,80,80,0.4);
+    color: #f0c0c0;
+  }
+
+  .explanation .exp-icon {
+    font-size: 1.2rem;
+    margin-right: 8px;
+  }
+
+  .explanation strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1.05rem;
+  }
+
+  .next-btn-wrap {
+    margin-top: 22px;
+    text-align: right;
+    display: none;
+  }
+
+  /* RESULTS */
+  #result-screen { display: none; animation: fadeUp 0.5s ease; }
+
+  .result-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 30px;
+    backdrop-filter: blur(10px);
+    text-align: center;
+  }
+
+  .result-score-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    background: radial-gradient(circle, rgba(201,146,42,0.1), transparent);
+    box-shadow: 0 0 40px rgba(201,146,42,0.3);
+    animation: glow 3s infinite;
+  }
+
+  .result-score-circle .score-num {
+    font-family: 'Cinzel', serif;
+    font-size: 2.6rem;
+    color: var(--gold-light);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .result-score-circle .score-total {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .result-grade {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+  }
+
+  .result-msg {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-bottom: 28px;
+  }
+
+  .result-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .stat-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 10px;
+  }
+
+  .stat-box .s-num {
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  .stat-box.correct-stat .s-num { color: var(--correct-light); }
+  .stat-box.wrong-stat .s-num { color: var(--wrong-light); }
+  .stat-box.pct-stat .s-num { color: var(--gold-light); }
+
+  .stat-box .s-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+
+  /* REVIEW SECTION */
+  .review-section {
+    margin-top: 30px;
+    text-align: left;
+  }
+
+  .review-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .review-item {
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+    border-left: 3px solid transparent;
+  }
+
+  .review-item.r-correct { border-left-color: var(--correct-light); }
+  .review-item.r-wrong { border-left-color: var(--wrong-light); }
+
+  .review-item .r-q {
+    font-size: 0.95rem;
+    color: var(--gold-pale);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .review-item .r-ans {
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+
+  .review-item .r-ans span { font-weight: 600; }
+  .review-item .r-ans .r-correct-lbl { color: var(--correct-light); }
+  .review-item .r-ans .r-wrong-lbl { color: var(--wrong-light); }
+
+  .btn-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  /* WAHEGURU WATERMARK */
+  .watermark {
+    text-align: center;
+    padding: 30px 0 20px;
+    color: rgba(201,146,42,0.2);
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 500px) {
+    .question-card { padding: 20px 16px; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+    .result-stats { grid-template-columns: 1fr 1fr 1fr; }
+    .btn { padding: 12px 24px; font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="khanda-symbol">☬</div>
+    <h1>Sikh History &amp;<br>Rehit Maryada</h1>
+    <p class="subtitle">A Journey Through Sacred Knowledge</p>
+    <div class="divider"></div>
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="start-screen">
+    <div class="start-card">
+      <p>Test your knowledge of Sikh history, the Ten Gurus, and the Sikh Rehit Maryada — the official code of conduct and conventions of the Khalsa.</p>
+      <div class="info-grid">
+        <div class="info-item"><div class="num">100</div><div class="lbl">Questions</div></div>
+        <div class="info-item"><div class="num">25</div><div class="lbl">Per Attempt</div></div>
+        <div class="info-item"><div class="num">4</div><div class="lbl">Options Each</div></div>
+        <div class="info-item"><div class="num">∞</div><div class="lbl">Retries</div></div>
+      </div>
+      <p style="font-size:1rem; color:var(--muted); font-style:italic;">Questions and answer choices are shuffled every attempt. An explanation is shown after each answer.</p>
+      <br>
+      <button class="btn btn-gold" onclick="startQuiz()">ਸ਼ੁਰੂ ਕਰੋ &nbsp;— Begin Quiz</button>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen" style="display:none;">
+    <div class="progress-label">
+      <span id="q-counter">Question 1 of 25</span>
+      <span class="score-badge" id="live-score">Score: 0</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:4%"></div>
+    </div>
+
+    <div class="question-card" id="question-card">
+      <div class="q-number" id="q-num-label">Question 1</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="options-container"></div>
+      <div class="explanation" id="explanation"></div>
+      <div class="next-btn-wrap" id="next-btn-wrap">
+        <button class="btn btn-gold" id="next-btn" onclick="nextQuestion()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="result-screen">
+    <div class="result-card">
+      <div class="khanda-symbol" style="font-size:2rem; margin-bottom:12px;">☬</div>
+      <div class="result-score-circle">
+        <div class="score-num" id="final-score">0</div>
+        <div class="score-total">out of 25</div>
+      </div>
+      <div class="result-grade" id="result-grade"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <div class="result-stats">
+        <div class="stat-box correct-stat"><div class="s-num" id="r-correct">0</div><div class="s-label">Correct</div></div>
+        <div class="stat-box wrong-stat"><div class="s-num" id="r-wrong">0</div><div class="s-label">Wrong</div></div>
+        <div class="stat-box pct-stat"><div class="s-num" id="r-pct">0%</div><div class="s-label">Score</div></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-gold" onclick="startQuiz()">New Attempt</button>
+        <button class="btn btn-outline" onclick="toggleReview()">Review Answers</button>
+      </div>
+      <div class="review-section" id="review-section" style="display:none;">
+        <div class="divider" style="margin:20px auto;"></div>
+        <div class="review-title">Answer Review</div>
+        <div id="review-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="watermark">Waheguru Ji Ka Khalsa · Waheguru Ji Ki Fateh</div>
+</div>
+
+<script>
+const ALL_QUESTIONS = [
+  // ── SIKH GURUS & HISTORY ──────────────────────────────────────────────
+  {
+    q: "Who was the founder of Sikhism and the first Sikh Guru?",
+    options: ["Guru Angad Dev Ji", "Guru Nanak Dev Ji", "Guru Amar Das Ji", "Guru Ram Das Ji"],
+    answer: 1,
+    explanation: "Guru Nanak Dev Ji (1469–1539) is the founder of Sikhism. He traveled extensively (udasis) to spread the message of one God, equality, and selfless service, establishing the core principles of Sikh faith."
+  },
+  {
+    q: "In which year was Guru Nanak Dev Ji born?",
+    options: ["1459", "1469", "1479", "1449"],
+    answer: 1,
+    explanation: "Guru Nanak Dev Ji was born on April 15, 1469 (Vaisakh Sudi 3, Samvat 1526) in Rai Bhoi Ki Talvandi, now known as Nankana Sahib in present-day Pakistan."
+  },
+  {
+    q: "Which Guru introduced the concept of Langar (community kitchen)?",
+    options: ["Guru Nanak Dev Ji", "Guru Amar Das Ji", "Guru Ram Das Ji", "Guru Angad Dev Ji"],
+    answer: 0,
+    explanation: "Guru Nanak Dev Ji introduced the institution of Langar to promote equality, break caste barriers, and demonstrate the principle of Seva (selfless service). Guru Amar Das Ji later made it mandatory to partake in Langar before meeting the Guru."
+  },
+  {
+    q: "Which Guru compiled the Adi Granth?",
+    options: ["Guru Arjan Dev Ji", "Guru Nanak Dev Ji", "Guru Gobind Singh Ji", "Guru Tegh Bahadur Ji"],
+    answer: 0,
+    explanation: "Guru Arjan Dev Ji, the fifth Sikh Guru, compiled the Adi Granth (also known as the Granth Sahib) in 1604 at Amritsar. This sacred scripture includes compositions of the first five Gurus and other saints."
+  },
+  {
+    q: "Who was the first Guru to be martyred in Sikhism?",
+    options: ["Guru Tegh Bahadur Ji", "Guru Arjan Dev Ji", "Guru Gobind Singh Ji", "Guru Hargobind Ji"],
+    answer: 1,
+    explanation: "Guru Arjan Dev Ji was the first Sikh Guru to be martyred in 1606 CE on the orders of Mughal Emperor Jahangir. He was tortured and killed for refusing to convert to Islam and for compiling the Adi Granth."
+  },
+  {
+    q: "Which Guru founded the city of Amritsar?",
+    options: ["Guru Nanak Dev Ji", "Guru Ram Das Ji", "Guru Arjan Dev Ji", "Guru Amar Das Ji"],
+    answer: 1,
+    explanation: "Guru Ram Das Ji, the fourth Sikh Guru, founded the city of Ramdaspur (now Amritsar) in 1574 CE. He excavated the sacred pool (sarovar) around which the Harmandir Sahib (Golden Temple) was later built."
+  },
+  {
+    q: "What was the name of the system introduced by Guru Amar Das Ji to spread Sikhism?",
+    options: ["Masand system", "Manji system", "Khalsa system", "Sangat system"],
+    answer: 1,
+    explanation: "Guru Amar Das Ji, the third Sikh Guru, introduced the Manji system (22 manjis/districts) to spread Sikhism across a wider area. He appointed both men and women as preachers to spread Gurbani."
+  },
+  {
+    q: "Which Guru is known as 'Hind Di Chaadar' (Shield of India)?",
+    options: ["Guru Gobind Singh Ji", "Guru Arjan Dev Ji", "Guru Tegh Bahadur Ji", "Guru Hargobind Ji"],
+    answer: 2,
+    explanation: "Guru Tegh Bahadur Ji, the ninth Sikh Guru, is called 'Hind Di Chaadar' because he sacrificed his life in 1675 CE to protect the religious freedom of Kashmiri Pandits and Hindus from forced conversion under Mughal Emperor Aurangzeb."
+  },
+  {
+    q: "Who was the tenth and last human Sikh Guru?",
+    options: ["Guru Tegh Bahadur Ji", "Guru Har Krishan Ji", "Guru Gobind Singh Ji", "Guru Har Rai Ji"],
+    answer: 2,
+    explanation: "Guru Gobind Singh Ji was the tenth and final human Sikh Guru (1666–1708). He founded the Khalsa in 1699, compiled the final version of the Guru Granth Sahib, and declared it the eternal, living Guru of the Sikhs."
+  },
+  {
+    q: "On what date was the Khalsa Panth founded by Guru Gobind Singh Ji?",
+    options: ["Baisakhi 1699 CE", "Baisakhi 1702 CE", "Diwali 1699 CE", "Maghi 1700 CE"],
+    answer: 0,
+    explanation: "The Khalsa Panth was founded by Guru Gobind Singh Ji on Baisakhi (April 13), 1699 CE at Anandpur Sahib. During this historic event, he initiated the Panj Pyare (Five Beloved Ones) and established the Amrit Sanchar ceremony."
+  },
+  {
+    q: "What is the name of the first Five Beloved Ones (Panj Pyare) — what were they collectively called?",
+    options: ["The Panj Kakars", "The Panj Pyare", "The Panj Sikhs", "The Panj Nihungs"],
+    answer: 1,
+    explanation: "The first Panj Pyare (Five Beloved Ones) were Bhai Daya Singh, Bhai Dharam Singh, Bhai Himmat Singh, Bhai Mohkam Singh, and Bhai Sahib Singh — the five who offered their heads to Guru Gobind Singh Ji at Anandpur Sahib in 1699."
+  },
+  {
+    q: "Which Guru introduced the Gurmukhi script?",
+    options: ["Guru Nanak Dev Ji", "Guru Angad Dev Ji", "Guru Amar Das Ji", "Guru Ram Das Ji"],
+    answer: 1,
+    explanation: "Guru Angad Dev Ji, the second Sikh Guru, standardized and popularized the Gurmukhi script to write Punjabi. This was instrumental in making Gurbani accessible to the common people and preserving Sikh literature."
+  },
+  {
+    q: "What is the holy scripture of the Sikhs?",
+    options: ["Dasam Granth", "Guru Granth Sahib Ji", "Sarbloh Granth", "Bansavalinama"],
+    answer: 1,
+    explanation: "Guru Granth Sahib Ji is the eternal, living Guru of the Sikh faith. It was elevated to the status of the permanent Guru by Guru Gobind Singh Ji in 1708 CE at Nanded, before his passing."
+  },
+  {
+    q: "Who was the Guru during whose time the Golden Temple (Harmandir Sahib) was built?",
+    options: ["Guru Ram Das Ji", "Guru Arjan Dev Ji", "Guru Hargobind Ji", "Guru Amar Das Ji"],
+    answer: 1,
+    explanation: "Guru Arjan Dev Ji completed the construction of the Harmandir Sahib (Golden Temple) at Amritsar. The foundation stone was laid by the Muslim Sufi saint Mian Mir, symbolizing interfaith harmony."
+  },
+  {
+    q: "Which battle is considered the first armed struggle by Sikhs under Guru Hargobind Ji?",
+    options: ["Battle of Chamkaur", "Battle of Muktsar", "Battle of Kartarpur", "Battle of Rohilla"],
+    answer: 2,
+    explanation: "The Battle of Kartarpur (1634 CE) is considered the first major battle fought by Sikhs, where Guru Hargobind Ji and his forces defended against the Mughal army sent by Emperor Shah Jahan."
+  },
+  {
+    q: "What is the concept of 'Miri-Piri' introduced by Guru Hargobind Ji?",
+    options: ["Two swords representing temporal and spiritual authority", "Two paths to salvation", "Two types of prayer", "Two rivers of the Punjab"],
+    answer: 0,
+    explanation: "Guru Hargobind Ji, the sixth Guru, introduced the concept of Miri-Piri by wearing two swords — Miri (temporal/worldly authority) and Piri (spiritual authority). This symbolized that a Sikh must be both spiritually strong and able to defend justice."
+  },
+  {
+    q: "Which structure did Guru Hargobind Ji build opposite the Harmandir Sahib?",
+    options: ["Akal Takht", "Anandpur Sahib", "Damdama Sahib", "Patna Sahib"],
+    answer: 0,
+    explanation: "Guru Hargobind Ji built the Akal Takht (Throne of the Timeless One) in 1606 CE, directly opposite the Harmandir Sahib. The Akal Takht is the highest seat of temporal authority for Sikhs."
+  },
+  {
+    q: "Who was the youngest Sikh Guru?",
+    options: ["Guru Har Rai Ji", "Guru Har Krishan Ji", "Guru Tegh Bahadur Ji", "Guru Gobind Singh Ji"],
+    answer: 1,
+    explanation: "Guru Har Krishan Ji became the Guru at the age of just 5 years and passed away at age 8 (1661–1664 CE). He is known as 'Bala Pir' (Child Saint) for his miraculous healing of smallpox victims in Delhi."
+  },
+  {
+    q: "What was the famous saying of Guru Har Krishan Ji when asked about his successor?",
+    options: ["'Baba Bakala'", "'Anandpur'", "'Nankana'", "'Amritsar'"],
+    answer: 0,
+    explanation: "Guru Har Krishan Ji's last words were 'Baba Bakala', indicating that his successor, the next Guru, was to be found at Bakala (a town in Punjab). This led to the discovery of Guru Tegh Bahadur Ji."
+  },
+  {
+    q: "At which place did Guru Gobind Singh Ji pass away (Joti Jot)?",
+    options: ["Anandpur Sahib", "Nanded (Hazur Sahib)", "Amritsar", "Delhi"],
+    answer: 1,
+    explanation: "Guru Gobind Singh Ji attained Joti Jot (passed away) on October 7, 1708 CE at Nanded in Maharashtra. The gurdwara built at this site is called Hazur Sahib (Takht Sachkhand Sri Hazur Abchal Nagar Sahib)."
+  },
+  // ── REHIT MARYADA ──────────────────────────────────────────────────────
+  {
+    q: "What is the 'Sikh Rehit Maryada'?",
+    options: ["A collection of Sikh folk songs", "The official Sikh code of conduct approved by the SGPC", "A commentary on the Guru Granth Sahib", "A list of Sikh festivals"],
+    answer: 1,
+    explanation: "The Sikh Rehit Maryada is the official code of conduct and conventions of Sikhism, approved by the Shiromani Gurdwara Parbandhak Committee (SGPC) in 1945. It defines the personal and community practices for all Sikhs."
+  },
+  {
+    q: "What are the 5 Ks (Panj Kakars) that Khalsa Sikhs must wear?",
+    options: ["Kesh, Kangha, Kara, Kachera, Kirpan", "Kesh, Kara, Kitab, Kapda, Khanda", "Kesh, Kanga, Kalgi, Kirpan, Kara", "Kachera, Kara, Kripa, Kesh, Khanda"],
+    answer: 0,
+    explanation: "The Panj Kakars are: Kesh (uncut hair), Kangha (wooden comb), Kara (iron/steel bracelet), Kachera (cotton undergarment), and Kirpan (steel sword). These five articles of faith are worn as symbols of the Sikh identity."
+  },
+  {
+    q: "What is 'Amrit Sanchar' (also called Amrit Pahul)?",
+    options: ["Daily prayer routine", "Sikh baptism/initiation ceremony into the Khalsa", "Sikh wedding ceremony", "A type of Ardas"],
+    answer: 1,
+    explanation: "Amrit Sanchar (Amrit Pahul) is the Sikh baptism ceremony through which a Sikh is initiated into the Khalsa Panth. The ceremony involves the preparation of Amrit (sanctified water) by the Panj Pyare and is administered in the presence of the Guru Granth Sahib Ji."
+  },
+  {
+    q: "What are the four major prohibitions (Char Kurahits) for an Amritdhari Sikh?",
+    options: [
+      "Cutting hair, consuming tobacco, eating halal meat, committing adultery",
+      "Eating non-vegetarian food, drinking alcohol, gambling, cutting nails",
+      "Lying, stealing, cheating, gambling",
+      "Cutting hair, eating pork, drinking milk, practicing idol worship"
+    ],
+    answer: 0,
+    explanation: "The four Kurahits (cardinal transgressions) that a Khalsa Sikh must never commit are: (1) Trimming/cutting hair (Kesh), (2) consuming any form of tobacco, (3) eating meat slaughtered in the Halal/Kutha manner, and (4) committing adultery. Violating any of these requires re-initiation (Amrit Sanchar)."
+  },
+  {
+    q: "What are the 'Nitnem' prayers prescribed in the Sikh Rehit Maryada?",
+    options: [
+      "Japji Sahib, Jaap Sahib, Tav Prasad Savaiye, Chaupai Sahib, Anand Sahib, and Rehras/Kirtan Sohila",
+      "Ardas, Anand Karaj, Hukamnama only",
+      "Japji Sahib and Rehras Sahib only",
+      "Sukhmani Sahib and Anand Sahib"
+    ],
+    answer: 0,
+    explanation: "The Nitnem (daily prayers) prescribed by the Rehit Maryada include morning prayers (Japji Sahib, Jaap Sahib, Tav Prasad Savaiye, Chaupai Sahib, Anand Sahib), evening prayer (Rehras Sahib), and night prayer (Kirtan Sohila)."
+  },
+  {
+    q: "What is 'Ardas' in Sikhism?",
+    options: ["A type of Langar dish", "A formal Sikh prayer/supplication recited at gatherings", "A martial art practice", "The Sikh oath of allegiance"],
+    answer: 1,
+    explanation: "Ardas is a formal Sikh prayer of supplication recited at the beginning and end of most Sikh ceremonies, events, and in gurdwara services. It commemorates the Gurus, Sikh history, and concludes with a request for the welfare of all."
+  },
+  {
+    q: "What is 'Hukamnama'?",
+    options: ["A royal decree by the Mughal emperor", "A random reading from Guru Granth Sahib Ji taken as divine guidance", "A decree issued by the Akal Takht", "An administrative order by SGPC"],
+    answer: 1,
+    explanation: "Hukamnama (divine command) is the practice of taking a random passage (shabad) from Guru Granth Sahib Ji as divine guidance and blessing. It is taken at the opening and closing of gurdwara services and is considered the Guru's command for the day."
+  },
+  {
+    q: "What is the Sikh ceremony for naming a newborn child?",
+    options: ["Amrit Sanchar", "Naam Karan", "Dastar Bandi", "Anand Karaj"],
+    answer: 1,
+    explanation: "Naam Karan is the Sikh ceremony for naming a newborn. The family visits the gurdwara, prayers are offered, Ardas is recited, and a Hukamnama is taken. The child's name is chosen based on the first letter of the Hukamnama's shabad."
+  },
+  {
+    q: "What is 'Anand Karaj'?",
+    options: ["The Sikh funeral rite", "The Sikh wedding ceremony", "The Sikh coming-of-age ceremony", "The Sikh baptism ceremony"],
+    answer: 1,
+    explanation: "Anand Karaj (Blissful Union) is the Sikh wedding ceremony. It involves four circumambulations (Laavaan) around the Guru Granth Sahib Ji while reciting the four Laav composed by Guru Ram Das Ji. It was given legal recognition in India in 2012."
+  },
+  {
+    q: "What is 'Antam Sanskar' (Sikh funeral rites)?",
+    options: ["Burial in sacred ground", "Cremation with Gurbani recitation and Ardas", "Immersion in a holy river", "Entombment in a Gurdwara"],
+    answer: 1,
+    explanation: "Antam Sanskar is the Sikh funeral rite involving cremation. Gurbani (especially Kirtan Sohila and Ardas) is recited, and the body is cremated. The Sikh Rehit Maryada specifies recitation of Japji Sahib during cremation and Sehaj Path or Akhand Path for the departed soul."
+  },
+  {
+    q: "How many times do the couple circumambulate the Guru Granth Sahib Ji during Anand Karaj?",
+    options: ["3", "4", "7", "5"],
+    answer: 1,
+    explanation: "The couple circumambulates the Guru Granth Sahib Ji four times during Anand Karaj, one for each of the four Laav (wedding hymns) composed by Guru Ram Das Ji. Each Lav represents a step in the journey of spiritual union."
+  },
+  {
+    q: "What is a 'Gurdwara'?",
+    options: ["A Sikh school", "A sacred house of worship where the Guru Granth Sahib Ji is installed", "A Sikh community center only", "A Sikh military academy"],
+    answer: 1,
+    explanation: "A Gurdwara (Gateway to the Guru) is any place where the Guru Granth Sahib Ji is installed with full maryada (protocols). It serves as a place of worship, community gathering, Langar, and Sikh education."
+  },
+  {
+    q: "What does 'Dasvandh' mean in Sikh practice?",
+    options: ["Ten rules of conduct", "Donating one-tenth of one's earnings to the community", "Ten daily prayers", "The ten Gurus' teachings"],
+    answer: 1,
+    explanation: "Dasvandh (one-tenth) is the Sikh practice of donating 10% of one's income to the Sikh community or charitable causes. It is considered a religious obligation promoting equality, generosity, and community welfare."
+  },
+  {
+    q: "What is 'Seva' in Sikhism?",
+    options: ["A type of Sikh meditation", "Selfless service performed without expectation of reward", "A Sikh prayer", "A Sikh festival"],
+    answer: 1,
+    explanation: "Seva (selfless service) is a core pillar of Sikhism. The Rehit Maryada emphasizes that every Sikh must engage in Seva — whether physical (Tan), mental (Man), or material (Dhan) — as a devotional act and means of spiritual purification."
+  },
+  {
+    q: "What is the 'Panj Takht' (Five Takhts)?",
+    options: [
+      "Five supreme seats of Sikh temporal and spiritual authority",
+      "Five famous battles of Sikhism",
+      "Five sacred rivers of the Punjab",
+      "Five prayers of the Nitnem"
+    ],
+    answer: 0,
+    explanation: "The Panj Takht (Five Thrones) are the five supreme seats of Sikh authority: (1) Akal Takht, Amritsar; (2) Takht Keshgarh Sahib, Anandpur; (3) Takht Damdama Sahib, Talwandi Sabo; (4) Takht Patna Sahib, Patna; (5) Takht Hazur Sahib, Nanded."
+  },
+  {
+    q: "What is 'Kirtan' in Sikhism?",
+    options: ["A Sikh martial art", "The devotional singing of Gurbani (sacred hymns)", "A Sikh ceremony for the dead", "Reading of the Sikh history"],
+    answer: 1,
+    explanation: "Kirtan is the devotional singing of Gurbani (sacred scripture) set to classical ragas. The Sikh Rehit Maryada prescribes that Kirtan should only be of Gurbani from the Guru Granth Sahib Ji and Bhai Gurdas Ji's vaars, and must be sung in prescribed ragas."
+  },
+  {
+    q: "What is the significance of the Khanda symbol?",
+    options: [
+      "It represents the five rivers of Punjab",
+      "Double-edged sword (Khanda), Chakkar (circular quoit), and two Kirpans representing divine power and justice",
+      "It is a decorative element with no symbolic meaning",
+      "It represents the union of Miri and Piri only"
+    ],
+    answer: 1,
+    explanation: "The Khanda symbol consists of: the double-edged Khanda sword (representing divine knowledge and power), the Chakkar (circular throwing weapon representing the eternal God with no beginning or end), and two Kirpans (representing Miri and Piri — temporal and spiritual authority)."
+  },
+  {
+    q: "What is 'Sangat' in Sikh practice?",
+    options: ["Individual meditation", "The holy congregation that gathers in the presence of the Guru Granth Sahib Ji", "A Sikh musical group", "A Sikh administrative committee"],
+    answer: 1,
+    explanation: "Sangat (holy congregation) is the community of Sikhs who gather in the presence of the Guru Granth Sahib Ji for prayers, Kirtan, and Langar. The Rehit Maryada emphasizes that being part of Sangat is essential for spiritual growth."
+  },
+  {
+    q: "What is 'Pangat' in the context of Langar?",
+    options: ["A separate dining hall for women", "Sitting in a row to partake in Langar, symbolizing equality", "The head cook of the Langar", "The menu of the Langar"],
+    answer: 1,
+    explanation: "Pangat means sitting in a row/line (pankti) to partake in Langar. This practice, emphasized since Guru Nanak Dev Ji's time, symbolizes equality — all people regardless of caste, creed, gender, or status eat together at the same level."
+  },
+  {
+    q: "What is the 'Degh Tegh Fateh' slogan?",
+    options: [
+      "Victory comes to those who have the cooking pot (charity) and the sword (protection)",
+      "God, Sword, Victory",
+      "Truth, Love, Courage",
+      "Sword, Shield, Armor"
+    ],
+    answer: 0,
+    explanation: "'Degh Tegh Fateh' means 'Victory of the Cauldron and the Sword.' Degh (cauldron/cooking pot) represents charity, sharing, and community welfare; Tegh (sword) represents the ability to protect the weak and fight injustice. Together they represent the complete Sikh ideal."
+  },
+  {
+    q: "What is 'Simran' in Sikh practice?",
+    options: ["A Sikh festival", "Meditation on God's name (Waheguru)", "Recitation of Ardas", "Reading of Sikh history"],
+    answer: 1,
+    explanation: "Simran is the meditative repetition of God's name, primarily 'Waheguru,' as a path to spiritual union. The Rehit Maryada prescribes Simran as an essential daily practice for all Sikhs to achieve spiritual enlightenment."
+  },
+  {
+    q: "What is 'Sehaj Path'?",
+    options: ["A quick reading of Guru Granth Sahib Ji in 48 hours", "An unbroken reading of Guru Granth Sahib Ji completed at one's own pace over time", "A daily recitation of Japji Sahib", "A special prayer on Gurpurab occasions"],
+    answer: 1,
+    explanation: "Sehaj Path is an extended, non-continuous reading of the entire Guru Granth Sahib Ji completed at one's own comfortable pace. It can be done individually or in a group and typically takes weeks or months to complete."
+  },
+  {
+    q: "What is 'Akhand Path'?",
+    options: ["A path conducted only by granthis", "A continuous, uninterrupted reading of the Guru Granth Sahib Ji completed in approximately 48 hours", "A daily prayer", "A path conducted only during Gurpurabs"],
+    answer: 1,
+    explanation: "Akhand Path is the continuous, uninterrupted reading of the entire Guru Granth Sahib Ji (1,430 pages) completed in approximately 48 hours. Readers take turns in relays to ensure the reading is never stopped. It is conducted on special occasions."
+  },
+  {
+    q: "What is the meaning of 'Waheguru Ji Ka Khalsa, Waheguru Ji Ki Fateh'?",
+    options: [
+      "The Khalsa belongs to the Wonderful Lord; Victory belongs to the Wonderful Lord",
+      "God's children shall always win",
+      "We are all Khalsa and will achieve victory",
+      "The Guru's way is the path to victory"
+    ],
+    answer: 0,
+    explanation: "'Waheguru Ji Ka Khalsa, Waheguru Ji Ki Fateh' means 'The Khalsa belongs to the Wonderful Lord; Victory belongs to the Wonderful Lord.' This is the formal Sikh greeting used by the Khalsa and is the motto/salutation of the Khalsa Panth."
+  },
+  {
+    q: "What is a 'Hola Mohalla'?",
+    options: ["A Sikh wedding festival", "A Sikh festival of martial arts, poetry, and mock battles held the day after Holi at Anandpur Sahib", "A Sikh harvest festival", "A Sikh new year festival"],
+    answer: 1,
+    explanation: "Hola Mohalla was started by Guru Gobind Singh Ji in 1700 CE at Anandpur Sahib as an alternative to Holi. It features mock battles, martial arts demonstrations, Kirtan, and poetry competitions. It is held annually at Anandpur Sahib."
+  },
+  {
+    q: "What is 'Baisakhi' in Sikh tradition?",
+    options: ["A harvest festival only", "A festival marking the founding of the Khalsa Panth and also the Punjabi harvest festival", "The Sikh new year only", "A day of fasting"],
+    answer: 1,
+    explanation: "Baisakhi (April 13/14) is a dual celebration: the Punjabi harvest festival and the anniversary of the founding of the Khalsa Panth by Guru Gobind Singh Ji in 1699 CE. It is one of the most important Sikh festivals."
+  },
+  {
+    q: "What is 'Gurpurab'?",
+    options: ["A Sikh pilgrimage site", "A Sikh celebration commemorating the birth or death anniversaries of the Gurus", "A Sikh prayer book", "A Sikh scripture"],
+    answer: 1,
+    explanation: "Gurpurab refers to days commemorating important events in Sikh history, particularly the birth (Parkash Utsav) and passing (Joti Jot) anniversaries of the Sikh Gurus. These are celebrated with Akhand Path, Nagar Kirtan, and Langar."
+  },
+  {
+    q: "What is the 'Dastar' (turban) in Sikh tradition?",
+    options: ["A decoration", "A sacred article of faith representing honor, courage, sovereignty, and the crown of God", "A cultural practice not mentioned in Rehit Maryada", "An optional covering"],
+    answer: 1,
+    explanation: "The Dastar (turban) is an important article of Sikh identity representing honor, courage, sovereignty, piety, and the crown of God. The Rehit Maryada requires Amritdhari Sikhs to cover their hair with a dastar at all times."
+  },
+  {
+    q: "What is 'Kachera' and its significance?",
+    options: ["A type of sword", "Cotton underwear/shorts representing sexual restraint and readiness for action", "A wooden comb", "An iron bracelet"],
+    answer: 1,
+    explanation: "The Kachera is a cotton undergarment (shorts) that is one of the Panj Kakars. It symbolizes sexual restraint (brahmacharya), moral character, and practical readiness for action. It replaced the dhoti to allow greater physical mobility."
+  },
+  {
+    q: "What is the significance of the 'Kangha' (comb)?",
+    options: ["For decoration only", "Represents cleanliness, order, and the discipline of maintaining spiritual and physical hygiene", "A weapon of defense", "An ancient Punjabi tradition unrelated to Sikhism"],
+    answer: 1,
+    explanation: "The Kangha (small wooden comb) is one of the Panj Kakars. It is worn in the hair and symbolizes cleanliness, discipline, and order. It represents the Sikh belief that spiritual life should be accompanied by physical hygiene and neatness."
+  },
+  {
+    q: "What is the significance of the 'Kara' (iron bracelet)?",
+    options: ["A decorative jewelry item", "Represents the eternal, infinite nature of God, restraint, and commitment to the Guru", "A weapon used in battle", "An amulet for protection"],
+    answer: 1,
+    explanation: "The Kara is an iron/steel bracelet worn on the right wrist, symbolizing the infinite, unbounded nature of God (a circle has no beginning or end). It also serves as a constant reminder of the Guru's teachings and a reminder to refrain from wrong actions."
+  },
+  {
+    q: "What does 'Kirpan' symbolize?",
+    options: ["Aggression and war", "Mercy, justice, courage, and the duty to protect the weak", "Political power", "Cultural identity only"],
+    answer: 1,
+    explanation: "The Kirpan (sacred sword) symbolizes mercy, divine grace (Kirpa), justice, courage, and the Sikh duty to protect the innocent and fight injustice. The word combines 'Kirpa' (mercy) and 'Aan' (honor/grace). It must never be used for aggression."
+  },
+  {
+    q: "What is 'Kesh' and why is it kept?",
+    options: ["A type of prayer", "Uncut hair, representing acceptance of God's will and Sikh identity", "A specific type of turban", "The Sikh way of tying the turban"],
+    answer: 1,
+    explanation: "Kesh (uncut hair) is the most visible and primary of the Panj Kakars. It represents acceptance of God's natural gift and will (Hukam), spiritual strength, and Sikh identity. Cutting hair is considered one of the four cardinal prohibitions (Kurahits)."
+  },
+  {
+    q: "What is a 'Granthi' in a Gurdwara?",
+    options: ["A Sikh musician", "The caretaker who reads and looks after the Guru Granth Sahib Ji and conducts ceremonies", "An elected Gurdwara committee member", "A Sikh scholar and historian"],
+    answer: 1,
+    explanation: "A Granthi is the custodian of the Guru Granth Sahib Ji in a Gurdwara. They perform daily prayers (Nitnem), recite Hukamnama, conduct ceremonies (Anand Karaj, Naam Karan, Antam Sanskar), and generally look after the Gurdwara and the Guru Granth Sahib Ji."
+  },
+  {
+    q: "What is 'Mool Mantar'?",
+    options: ["The opening verse of Guru Granth Sahib Ji defining the basic qualities of God", "A type of Sikh prayer", "A Sikh meditation technique", "The Sikh wedding vow"],
+    answer: 0,
+    explanation: "The Mool Mantar (Root Mantra) is the opening verse of the Guru Granth Sahib Ji, composed by Guru Nanak Dev Ji. It begins with 'Ik Onkar' and defines the fundamental qualities of God: One Creator, Truth by Name, Creative Being, Without Fear, Without Enmity, Timeless, Self-Existent, known by the Guru's grace."
+  },
+  {
+    q: "Who was Banda Singh Bahadur?",
+    options: ["A Mughal general who converted to Sikhism", "A Hindu ascetic who became a Khalsa warrior and established Sikh rule in Punjab", "The son of Guru Gobind Singh Ji", "A Sikh poet"],
+    answer: 1,
+    explanation: "Banda Singh Bahadur (1670–1716) was a Hindu ascetic (Madho Das Bairagi) who met Guru Gobind Singh Ji and was initiated into the Khalsa in 1708. He became a fierce Sikh warrior, established the first Sikh sovereign rule in Punjab, abolished zamindari, and was martyred by the Mughals."
+  },
+  {
+    q: "What is the 'Chaar Sahibzaade' (Four Sons)?",
+    options: ["Four disciples of Guru Nanak Dev Ji", "The four sons of Guru Gobind Singh Ji who were martyred", "Four commanders of the Khalsa army", "Four scholars who compiled the Guru Granth Sahib Ji"],
+    answer: 1,
+    explanation: "The Chaar Sahibzaade are the four sons of Guru Gobind Singh Ji: Baba Ajit Singh Ji and Baba Jujhar Singh Ji who fought and fell at the Battle of Chamkaur (1704), and Baba Zorawar Singh Ji and Baba Fateh Singh Ji who were bricked alive at Sirhind by the Mughal Nawab."
+  },
+  {
+    q: "What is 'Chardi Kala'?",
+    options: ["A type of Sikh music", "The Sikh concept of eternal optimism, resilience, and high spirit in the face of adversity", "A Sikh martial art", "A festival of victory"],
+    answer: 1,
+    explanation: "Chardi Kala means 'ascending spirit' or 'ever-rising spirit.' It is a core Sikh concept representing perpetual optimism, resilience, and positive energy even in the face of hardship. The Ardas concludes with a wish for Chardi Kala for all."
+  },
+  {
+    q: "What is the Sikh concept of 'Ik Onkar'?",
+    options: ["There is one Guru", "There is One God/Creator (the fundamental Sikh belief in monotheism)", "One prayer is sufficient", "One community of Sikhs"],
+    answer: 1,
+    explanation: "'Ik Onkar' (ੴ) means 'One God' and is the first phrase of the Mool Mantar. It encapsulates the central Sikh belief in strict monotheism — the oneness and universality of God who is present in all creation and beyond all definition."
+  },
+  {
+    q: "What is the 'Shiromani Gurdwara Parbandhak Committee' (SGPC)?",
+    options: ["A Sikh political party", "The apex body that manages historical Sikh Gurdwaras in Punjab, Haryana, and Himachal Pradesh", "A Sikh educational institution", "The governing body of all Sikhs worldwide"],
+    answer: 1,
+    explanation: "The SGPC (Shiromani Gurdwara Parbandhak Committee) was established in 1925 through the Sikh Gurdwaras Act. It manages the historic gurdwaras in Punjab, Haryana, and Himachal Pradesh, and is considered the 'mini-parliament' of the Sikhs."
+  },
+  {
+    q: "What event is known as 'Sahibzada Zorawar Singh and Sahibzada Fateh Singh's martyrdom'?",
+    options: ["Battle of Chamkaur", "Chotte Sahibzaade being bricked alive at Sirhind", "Battle of Muktsar", "Sacking of Anandpur Sahib"],
+    answer: 1,
+    explanation: "Sahibzada Zorawar Singh (age 9) and Sahibzada Fateh Singh (age 7) were captured along with Mata Gujri Ji after the evacuation of Anandpur Sahib and were bricked alive at Sirhind (Fatehgarh Sahib) in 1704 CE for refusing to convert to Islam."
+  },
+  {
+    q: "What is 'Gur Fateh' or 'Waheguru Ji Ka Khalsa'?",
+    options: ["A battle cry", "The formal Sikh salutation/greeting used by the Khalsa", "A type of Ardas", "A declaration of victory"],
+    answer: 1,
+    explanation: "'Waheguru Ji Ka Khalsa, Waheguru Ji Ki Fateh' is the formal Khalsa greeting and salutation. 'Sat Sri Akal' (meaning 'Eternal is the Holy/Timeless Lord') is another common Sikh greeting. Both are prescribed greetings in the Sikh Rehit Maryada."
+  },
+  {
+    q: "What is the meaning of the word 'Sikh'?",
+    options: ["Warrior", "Disciple/learner", "Holy person", "Servant of God"],
+    answer: 1,
+    explanation: "The word 'Sikh' comes from Sanskrit 'Shishya' and Pali 'Sekha,' both meaning 'disciple' or 'learner.' A Sikh is a disciple of the Guru (first the ten human Gurus, now the Guru Granth Sahib Ji) and a learner on the spiritual path."
+  },
+  {
+    q: "What is the definition of a Sikh according to the Sikh Rehit Maryada?",
+    options: [
+      "Any person born in Punjab",
+      "Any human being who faithfully believes in Ik Onkar, the ten Gurus, Guru Granth Sahib Ji, and Amrit of the tenth Guru, and who does not follow any other religion",
+      "Any person who reads Japji Sahib daily",
+      "Any person who has taken Amrit"
+    ],
+    answer: 1,
+    explanation: "According to the Sikh Rehit Maryada, a Sikh is defined as 'any human being who faithfully believes in One Immortal Being, the ten Gurus from Guru Nanak Dev to Guru Gobind Singh, the Guru Granth Sahib, the utterances and teachings of the ten Gurus, and the Amrit of the tenth Nanak, and who does not owe allegiance to any other religion.'"
+  },
+  {
+    q: "What is 'Naam Japna' in Sikh practice?",
+    options: ["Reading of Sikh history", "Meditating on God's name as a spiritual discipline", "Community service", "The Sikh wedding ritual"],
+    answer: 1,
+    explanation: "Naam Japna (meditating on God's name) is one of the three pillars of Sikh practice (along with Kirat Karni and Vand Chakna). It involves constant remembrance of God's name, particularly 'Waheguru,' and is considered the highest spiritual practice."
+  },
+  {
+    q: "What are the 'three pillars' (Teen Kirats) of Sikhism?",
+    options: [
+      "Naam Japna (meditate), Kirat Karni (honest work), Vand Chakna (share with others)",
+      "Prayer, Fasting, Pilgrimage",
+      "Truth, Contentment, Patience",
+      "Seva, Simran, Sangat"
+    ],
+    answer: 0,
+    explanation: "The three pillars of Sikh living are: (1) Naam Japna — meditating on God's name; (2) Kirat Karni — earning an honest living through hard work; and (3) Vand Chakna — sharing one's earnings and serving others. These form the foundation of Sikh ethical life."
+  },
+  {
+    q: "Who built the Harmandir Sahib (Golden Temple) and invited whom to lay the foundation stone?",
+    options: [
+      "Guru Ram Das Ji built it; Guru Nanak laid the stone",
+      "Guru Arjan Dev Ji built it and invited Muslim Sufi saint Mian Mir to lay the foundation stone",
+      "Guru Hargobind Ji built it; a Hindu priest laid the stone",
+      "Guru Nanak Dev Ji built it"
+    ],
+    answer: 1,
+    explanation: "Guru Arjan Dev Ji completed the Harmandir Sahib and invited the revered Muslim Sufi saint Mian Mir of Lahore to lay the foundation stone, demonstrating the Sikh values of interfaith harmony and universal brotherhood."
+  },
+  {
+    q: "What is 'Panthic' in Sikh terminology?",
+    options: ["Related to the path/spiritual journey", "Relating to the Sikh community/collective body as a whole", "A type of Sikh hymn", "A Sikh sect"],
+    answer: 1,
+    explanation: "'Panthic' refers to matters relating to the entire Sikh Panth (community/nation) as a collective body. A 'Panthic decision' is one made collectively by the Khalsa Panth, especially through the Panj Pyare or Akal Takht, and is considered binding on all Sikhs."
+  },
+  {
+    q: "What is 'Gurmukhi'?",
+    options: ["The language spoken by the Gurus", "The script in which Punjabi and Gurbani are written, standardized by Guru Angad Dev Ji", "A type of Sikh poetry", "A collection of Guru Nanak's travels"],
+    answer: 1,
+    explanation: "Gurmukhi (literally 'from the Guru's mouth') is the script used to write Punjabi and the Gurbani in the Guru Granth Sahib Ji. It was standardized by Guru Angad Dev Ji to preserve and spread Gurbani in a script accessible to common people."
+  },
+  {
+    q: "What is the 'Sarbat Da Bhala' concept in Sikhism?",
+    options: ["Personal salvation only", "Well-being and welfare of all humanity, prayed for in every Ardas", "The welfare of only Sikhs", "A type of Sikh meditation"],
+    answer: 1,
+    explanation: "'Sarbat Da Bhala' means 'welfare of all' or 'well-being of everyone.' It is recited in every Ardas, reflecting the universal, inclusive nature of Sikh spirituality that extends concern and prayer beyond the Sikh community to all of humanity."
+  },
+  {
+    q: "What is a 'Hukam' (divine will) in Sikh philosophy?",
+    options: ["An administrative order", "The divine order/will of God to which Sikhs must willingly submit with contentment", "A command from the Akal Takht", "A ruling by the SGPC"],
+    answer: 1,
+    explanation: "Hukam (divine will/order) in Sikh philosophy refers to the omnipotent divine will of God that governs all of creation. Guru Nanak Dev Ji emphasized that accepting God's Hukam with joy and equanimity (Bhana Manna) is the path to liberation."
+  },
+  {
+    q: "What is the significance of Anandpur Sahib for Sikhs?",
+    options: ["Birthplace of Guru Nanak", "Founded by Guru Tegh Bahadur Ji, it is where the Khalsa was created in 1699 CE", "Location of the Golden Temple", "Where Guru Gobind Singh Ji attained Joti Jot"],
+    answer: 1,
+    explanation: "Anandpur Sahib (City of Bliss) was founded by Guru Tegh Bahadur Ji in 1665 CE. It became the spiritual capital of the Sikhs under Guru Gobind Singh Ji and is most significant as the birthplace of the Khalsa Panth on Baisakhi 1699 CE."
+  },
+  {
+    q: "What was the 'Sarbat Khalsa'?",
+    options: ["A type of Sikh prayer", "A gathering of the entire Khalsa Panth to make collective decisions (historically twice a year at Amritsar)", "A Sikh festival", "A military formation"],
+    answer: 1,
+    explanation: "Sarbat Khalsa was the general assembly of the entire Khalsa Panth, historically convened twice a year (Baisakhi and Diwali) at Amritsar in front of the Akal Takht. Collective resolutions (Gurmatas) passed by the Sarbat Khalsa were binding on all Sikhs."
+  },
+  {
+    q: "What is a 'Gurmata'?",
+    options: ["A Sikh scripture", "A resolution passed by the Sarbat Khalsa in the presence of Guru Granth Sahib Ji", "A Sikh prayer", "An administrative order of the SGPC"],
+    answer: 1,
+    explanation: "A Gurmata (Guru's intention/resolution) is a formal resolution passed by the Sarbat Khalsa in the presence of the Guru Granth Sahib Ji on matters of paramount importance to the Panth. Once passed, it is considered the Guru's will and binding on all Sikhs."
+  },
+  {
+    q: "What is the 'Nagar Kirtan'?",
+    options: ["An indoor prayer session", "A Sikh religious procession through streets with Kirtan, the Palki of Guru Granth Sahib Ji, and Gurdwara music", "A village prayer", "A Sikh festival at the Gurdwara only"],
+    answer: 1,
+    explanation: "Nagar Kirtan (City Hymn Singing) is a public religious procession where Sikhs carry the Guru Granth Sahib Ji on a decorated Palki (palanquin), sing Kirtan, and march through the streets. It is conducted on important Sikh occasions like Baisakhi and Gurpurabs."
+  },
+  {
+    q: "What is 'Kaur' and 'Singh' in Sikh names?",
+    options: [
+      "Caste titles",
+      "Kaur (Princess) for women and Singh (Lion) for men — surnames given at Amrit Sanchar to replace caste names",
+      "Titles of honor for scholars",
+      "Regional titles from Punjab"
+    ],
+    answer: 1,
+    explanation: "Guru Gobind Singh Ji gave the surname 'Singh' (Lion) to all Khalsa men and 'Kaur' (Princess/Prince) to all Khalsa women at the founding of the Khalsa in 1699. These titles replaced caste surnames, symbolizing equality and abolishing caste distinctions."
+  },
+  {
+    q: "What is the 'Deg' in 'Degh Tegh Fateh' and its religious significance?",
+    options: ["A sacred water vessel", "A large cooking vessel symbolizing charity, sharing of food, and Langar", "A ceremonial drum", "A sacred flag"],
+    answer: 1,
+    explanation: "Deg (cauldron) represents the Sikh institution of Langar — the community kitchen where food is prepared and shared freely with all. In a religious context, Deg refers to Karah Prasad (sacred sweet pudding) distributed at the end of Sikh services as a blessing."
+  },
+  {
+    q: "What is 'Karah Prasad'?",
+    options: ["A type of Sikh bread", "Sacred sweet pudding made of equal parts flour, ghee, and sugar, distributed in Gurdwaras as a blessing", "A Sikh festival food", "An offering to God"],
+    answer: 1,
+    explanation: "Karah Prasad is a sacred sweet pudding made of equal parts whole wheat flour (atta), clarified butter (ghee), and sugar, cooked while reciting Gurbani. It is distributed to all attendees at the Gurdwara as a symbol of equality, God's grace, and blessing."
+  },
+  {
+    q: "What is the Sikh stance on caste system?",
+    options: ["Accepts caste as part of society", "Completely rejects the caste system as contrary to the principle of equality before God", "Accepts caste for social organization only", "Views caste as a spiritual classification"],
+    answer: 1,
+    explanation: "Sikhism categorically rejects the caste system. Guru Nanak Dev Ji strongly condemned caste discrimination. The Sikh Rehit Maryada prohibits caste-based discrimination, and the institutions of Sangat, Pangat, and Langar were specifically designed to break caste barriers."
+  },
+  {
+    q: "What is 'Gurdwara Patna Sahib' (Takht Patna Sahib)?",
+    options: ["The birthplace of Guru Nanak Dev Ji", "The birthplace of Guru Gobind Singh Ji, one of the five Takhts", "The place where the Khalsa was founded", "The place where Guru Granth Sahib Ji was compiled"],
+    answer: 1,
+    explanation: "Takht Sri Patna Sahib in Patna, Bihar is the birthplace of Guru Gobind Singh Ji (born December 22, 1666). It is one of the five Takhts (supreme seats of authority) and one of the most sacred pilgrimage sites for Sikhs."
+  },
+  {
+    q: "What are the 'Five Transgressions' (Panj Dosh or five vices) against which Sikhs must guard?",
+    options: [
+      "Lust (Kaam), Anger (Krodh), Greed (Lobh), Attachment (Moh), Pride/Ego (Ahankaar)",
+      "Lying, Cheating, Stealing, Violence, Envy",
+      "Eating meat, drinking alcohol, gambling, adultery, drugs",
+      "Cutting hair, eating halal, smoking, idol worship, caste discrimination"
+    ],
+    answer: 0,
+    explanation: "The Panj Dosh (Five Thieves/Vices) are: Kaam (lust), Krodh (anger/wrath), Lobh (greed), Moh (worldly attachment), and Ahankaar (ego/pride). The Sikh Rehit Maryada and Gurbani constantly warn against these as the greatest obstacles to spiritual progress."
+  },
+  {
+    q: "What is the 'Dasam Granth'?",
+    options: ["The second Sikh scripture attributed mainly to Guru Gobind Singh Ji", "The first draft of the Guru Granth Sahib Ji", "A collection of Sikh history", "The Sikh law book"],
+    answer: 0,
+    explanation: "The Dasam Granth (Book of the Tenth Guru) is a scripture attributed primarily to Guru Gobind Singh Ji. It contains compositions including Jaap Sahib, Tav Prasad Savaiye, Chaupai Sahib (which are part of the daily Nitnem), as well as heroic poetry, mythology, and philosophy."
+  },
+  {
+    q: "What is 'Damdama Sahib' and why is it significant?",
+    options: ["Where Guru Gobind Singh Ji rested and dictated the final version of the Guru Granth Sahib Ji from memory", "The birthplace of Guru Nanak Dev Ji", "Where Amrit Sanchar was first performed", "Where Guru Tegh Bahadur Ji was martyred"],
+    answer: 0,
+    explanation: "Damdama Sahib (Talwandi Sabo, Punjab) is where Guru Gobind Singh Ji rested and dictated the complete Guru Granth Sahib Ji (including the hymns of Guru Tegh Bahadur Ji) from memory to Bhai Mani Singh in 1706. It is known as the 'Guru Ki Kashi' (the Guru's center of learning)."
+  },
+  {
+    q: "What was the first battle of the Sikh Misls?",
+    options: ["Battle of Sirhind", "Battle of Kartarpur", "Battle of Chamkaur", "Battle of Amritsar"],
+    answer: 1,
+    explanation: "The Battle of Kartarpur (1634 CE) was one of the first significant battles, fought by Guru Hargobind Ji against Mughal forces. The Sikh Misls (confederacies) later rose to power during the 18th century following the chaos after Banda Singh Bahadur's martyrdom."
+  },
+  {
+    q: "Who was Maharaja Ranjit Singh?",
+    options: ["A Mughal general", "The Sikh emperor who united the Sikh Misls and established the Sikh Empire (Khalsa Raj) in Punjab", "A disciple of Guru Gobind Singh Ji", "A Sikh scholar"],
+    answer: 1,
+    explanation: "Maharaja Ranjit Singh (1780–1839), known as the 'Lion of Punjab,' was the founder and ruler of the Sikh Empire (1799–1849). He consolidated the Sikh Misls, captured Lahore in 1799, and created the largest empire in South Asia at the time."
+  },
+  {
+    q: "What is 'Sach Khand' in Sikh philosophy?",
+    options: ["A physical location", "The realm of Truth — the highest spiritual state of union with God in Sikh theology", "A type of prayer", "The Sikh paradise"],
+    answer: 1,
+    explanation: "Sach Khand (Realm of Truth) is the highest of the five spiritual realms (Khands) described by Guru Nanak Dev Ji in Japji Sahib. It represents the ultimate state of spiritual liberation (Mukti) — complete union with God."
+  },
+  {
+    q: "What is 'Baani' or 'Gurbani'?",
+    options: ["Sikh folk music", "The sacred word of God as revealed through the Sikh Gurus, recorded in the Guru Granth Sahib Ji", "The Punjabi language", "Sikh religious poetry separate from scripture"],
+    answer: 1,
+    explanation: "Gurbani (Guru's word/utterance) refers to the divinely revealed sacred scripture recorded in the Guru Granth Sahib Ji. Sikhs believe Gurbani is not composed by the Gurus themselves but is the divine word of God revealed through them."
+  },
+  {
+    q: "What is 'Bhog' in Sikh practice?",
+    options: ["A type of food offering", "The concluding ceremony of an Akhand Path or Sehaj Path", "A Sikh pilgrimage", "The beginning ceremony of Akhand Path"],
+    answer: 1,
+    explanation: "Bhog refers to the completion/concluding ceremony of an Akhand Path or Sehaj Path. During the Bhog ceremony, the final Ang (page) of the Guru Granth Sahib Ji is read, followed by Ardas, Hukamnama, and distribution of Karah Prasad."
+  },
+  {
+    q: "What is the significance of Diwali in Sikh tradition?",
+    options: ["A Hindu festival only, not observed by Sikhs", "Bandi Chhor Divas — celebrating Guru Hargobind Ji's release from Gwalior Fort along with 52 kings", "The anniversary of the Golden Temple's completion", "The birth anniversary of Guru Nanak Dev Ji"],
+    answer: 1,
+    explanation: "Sikhs celebrate Diwali as Bandi Chhor Divas (Day of Liberation). In 1619 CE, Guru Hargobind Ji was released from Gwalior Fort by Mughal Emperor Jahangir. The Guru agreed to leave only if 52 Hindu kings imprisoned with him were also released. He held their cloaks as he walked out, earning the title 'Bandi Chhor' (Liberator)."
+  },
+  {
+    q: "What is the 'Sikh Rehat Maryada' regarding the consumption of intoxicants?",
+    options: ["Allowed in moderation", "Strictly prohibited — any tobacco, alcohol, or intoxicant is forbidden for Amritdhari Sikhs", "Prohibited only on holy days", "Only tobacco is prohibited"],
+    answer: 1,
+    explanation: "The Sikh Rehit Maryada strictly prohibits the consumption of tobacco in any form as one of the four cardinal prohibitions (Kurahits). It also strongly discourages the use of alcohol and other intoxicants, as they impair the mind and go against the Sikh principle of spiritual consciousness."
+  },
+  {
+    q: "What is a 'Takht' in Sikhism?",
+    options: ["A royal throne", "A seat of supreme temporal and spiritual authority for the Sikh Panth", "A type of Gurdwara", "An administrative title"],
+    answer: 1,
+    explanation: "A Takht (throne) in Sikhism is a seat of supreme authority that issues edicts (hukamnamas) on matters of religious significance for the entire Sikh Panth. The highest Takht is the Akal Takht in Amritsar, established by Guru Hargobind Ji."
+  },
+  {
+    q: "What is 'Langar' and who can partake in it?",
+    options: ["A special meal only for initiated Sikhs", "A community kitchen open to all — regardless of religion, caste, gender, or status — where free food is served", "A meal served only on special occasions", "A meal for the poor only"],
+    answer: 1,
+    explanation: "Langar is the community kitchen of the Gurdwara that serves free vegetarian meals to absolutely everyone — regardless of religion, caste, gender, social status, or any other distinction. It embodies the Sikh principles of equality, generosity, and service (Seva)."
+  },
+  {
+    q: "What happened at the Battle of Chamkaur Sahib (1704)?",
+    options: [
+      "Guru Tegh Bahadur Ji was arrested",
+      "Guru Gobind Singh Ji and his Sikhs fought a vastly outnumbered battle against Mughal forces; his two elder sons Ajit Singh and Jujhar Singh were martyred",
+      "The Khalsa was founded",
+      "Anandpur Sahib was established"
+    ],
+    answer: 1,
+    explanation: "The Battle of Chamkaur Sahib (December 1704) was a valiant last stand where Guru Gobind Singh Ji and approximately 40 Sikhs were besieged by hundreds of thousands of Mughal soldiers. His two elder sons, Sahibzada Ajit Singh (18) and Sahibzada Jujhar Singh (14), fought and attained martyrdom here."
+  },
+  {
+    q: "What is the 'Sikh Ardas' and when is it recited?",
+    options: [
+      "A personal prayer recited only before sleeping",
+      "The formal supplicatory prayer recited at the beginning and end of all Sikh ceremonies, gatherings, and gurdwara services",
+      "A prayer recited only during Gurpurabs",
+      "A prayer recited only at the Akal Takht"
+    ],
+    answer: 1,
+    explanation: "The Ardas (from Persian 'Arzdasht' meaning petition/supplication) is the formal Sikh prayer recited at the start and end of all Sikh ceremonies, services, and important occasions. It commemorates the Gurus and Sikh martyrs, seeks God's blessings, and concludes with 'Sarbat Da Bhala' (welfare of all)."
+  },
+  {
+    q: "What is the role of the 'Panj Pyare' today?",
+    options: [
+      "They exist only in historical memory",
+      "Five initiated Sikhs (representing the original Panj Pyare) who conduct Amrit Sanchar, issue Panthic decisions, and lead Nagar Kirtan processions",
+      "Five SGPC elected officials",
+      "Five Giani scholars who explain Gurbani"
+    ],
+    answer: 1,
+    explanation: "The Panj Pyare today are five initiated (Amritdhari) Sikhs selected to represent the original Five Beloved Ones. They conduct the Amrit Sanchar ceremony, lead Nagar Kirtans carrying the Nishan Sahib, and their collective decisions carry Panthic authority."
+  },
+  {
+    q: "What is the 'Nishan Sahib'?",
+    options: ["A Sikh war drum", "The triangular Sikh flag/standard with the Khanda symbol, flown at all Gurdwaras", "A decorative cloth for the Guru Granth Sahib Ji", "The royal insignia of Maharaja Ranjit Singh"],
+    answer: 1,
+    explanation: "The Nishan Sahib is the triangular Sikh flag bearing the Khanda symbol, flown on a tall flagpole at every Gurdwara. Its height and saffron/navy blue colour serve as a beacon, and it symbolizes the sovereignty of the Guru Granth Sahib Ji and the Sikh Panth."
+  },
+  {
+    q: "What is 'Chaur Sahib' (Chauri)?",
+    options: ["A type of sword", "The ceremonial whisk/fan waved over the Guru Granth Sahib Ji as a mark of reverence and royalty", "A Sikh musical instrument", "The cloth used to cover the Guru Granth Sahib Ji"],
+    answer: 1,
+    explanation: "The Chaur Sahib (ceremonial whisk/fly-whisk) is waved over the Guru Granth Sahib Ji continuously during ceremonies as a mark of the highest respect and royalty. This tradition follows the custom of showing reverence to royalty with a whisk, affirming the Guru Granth Sahib Ji's supreme status."
+  },
+  {
+    q: "What is 'Manji Sahib' or 'Takhtnuma' in a Gurdwara?",
+    options: ["The kitchen area", "The raised throne/platform on which the Guru Granth Sahib Ji is installed and read", "The musicians' area", "The shoe storage area"],
+    answer: 1,
+    explanation: "The Manji Sahib (also called Takhtnuma or Palki Sahib) is the raised, ornate platform or throne on which the Guru Granth Sahib Ji is installed in the main hall (Darbar Sahib) of a Gurdwara. It signifies the supreme sovereign status of the Guru Granth Sahib Ji."
+  },
+  {
+    q: "What is the significance of Maghi (Muktsar) in Sikh history?",
+    options: ["Birthday of Guru Nanak Dev Ji", "Commemorates the martyrdom of the 40 Muktas (liberated ones) at Muktsar who fought against the Mughals", "The foundation of the Khalsa", "Guru Tegh Bahadur Ji's martyrdom"],
+    answer: 1,
+    explanation: "Maghi (celebrated on Makar Sankranti) commemorates the Battle of Muktsar (1705 CE). Forty Sikhs who had previously deserted Guru Gobind Singh Ji returned, fought against the Mughals, and attained martyrdom. The Guru blessed them with liberation (Mukti) — hence 'Muktas' and 'Muktsar' (Pool of Liberation)."
+  },
+  {
+    q: "How many Angs (pages) does the Guru Granth Sahib Ji contain?",
+    options: ["1230", "1430", "1530", "1330"],
+    answer: 1,
+    explanation: "The Guru Granth Sahib Ji contains exactly 1,430 Angs (pages/limbs — 'Ang' meaning 'limb of the Guru'). It is organized by 31 musical ragas and contains compositions of 6 Sikh Gurus, 15 Bhagats (saints), 11 Bhatts (bards), and 4 Gursikhs."
+  },
+  {
+    q: "What is 'Sewa Panthi' or 'Sewa' as prescribed in Rehit Maryada?",
+    options: ["A Sikh sect focused only on meditation", "Active service to humanity as a path to God — considered as important as prayer and meditation", "Service only to Sikhs", "Service only in Gurdwaras"],
+    answer: 1,
+    explanation: "The Sikh Rehit Maryada prescribes Sewa (selfless service) as an essential spiritual practice equivalent to prayer. Service can be Tan (physical), Man (mental/intellectual), or Dhan (material/monetary). Serving humanity is serving God, as God is present in all."
+  },
+  {
+    q: "What is the Sikh view on idol worship?",
+    options: ["Permitted as a cultural practice", "Strictly prohibited — Sikhism teaches worship of the formless, omnipresent God alone", "Permitted for new converts", "Encouraged for visual representation of the Gurus"],
+    answer: 1,
+    explanation: "Sikhism strictly prohibits idol worship (Murti Puja). The Sikh Rehit Maryada explicitly states that Sikhs should not worship idols, graves, or cremation sites. Sikhs worship the formless, omnipresent God (Waheguru) through prayer, Gurbani, and Kirtan."
+  },
+  {
+    q: "Who composed the 'Anand Sahib' and on what occasion is it recited?",
+    options: [
+      "Guru Nanak Dev Ji, recited at weddings",
+      "Guru Amar Das Ji, recited at the end of all Sikh ceremonies and services",
+      "Guru Arjan Dev Ji, recited at funerals",
+      "Guru Gobind Singh Ji, recited at Amrit Sanchar"
+    ],
+    answer: 1,
+    explanation: "Anand Sahib (Song of Bliss) was composed by Guru Amar Das Ji and is recited at the conclusion of all Sikh religious services and ceremonies. It is part of the Nitnem (morning prayers) and expresses the spiritual joy of union with God."
+  },
+  {
+    q: "What is the concept of 'Haumai' in Sikh theology?",
+    options: ["God's grace", "Ego or self-centredness — the greatest obstacle to spiritual liberation in Sikh philosophy", "Attachment to material world", "The divine spark within humans"],
+    answer: 1,
+    explanation: "Haumai (ego/self-centredness) is considered by Guru Nanak Dev Ji as the root cause of human suffering and the greatest obstacle to spiritual liberation. It means placing the self ('I am') at the center rather than God. Overcoming Haumai through Gurbani and Simran is central to Sikh spirituality."
+  },
+  {
+    q: "What is a 'Masand' system and why was it abolished?",
+    options: [
+      "A music system; abolished for modernization",
+      "A revenue-collection system through appointed agents; abolished by Guru Gobind Singh Ji due to corruption and exploitation",
+      "A caste-based administration; abolished by the British",
+      "A legal system; abolished after Sikh Empire fell"
+    ],
+    answer: 1,
+    explanation: "The Masand system was introduced by Guru Ram Das Ji as a network of appointed agents to collect tithes (dasvandh) and spread Sikhism. Over time, many Masands became corrupt, exploiting Sikhs and keeping offerings for themselves. Guru Gobind Singh Ji abolished the Masand system entirely and called Sikhs to bring their offerings directly to him."
+  },
+  {
+    q: "What is the meaning of 'Waheguru' — the Sikh name for God?",
+    options: [
+      "The one true God",
+      "Wonderful Lord/Teacher — expressing wonder and awe at the greatness of God",
+      "The eternal creator",
+      "God of gods"
+    ],
+    answer: 1,
+    explanation: "'Waheguru' combines 'Wahe' (wonderful/praise/awe) and 'Guru' (teacher/enlightener). It expresses the Sikh experience of God as the Wonderful Enlightener who dispels darkness and ignorance. It is the primary name used for God in Sikh practice and the most common mantra for Simran."
+  },
+  {
+    q: "What is the Sikh Rehit Maryada regarding meat consumption (particularly for non-Amritdharis)?",
+    options: [
+      "All Sikhs must be strictly vegetarian",
+      "Amritdhari Sikhs must avoid Kutha (ritually slaughtered Halal/Kosher) meat; the Rehit Maryada does not mandate vegetarianism for all Sikhs",
+      "All meat is prohibited",
+      "Meat is encouraged as part of martial Sikh culture"
+    ],
+    answer: 1,
+    explanation: "The Sikh Rehit Maryada specifically prohibits Kutha meat (ritually slaughtered by Islamic Halal or Jewish Kosher methods) as one of the four Kurahits. The Maryada does not mandate strict vegetarianism for all Sikhs, though Langar food is vegetarian to accommodate everyone."
+  },
+  {
+    q: "What is 'Parkash Utsav'?",
+    options: ["A Sikh lighting festival", "The celebration of a Sikh Guru's birth anniversary", "The inauguration of a new Gurdwara", "The installation of the Guru Granth Sahib Ji"],
+    answer: 1,
+    explanation: "Parkash Utsav (Festival of Light/Appearance) celebrates the birth anniversary of a Sikh Guru. The most widely celebrated are Guru Nanak Dev Ji's Parkash Utsav (November full moon) and Guru Gobind Singh Ji's Parkash Utsav (December/January)."
+  },
+  {
+    q: "What is 'Katha' in Sikh tradition?",
+    options: ["A type of Sikh music", "The verbal exposition and explanation of Gurbani performed by a Granthi or scholar in the Gurdwara", "A form of Sikh poetry", "A Sikh meditation technique"],
+    answer: 1,
+    explanation: "Katha (discourse/commentary) is the verbal explanation and exposition of Gurbani passages by a Granthi, Gyani, or scholar in the Gurdwara. It helps the congregation understand the meaning and teachings of the sacred scripture."
+  },
+  {
+    q: "What is the significance of the Sarovar (sacred pool) at the Golden Temple?",
+    options: [
+      "It has no religious significance, only aesthetic",
+      "It is a sacred tank of holy water (Amrit Sarovar) where Sikhs bathe for spiritual purification; Amritsar derives its name from it",
+      "It is used only for Gurdwara water supply",
+      "It was built by the British"
+    ],
+    answer: 1,
+    explanation: "The Amrit Sarovar (Pool of Nectar) surrounding the Harmandir Sahib was excavated under Guru Ram Das Ji. The city 'Amritsar' takes its name from this sacred pool. Bathing in the Sarovar is considered spiritually cleansing. The water is treated with great reverence by Sikhs."
+  },
+  {
+    q: "What is the 'Sikh Gurdwaras Act 1925'?",
+    options: [
+      "A law allowing the British to control Gurdwaras",
+      "Legislation that transferred management of historical Sikh Gurdwaras from corrupt Mahants to the elected SGPC",
+      "A law establishing Sikh personal law",
+      "A law defining who is a Sikh"
+    ],
+    answer: 1,
+    explanation: "The Sikh Gurdwaras Act 1925 was the legislative outcome of the Gurdwara Reform Movement (Akali Movement 1920–25). It transferred control of historical Sikh Gurdwaras from hereditary mahants (priests who had become corrupt) to the democratically elected Shiromani Gurdwara Parbandhak Committee (SGPC)."
+  },
+  {
+    q: "What are 'Jathedar' and what is their role?",
+    options: [
+      "Head of a Sikh musical group",
+      "The head (chief) of one of the five Takhts, who issues hukamnamas and is the highest religious authority of Sikh temporal matters",
+      "The SGPC president",
+      "The head Granthi of the Golden Temple"
+    ],
+    answer: 1,
+    explanation: "A Jathedar is the head/leader of a Takht. The most senior is the Jathedar of Akal Takht, who is considered the highest temporal authority in Sikhism. Jathedars can issue hukamnamas (decrees), excommunicate Sikhs (tankhah), and make declarations on Panthic matters."
+  },
+  {
+    q: "What is 'Tankhah' in Sikh practice?",
+    options: ["A financial payment", "A religious penalty/punishment imposed by the Panj Pyare for violation of Sikh Rehit", "A type of prayer", "Salary for Gurdwara staff"],
+    answer: 1,
+    explanation: "Tankhah is a religious penalty or punishment imposed by the Panj Pyare on a Sikh for violations of the Rehit Maryada. The guilty Sikh must present themselves before the Panj Pyare, confess their transgression (Ardas), accept the penalty (which may include additional Seva), and may need to retake Amrit for serious offences."
+  },
+  {
+    q: "What were the 'Chali Mukte' (Forty Liberated Ones)?",
+    options: [
+      "Forty Sikhs who abandoned Guru Gobind Singh Ji but later returned, fought at Muktsar, and were liberated/blessed by the Guru",
+      "Forty Sikh scholars",
+      "Forty generals of the Sikh army",
+      "Forty kings freed by Guru Hargobind Ji"
+    ],
+    answer: 0,
+    explanation: "The Chali Mukte (Forty Liberated Ones) were Sikhs from the Majha region who had abandoned Guru Gobind Singh Ji at Anandpur with a 'bedava' (disclaimer). They later repented and returned under Mai Bhago's leadership, fought valiantly against the Mughals at Muktsar (1705 CE), and all attained martyrdom. Guru Gobind Singh Ji tore up the disclaimer and declared them liberated."
+  }
+];
+
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let userAnswers = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+
+  const shuffledAll = shuffle(ALL_QUESTIONS);
+  questions = shuffledAll.slice(0, 25).map(q => {
+    // Shuffle options
+    const opts = q.options.map((o, i) => ({ text: o, original: i }));
+    const shuffledOpts = shuffle(opts);
+    const newAnswer = shuffledOpts.findIndex(o => o.original === q.answer);
+    return {
+      q: q.q,
+      options: shuffledOpts.map(o => o.text),
+      answer: newAnswer,
+      explanation: q.explanation
+    };
+  });
+
+  currentQ = 0;
+  score = 0;
+  userAnswers = [];
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of 25`;
+  document.getElementById('live-score').textContent = `Score: ${score}`;
+  document.getElementById('progress-bar').style.width = `${((currentQ) / 25) * 100}%`;
+  document.getElementById('q-num-label').textContent = `Question ${currentQ + 1}`;
+  document.getElementById('q-text').textContent = q.q;
+
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  const labels = ['A', 'B', 'C', 'D'];
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-label">${labels[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    container.appendChild(btn);
+  });
+
+  document.getElementById('explanation').style.display = 'none';
+  document.getElementById('explanation').className = 'explanation';
+  document.getElementById('next-btn-wrap').style.display = 'none';
+
+  // Animate
+  const card = document.getElementById('question-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'fadeUp 0.4s ease';
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = idx === correct;
+
+  if (isCorrect) score++;
+
+  userAnswers.push({ q: q.q, chosen: q.options[idx], correct: q.options[correct], isCorrect });
+
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === correct) btn.classList.add('correct');
+    else if (i === idx && !isCorrect) btn.classList.add('wrong');
+  });
+
+  // Explanation
+  const expBox = document.getElementById('explanation');
+  expBox.className = `explanation ${isCorrect ? 'correct-exp' : 'wrong-exp'}`;
+  expBox.innerHTML = `<strong>${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</strong>${q.explanation}`;
+  expBox.style.display = 'block';
+
+  document.getElementById('live-score').textContent = `Score: ${score}`;
+  document.getElementById('next-btn-wrap').style.display = 'block';
+
+  // Last question
+  const nextBtn = document.getElementById('next-btn');
+  if (currentQ === 24) {
+    nextBtn.textContent = 'See Results →';
+  } else {
+    nextBtn.textContent = 'Next →';
+  }
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= 25) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+
+  const pct = Math.round((score / 25) * 100);
+  const wrong = 25 - score;
+
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('r-correct').textContent = score;
+  document.getElementById('r-wrong').textContent = wrong;
+  document.getElementById('r-pct').textContent = pct + '%';
+
+  let grade, msg;
+  if (pct >= 90) { grade = '⭐ Gurmat Scholar'; msg = 'Outstanding! Your knowledge of Sikh history and Rehit Maryada is exceptional.'; }
+  else if (pct >= 75) { grade = '🏅 Khalsa Vaasi'; msg = 'Excellent! You demonstrate deep understanding of Sikh teachings.'; }
+  else if (pct >= 60) { grade = '📖 Gurmukh Seeker'; msg = 'Good effort! Continue studying Gurbani and Sikh history.'; }
+  else if (pct >= 40) { grade = '🌱 Sikh Learner'; msg = 'Keep learning! Every Sikh should strive to deepen their knowledge.'; }
+  else { grade = '🙏 Beginner\'s Path'; msg = 'A journey of a thousand miles begins with a single step. Keep studying Sikh history!'; }
+
+  document.getElementById('result-grade').textContent = grade;
+  document.getElementById('result-msg').textContent = msg;
+  document.getElementById('review-section').style.display = 'none';
+}
+
+function toggleReview() {
+  const section = document.getElementById('review-section');
+  const list = document.getElementById('review-list');
+
+  if (section.style.display === 'none') {
+    section.style.display = 'block';
+    list.innerHTML = userAnswers.map((a, i) => `
+      <div class="review-item ${a.isCorrect ? 'r-correct' : 'r-wrong'}">
+        <div class="r-q">${i + 1}. ${a.q}</div>
+        <div class="r-ans">
+          Your answer: <span class="${a.isCorrect ? 'r-correct-lbl' : 'r-wrong-lbl'}">${a.chosen}</span>
+          ${!a.isCorrect ? `<br>Correct answer: <span class="r-correct-lbl">${a.correct}</span>` : ''}
+        </div>
+      </div>
+    `).join('');
+  } else {
+    section.style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>
