@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<!--
+  Animal Dice Adventure! — v3 "Full Edition"
+  Purpose  : Multi-player kids dice game for flat-table play; players sit around device.
+  Author   : [placeholder]
+  Created  : 2026
+  Deps     : Google Fonts (Boogaloo, Nunito) — degrades gracefully if offline.
+  Security : No external API calls. All state in memory; history in localStorage
+             wrapped in try/catch for private-browsing safety.
+  v3 changes vs v2:
+    - State machine (IDLE/ROLLING/RESULT) fixes race conditions + interval leaks
+    - Round counter fixed via turn-order-position tracking (not index comparison)
+    - Win conditions: round limit / score target / unlimited (new config screen)
+    - Turn timer: SVG ring drains green→yellow→red; auto-advances on expiry
+    - Streak bonus: same animal twice = ×1.5 pts + 🔥 animation + distinct sound
+    - Per-player colour assignment (8 vivid colours used on cards, chart, pointer)
+    - Per-animal result flash colours (Tiger=gold, Elephant=purple, etc.)
+    - Score bar chart on leaderboard with animated reveal
+    - Haptic feedback via navigator.vibrate()
+    - Shake-to-roll via DeviceMotion API (iOS permission-aware)
+    - Undo last roll (one level, available until next player acts)
+    - In-game scoreboard bottom sheet (tap 📊 or press S)
+    - Expandable history cards (tap to reveal per-player ranking)
+    - Keyboard: Space/Enter=roll, Esc=dismiss/skip, Ctrl+Z=undo, S=scoreboard
+    - PWA meta tags for home-screen install
+    - Physical dice: buttons correctly re-enabled each turn
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ਡੰਗਰ DICE">
+<meta name="theme-color" content="#1A0533">
+<title>ਡੰਗਰ DICE</title>
+<!-- Boogaloo + Nunito for UI; Noto Sans Gurmukhi for Punjabi script -->
+<link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@600;800;900&family=Noto+Sans+Gurmukhi:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cy:#FFCE47;--co:#FF8C42;--cr:#FF4E6A;--cg:#3DD68C;
+  --ct:#2EC4B6;--cp:#9B5DE5;--ck:#FF85C8;--cb:#4A90E2;
+  --bg1:#1A0533;--bg2:#2D1052;--bg3:#0E2A5C;
+  --tl:rgba(255,255,255,.85);--tm:rgba(255,255,255,.50);
+  --rxl:28px;--rlg:20px;--rmd:14px;--rfl:9999px;
+  --sh:0 8px 32px rgba(0,0,0,.42);
+  --fd:'Boogaloo','Comic Sans MS',cursive;
+  --fb:'Nunito','Trebuchet MS',sans-serif;
+}
+html{height:100%}
+body{
+  font-family:var(--fb);font-weight:600;min-height:100%;
+  background:linear-gradient(145deg,var(--bg1) 0%,var(--bg2) 40%,var(--bg3) 100%) fixed;
+  color:#fff;overflow-x:hidden;position:relative;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.8) 1px,transparent 1px),
+                   radial-gradient(circle,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:80px 80px,40px 40px;background-position:0 0,20px 20px;opacity:.14;
+}
+
+/* ── SCREENS ── */
+.screen{
+  display:none;min-height:100vh;min-height:100dvh;
+  flex-direction:column;align-items:center;justify-content:center;
+  position:relative;z-index:1;padding:24px 16px 36px;overflow-y:auto;
+}
+.screen.active{display:flex}
+#screen-game{padding:0;overflow:hidden}
+
+/* ── BASE CARD ── */
+.card{
+  background:rgba(255,255,255,.12);backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);border:1.5px solid rgba(255,255,255,.22);
+  border-radius:var(--rxl);padding:30px 26px;width:100%;max-width:600px;box-shadow:var(--sh);
+}
+
+/* ── TYPOGRAPHY ── */
+.title-glow{
+  font-family:var(--fd);font-size:clamp(2.8rem,10vw,4.4rem);
+  text-align:center;line-height:1.1;
+  background:linear-gradient(135deg,var(--cy),var(--co),var(--cr));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 26px rgba(255,180,0,.5));
+}
+.section-label{font-family:var(--fd);font-size:1.4rem;color:var(--cy);margin-bottom:12px}
+.subtitle{text-align:center;color:var(--tl);font-size:1.1rem}
+
+/* ── BUTTONS ── */
+.btn{
+  font-family:var(--fd);font-size:1.4rem;border:none;border-radius:var(--rfl);
+  padding:14px 30px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  -webkit-tap-highlight-color:transparent;user-select:none;
+  position:relative;overflow:hidden;transition:transform .1s,box-shadow .1s;
+}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background .15s;border-radius:inherit}
+.btn:hover::after{background:rgba(255,255,255,.12)}
+.btn:active{transform:translateY(4px)}
+.btn-red   {background:linear-gradient(135deg,#FF4E6A,#FF2D4E);color:#fff;box-shadow:0 6px 0 #b01c31}
+.btn-yellow{background:linear-gradient(135deg,#FFCE47,#FFB020);color:#3a2000;box-shadow:0 6px 0 #c07800}
+.btn-green {background:linear-gradient(135deg,#3DD68C,#22B870);color:#fff;box-shadow:0 6px 0 #148050}
+.btn-purple{background:linear-gradient(135deg,#9B5DE5,#7A3CCB);color:#fff;box-shadow:0 6px 0 #4a1a90}
+.btn-teal  {background:linear-gradient(135deg,#2EC4B6,#1AA39A);color:#fff;box-shadow:0 6px 0 #0e7070}
+.btn-ghost {background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.25);box-shadow:none}
+.btn-full{width:100%}.btn-lg{font-size:1.9rem;padding:18px 40px}
+.btn-sm{font-size:1.05rem;padding:9px 20px}.btn-xs{font-size:.9rem;padding:7px 14px}
+.btn-icon{
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);
+  border-radius:var(--rfl);font-size:1.4rem;width:46px;height:46px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;border:none;color:#fff;
+}
+
+/* ── SETUP SCREEN ── */
+#screen-setup .card{text-align:center}
+.player-counter{display:flex;align-items:center;justify-content:center;gap:36px;margin:16px 0 34px}
+.counter-btn{
+  width:72px;height:72px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,var(--cy),var(--co));color:#3a1a00;
+  font-size:2.6rem;font-family:var(--fd);cursor:pointer;box-shadow:0 6px 0 #a05000;
+  transition:transform .1s,box-shadow .1s;
+  display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;
+}
+.counter-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #a05000}
+.counter-num{font-family:var(--fd);font-size:5.5rem;color:var(--cy);min-width:80px;line-height:1;text-shadow:0 0 24px rgba(255,206,71,.7)}
+.dice-choice{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0 30px}
+.dice-card{
+  border:3px solid rgba(255,255,255,.2);border-radius:var(--rlg);
+  padding:24px 14px;cursor:pointer;background:rgba(255,255,255,.07);
+  transition:all .2s;-webkit-tap-highlight-color:transparent;
+}
+.dice-card.selected{border-color:var(--cy);background:rgba(255,206,71,.18);transform:scale(1.04);box-shadow:0 0 24px rgba(255,206,71,.35)}
+.dice-card .dc-icon{font-size:4rem;display:block;margin-bottom:10px}
+.dice-card .dc-label{font-family:var(--fd);font-size:1.3rem;display:block}
+.dice-card .dc-sub{font-size:.9rem;color:var(--tm);margin-top:4px;display:block}
+.setup-actions{display:flex;flex-direction:column;gap:12px}
+
+/* ── GAME CONFIG SCREEN ── */
+#screen-gameconfig .card{text-align:left}
+.config-section{margin-bottom:28px}
+.config-label{font-family:var(--fd);font-size:1.4rem;color:var(--cy);margin-bottom:14px;display:block}
+.win-type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.win-type-card{
+  border:2.5px solid rgba(255,255,255,.15);border-radius:var(--rlg);
+  padding:18px 10px;cursor:pointer;text-align:center;
+  background:rgba(255,255,255,.06);transition:all .2s;-webkit-tap-highlight-color:transparent;
+}
+.win-type-card.selected{border-color:var(--cy);background:rgba(255,206,71,.18);transform:scale(1.04);box-shadow:0 0 20px rgba(255,206,71,.3)}
+.wtc-icon{font-size:2.4rem;display:block;margin-bottom:8px}
+.wtc-label{font-family:var(--fd);font-size:1.05rem;color:#fff;display:block}
+.win-value-area{display:none;margin-top:4px}
+.win-value-area.visible{display:block}
+.option-pills{display:flex;flex-wrap:wrap;gap:10px}
+.opt-pill{
+  font-family:var(--fd);font-size:1.1rem;padding:10px 20px;
+  border-radius:var(--rfl);border:2px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.07);color:#fff;cursor:pointer;
+  transition:all .15s;-webkit-tap-highlight-color:transparent;
+}
+.opt-pill.selected{border-color:var(--cy);background:rgba(255,206,71,.22);color:var(--cy);box-shadow:0 0 16px rgba(255,206,71,.3)}
+.config-actions{display:flex;gap:14px;margin-top:4px}
+
+/* ── NAMES SCREEN ── */
+.player-rows{display:flex;flex-direction:column;gap:14px;margin-bottom:26px}
+.player-row{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.08);border-radius:var(--rmd);
+  padding:12px 16px;border:1.5px solid rgba(255,255,255,.12);
+}
+.p-badge{
+  font-family:var(--fd);font-size:1.1rem;color:#fff;
+  border-radius:50%;width:36px;height:36px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(0,0,0,.3);
+}
+.avatar-pick{
+  width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.25);
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:2.4rem;background:rgba(255,255,255,.1);
+  transition:border-color .2s,transform .15s;-webkit-tap-highlight-color:transparent;
+}
+.avatar-pick:hover{transform:scale(1.1)}
+input.name-input{
+  flex:1;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);
+  border-radius:var(--rmd);padding:13px 16px;color:#fff;
+  font-family:var(--fb);font-size:1.1rem;font-weight:800;outline:none;transition:border-color .2s;
+}
+input.name-input::placeholder{color:rgba(255,255,255,.35)}
+input.name-input:focus{border-color:var(--cy)}
+
+/* ── AVATAR MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(10,0,25,.75);z-index:300;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:linear-gradient(145deg,#2D1052,#1A0533);
+  border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rxl);
+  padding:28px;width:100%;max-width:440px;max-height:80vh;overflow-y:auto;
+}
+.modal-title{font-family:var(--fd);font-size:1.9rem;color:var(--cy);text-align:center;margin-bottom:20px}
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.av-option{
+  aspect-ratio:1;border-radius:50%;border:3px solid rgba(255,255,255,.15);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:2.1rem;background:rgba(255,255,255,.07);transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.av-option:hover{border-color:var(--cy);transform:scale(1.14)}
+.av-option.chosen{border-color:var(--cy);background:rgba(255,206,71,.22);transform:scale(1.1)}
+
+/* ── GAME ARENA ── */
+.game-arena{position:relative;width:100%;height:100vh;height:100dvh;overflow:hidden}
+.game-topbar{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;z-index:50;
+  background:linear-gradient(to bottom,rgba(26,5,51,.9) 0%,transparent 100%);
+  pointer-events:none;
+}
+.game-topbar>*{pointer-events:auto}
+.topbar-left{display:flex;gap:8px;align-items:center}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.round-pill{
+  background:rgba(255,206,71,.2);border:1.5px solid var(--cy);color:var(--cy);
+  font-family:var(--fd);font-size:1.05rem;padding:6px 16px;border-radius:var(--rfl);
+}
+
+/* ── PLAYER CARDS ── */
+#playersGrid{position:absolute;inset:0;pointer-events:none}
+.p-card{
+  position:absolute;border-radius:var(--rlg);
+  background:rgba(255,255,255,.10);border:2.5px solid rgba(255,255,255,.22);
+  padding:10px 8px;text-align:center;pointer-events:auto;
+  transition:background .3s,border-color .3s,box-shadow .3s,transform .3s;
+}
+.p-card.is-active{background:rgba(255,255,255,.18)}
+.p-card.is-quit{opacity:.3;filter:grayscale(90%);pointer-events:none}
+.quit-x{
+  position:absolute;top:-10px;right:-10px;
+  width:32px;height:32px;border-radius:50%;
+  background:var(--cr);border:2px solid rgba(255,255,255,.4);
+  color:#fff;font-size:.85rem;font-weight:900;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  z-index:2;transition:transform .15s;-webkit-tap-highlight-color:transparent;
+}
+.quit-x:hover{transform:scale(1.2)}
+.pc-avatar{display:block;line-height:1.1;margin-bottom:4px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4))}
+.pc-name{font-family:var(--fd);color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.pc-score{font-family:var(--fd);display:block;line-height:1}
+.pc-last{color:var(--tm);margin-top:2px;display:block}
+.pc-streak{font-family:var(--fd);font-size:.75rem;color:#FF8C42;display:block;margin-top:1px}
+.pc-prog{width:100%;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin-top:5px;overflow:hidden}
+.pc-prog-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.score-pop{animation:sPop .45s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes sPop{0%{transform:scale(1)}50%{transform:scale(1.7)}100%{transform:scale(1)}}
+
+/* ── TURN POINTER ── */
+.turn-pointer{
+  position:absolute;top:50%;left:50%;width:0;height:0;
+  transform:translate(-50%,-50%) rotate(0deg);
+  transition:transform .65s cubic-bezier(.34,1.56,.64,1);
+  z-index:5;pointer-events:none;
+}
+.pointer-arrow{
+  position:absolute;left:0;transform:translateX(-50%);
+  font-size:2.6rem;line-height:1;
+  animation:ptrBounce .8s ease-in-out infinite alternate;user-select:none;
+}
+@keyframes ptrBounce{
+  from{opacity:.7;transform:translateX(-50%) translateY(0) scale(1)}
+  to{opacity:1;transform:translateX(-50%) translateY(-10px) scale(1.2);filter:drop-shadow(0 0 18px currentColor)}
+}
+
+/* ── DICE CENTER ── */
+.dice-center-wrap{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:10;text-align:center;
+}
+.timer-ring-wrap{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:0;pointer-events:none;
+}
+.timer-svg{overflow:visible;display:block}
+.timer-track{fill:none;stroke:rgba(255,255,255,.10)}
+.timer-arc{
+  fill:none;stroke:#3DD68C;stroke-linecap:round;
+  transform-origin:50% 50%;
+  transform:rotate(-90deg);
+  transition:stroke .4s ease;
+}
+.virtual-dice{
+  background:linear-gradient(145deg,#fff,#ddd);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;line-height:1;
+  border:3px solid rgba(255,255,255,.9);
+  position:relative;z-index:1;
+  -webkit-tap-highlight-color:transparent;user-select:none;
+  transition:transform .1s,box-shadow .1s;
+}
+.virtual-dice:active{transform:translateY(8px) !important;box-shadow:none !important}
+.virtual-dice.rolling{animation:rollShake .95s ease-in-out;cursor:default;pointer-events:none}
+@keyframes rollShake{
+  0%{transform:rotate(0deg) scale(1)}
+  12%{transform:rotate(-22deg) scale(.86)}
+  28%{transform:rotate(22deg) scale(1.14)}
+  44%{transform:rotate(-16deg) scale(.91)}
+  60%{transform:rotate(16deg) scale(1.09)}
+  76%{transform:rotate(-8deg) scale(.96)}
+  90%{transform:rotate(8deg) scale(1.04)}
+  100%{transform:rotate(0deg) scale(1)}
+}
+.dice-tap-hint{font-family:var(--fd);color:var(--tm);margin-top:10px;user-select:none;position:relative;z-index:1}
+.timer-secs-warning{
+  position:absolute;z-index:2;pointer-events:none;
+  font-family:var(--fd);font-size:2.5rem;color:var(--cr);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  text-shadow:0 0 20px rgba(255,78,106,.8);
+  animation:warningPulse .5s ease-in-out infinite alternate;
+  display:none;
+}
+@keyframes warningPulse{from{opacity:.7;transform:translate(-50%,-50%) scale(1)}to{opacity:1;transform:translate(-50%,-50%) scale(1.2)}}
+
+/* ── PHYSICAL PICK PANEL ── */
+.phys-pick-panel{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:min(90vw,380px);z-index:10;
+  background:rgba(20,5,50,.93);border:2px solid rgba(255,255,255,.22);
+  border-radius:var(--rxl);padding:18px;
+  backdrop-filter:blur(14px);box-shadow:var(--sh);
+}
+.pick-label{font-family:var(--fd);font-size:1.15rem;color:var(--cy);text-align:center;margin-bottom:14px}
+.animal-pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.animal-btn{
+  background:rgba(255,255,255,.10);border:2px solid rgba(255,255,255,.18);
+  border-radius:var(--rmd);padding:14px 8px;cursor:pointer;text-align:center;
+  transition:all .15s;-webkit-tap-highlight-color:transparent;
+}
+.animal-btn:hover{border-color:var(--cy);background:rgba(255,206,71,.15);transform:translateY(-3px) scale(1.05)}
+.animal-btn:disabled{opacity:.35;cursor:default;transform:none;pointer-events:none}
+.ab-emoji{font-size:2.6rem;display:block}
+.ab-name{font-family:var(--fd);font-size:.9rem;color:#fff;display:block;margin-top:3px}
+.ab-score{font-family:var(--fd);font-size:1rem;color:var(--cy);display:block}
+
+/* ── RESULT FLASH ── */
+.result-flash{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.3);
+  width:min(90vw,400px);opacity:0;
+  border-radius:var(--rxl);padding:26px 28px;text-align:center;
+  z-index:25;pointer-events:none;
+  background:linear-gradient(135deg,var(--co),var(--cr));
+}
+.result-flash.show{pointer-events:auto;animation:flashPop .4s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes flashPop{to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.rf-emoji{font-size:clamp(3.5rem,13vmin,6rem);line-height:1;display:block}
+.rf-streak-badge{
+  display:inline-block;font-family:var(--fd);font-size:1.3rem;
+  background:rgba(255,255,255,.25);border-radius:var(--rfl);
+  padding:4px 16px;margin:8px 0 4px;color:#fff;
+}
+.rf-text{font-family:var(--fd);font-size:clamp(1.2rem,4vmin,1.9rem);color:#fff;margin:4px 0}
+.rf-pts{font-family:var(--fd);font-size:clamp(2.8rem,10vmin,4.5rem);color:#fff;line-height:1}
+.next-area{margin-top:16px;text-align:center}
+.auto-next-bar{height:8px;background:rgba(255,255,255,.25);border-radius:var(--rfl);overflow:hidden;margin-bottom:8px}
+.auto-next-fill{
+  height:100%;width:100%;background:linear-gradient(90deg,#fff,rgba(255,255,255,.6));
+  border-radius:var(--rfl);transform-origin:left;animation:drainBar 2.8s linear forwards;
+}
+@keyframes drainBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.auto-next-label{font-family:var(--fd);font-size:1.05rem;color:rgba(255,255,255,.85);margin-bottom:10px}
+.next-btns{display:flex;gap:10px;justify-content:center;margin-top:8px}
+
+/* ── IN-GAME SCOREBOARD SHEET ── */
+.scoreboard-sheet{
+  position:absolute;bottom:0;left:50%;
+  transform:translateX(-50%) translateY(calc(100% + 2px));
+  width:min(92vw,360px);z-index:30;
+  background:rgba(12,4,28,.96);border:1.5px solid rgba(255,255,255,.2);
+  border-radius:20px 20px 0 0;padding:18px 18px 28px;
+  backdrop-filter:blur(20px);box-shadow:var(--sh);
+  transition:transform .38s cubic-bezier(.34,1.2,.64,1);
+}
+.scoreboard-sheet.open{transform:translateX(-50%) translateY(0)}
+.sco-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sco-title{font-family:var(--fd);font-size:1.5rem;color:var(--cy)}
+.sco-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.sco-row:last-child{border-bottom:none}
+.sco-rank{font-family:var(--fd);font-size:1.2rem;width:28px;color:var(--tm);flex-shrink:0}
+.sco-ava{font-size:1.8rem;flex-shrink:0}
+.sco-name{font-family:var(--fd);flex:1;color:#fff;font-size:1rem}
+.sco-pts{font-family:var(--fd);font-size:1.3rem}
+.sco-active-tag{font-size:.7rem;color:var(--cy);display:block}
+
+/* ── CONFIRM MODALS ── */
+.confirm-modal{
+  display:none;position:fixed;inset:0;background:rgba(10,0,25,.82);z-index:400;
+  align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);
+}
+.confirm-modal.open{display:flex}
+.confirm-box{
+  background:linear-gradient(145deg,#2D1052,#1A0533);
+  border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rxl);
+  padding:36px 30px;max-width:380px;width:100%;text-align:center;
+  box-shadow:var(--sh);animation:popIn .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.confirm-icon{font-size:4.5rem;margin-bottom:10px;display:block}
+.confirm-title{font-family:var(--fd);font-size:2rem;color:#fff;margin-bottom:10px}
+.confirm-body{color:var(--tl);font-size:1rem;margin-bottom:28px;line-height:1.6}
+.confirm-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ── LEADERBOARD ── */
+#screen-leaderboard{justify-content:flex-start;padding-top:24px}
+.lb-card{
+  background:rgba(255,255,255,.10);backdrop-filter:blur(16px);
+  border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rxl);
+  padding:30px 24px;width:100%;max-width:560px;box-shadow:var(--sh);
+}
+.lb-title{
+  font-family:var(--fd);font-size:clamp(2.2rem,8vw,3.2rem);text-align:center;
+  background:linear-gradient(135deg,var(--cy),var(--co));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:20px;
+}
+.winner-pod{
+  background:linear-gradient(135deg,rgba(255,206,71,.28),rgba(255,140,66,.28));
+  border:2.5px solid var(--cy);border-radius:var(--rxl);
+  padding:26px 20px;text-align:center;margin-bottom:22px;
+  box-shadow:0 0 40px rgba(255,206,71,.35);
+}
+.winner-tag{font-family:var(--fd);font-size:1.1rem;color:var(--cy);letter-spacing:3px;margin-bottom:8px;display:block}
+.winner-ava{font-size:6rem;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5));display:block}
+.winner-name{font-family:var(--fd);font-size:2.4rem;color:#fff;margin-top:8px;display:block}
+.winner-score{font-family:var(--fd);font-size:1.4rem;color:var(--cy);display:block}
+.rank-rows{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.rank-row{
+  display:flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,.07);border-radius:var(--rmd);
+  padding:14px 16px;border:1.5px solid rgba(255,255,255,.10);
+}
+.rank-row.gold{background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(255,165,0,.25));border-color:#FFD700}
+.rank-row.silver{background:linear-gradient(135deg,rgba(192,192,192,.2),rgba(160,160,160,.2));border-color:#C0C0C0}
+.rank-row.bronze{background:linear-gradient(135deg,rgba(205,127,50,.2),rgba(139,90,43,.2));border-color:#CD7F32}
+.rank-row.quit-row{opacity:.38}
+.rank-medal{font-size:1.7rem;width:36px;text-align:center;flex-shrink:0;font-family:var(--fd);color:var(--tm)}
+.rank-ava{font-size:2.4rem;flex-shrink:0}
+.rank-name{font-family:var(--fd);font-size:1.15rem;color:#fff;flex:1}
+.rank-pts{font-family:var(--fd);font-size:1.4rem}
+.rank-quit-tag{font-size:.72rem;color:var(--cr);display:block;line-height:1.3}
+
+/* ── SCORE CHART ── */
+.score-chart{margin-bottom:22px}
+.sc-title{font-family:var(--fd);font-size:1.3rem;color:var(--cy);margin-bottom:14px}
+.sc-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sc-label{font-family:var(--fd);font-size:.88rem;color:#fff;width:78px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-bar-wrap{flex:1;height:22px;background:rgba(255,255,255,.1);border-radius:11px;overflow:hidden}
+.sc-bar{height:100%;border-radius:11px;min-width:5px;transform-origin:left;animation:barGrow .65s cubic-bezier(.34,1.2,.64,1) both}
+@keyframes barGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.sc-val{font-family:var(--fd);font-size:.95rem;color:var(--cy);width:46px;text-align:right;flex-shrink:0}
+
+.lb-actions{display:flex;flex-direction:column;gap:12px}
+
+/* ── HISTORY ── */
+#screen-history{justify-content:flex-start;padding-top:24px}
+.history-card{
+  background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.12);
+  border-radius:var(--rlg);padding:16px;margin-bottom:14px;
+  transition:border-color .2s;
+}
+.history-card:hover{border-color:rgba(255,255,255,.28)}
+.hc-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hc-winner{display:flex;align-items:center;gap:10px;flex:1;cursor:pointer}
+.hc-ava{font-size:2.4rem}
+.hc-name{font-family:var(--fd);font-size:1.2rem;color:#fff}
+.hc-score{font-family:var(--fd);font-size:.95rem}
+.hc-meta{font-size:.8rem;color:var(--tm);text-align:right;line-height:1.7}
+.hc-toggle-btn{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  border-radius:var(--rfl);color:var(--tm);font-size:.8rem;cursor:pointer;
+  padding:5px 10px;-webkit-tap-highlight-color:transparent;
+  transition:all .15s;flex-shrink:0;
+}
+.hc-toggle-btn:hover{border-color:var(--cy);color:var(--cy)}
+.hc-detail{
+  max-height:0;overflow:hidden;
+  transition:max-height .35s ease,padding .35s ease;
+}
+.hc-detail.open{max-height:300px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);margin-top:12px}
+.hc-rank-row{display:flex;align-items:center;gap:10px;padding:6px 0}
+.hcr-medal{font-size:1.2rem;width:24px;flex-shrink:0}
+.hcr-ava{font-size:1.5rem}
+.hcr-name{font-family:var(--fd);font-size:.95rem;color:#fff;flex:1}
+.hcr-pts{font-family:var(--fd);font-size:1rem}
+.history-empty{text-align:center;padding:60px 0;color:var(--tm)}
+.he-icon{font-size:5rem;display:block;margin-bottom:16px}
+.he-text{font-family:var(--fd);font-size:1.5rem;color:var(--tl)}
+.he-sub{font-size:.95rem;margin-top:8px}
+
+/* ── FLOATING / PARTICLES ── */
+.float-pop{
+  position:fixed;pointer-events:none;z-index:500;
+  font-family:var(--fd);font-size:2.5rem;color:var(--cy);
+  text-shadow:0 2px 10px rgba(0,0,0,.6);
+  animation:floatAway 1.7s ease-out forwards;
+}
+@keyframes floatAway{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-120px) scale(1.6)}}
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:600;overflow:hidden}
+.confetti-bit{position:absolute;border-radius:3px;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(-40px) rotate(0)}100%{opacity:0;transform:translateY(110vh) rotate(900deg)}}
+
+/* ── TIGER SPARKS ── */
+.tiger-spark{
+  position:fixed;pointer-events:none;z-index:501;font-size:1.8rem;
+  animation:sparkFly 1.2s ease-out forwards;
+}
+@keyframes sparkFly{
+  0%{opacity:1;transform:translate(0,0) scale(1) rotate(0)}
+  100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(.3) rotate(var(--sr))}
+}
+
+/* ── GURMUKHI TITLE ── */
+.gurmukhi{
+  font-family:'Noto Sans Gurmukhi','Raavi','Lohit Gurmukhi',sans-serif;
+  font-weight:900;
+}
+
+/* ── QUESTION OVERLAY ── */
+.question-overlay{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.85);
+  width:min(92vw,420px);opacity:0;
+  background:linear-gradient(145deg,#0A1628,#1A0C3C);
+  border:2px solid rgba(255,255,255,.22);
+  border-radius:var(--rxl);padding:22px 20px 20px;
+  z-index:20;pointer-events:none;
+  box-shadow:0 14px 50px rgba(0,0,0,.6);
+  transition:opacity .3s ease, transform .3s cubic-bezier(.34,1.3,.64,1);
+}
+.question-overlay.show{
+  opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto;
+}
+.q-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.q-subject-badge{
+  font-family:var(--fd);font-size:.85rem;padding:4px 12px;
+  border-radius:var(--rfl);border:1.5px solid;flex-shrink:0;
+}
+.q-player{font-family:var(--fd);font-size:1rem;color:var(--tl);flex:1}
+.q-text{
+  font-family:var(--fb);font-size:1.05rem;color:#fff;
+  line-height:1.6;margin-bottom:16px;font-weight:700;min-height:40px;
+}
+.q-loader{
+  text-align:center;padding:20px 0;font-family:var(--fd);
+  color:var(--tm);font-size:1.2rem;
+}
+.q-loader .spinner{
+  display:inline-block;font-size:2rem;
+  animation:spin .8s linear infinite;margin-bottom:8px;display:block;
+}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.q-options{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.q-option{
+  background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.18);
+  border-radius:var(--rmd);padding:12px 16px;cursor:pointer;
+  display:flex;align-items:center;gap:12px;
+  font-family:var(--fb);font-size:.98rem;color:#fff;font-weight:700;
+  transition:all .15s;text-align:left;-webkit-tap-highlight-color:transparent;
+}
+.q-option:hover{border-color:var(--cy);background:rgba(255,206,71,.12);transform:translateX(4px)}
+.q-option.correct{border-color:var(--cg)!important;background:rgba(61,214,140,.22)!important;pointer-events:none}
+.q-option.wrong  {border-color:var(--cr)!important;background:rgba(255,78,106,.22)!important;pointer-events:none}
+.q-option.reveal-correct{border-color:var(--cg)!important;background:rgba(61,214,140,.12)!important}
+.q-opt-letter{
+  font-family:var(--fd);font-size:1.1rem;color:var(--cy);
+  width:28px;flex-shrink:0;text-align:center;
+}
+.q-result-bar{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;
+  border-radius:var(--rmd);margin-bottom:10px;
+}
+.q-result-bar.correct{background:rgba(61,214,140,.18);border:1.5px solid var(--cg)}
+.q-result-bar.wrong  {background:rgba(255,78,106,.18);border:1.5px solid var(--cr)}
+.q-result-icon{font-size:1.8rem}
+.q-result-text{font-family:var(--fd);font-size:1.05rem;flex:1;color:#fff}
+.q-fact{font-size:.85rem;color:var(--tm);margin-top:4px;line-height:1.5}
+.q-skip-btn{
+  font-family:var(--fd);font-size:.88rem;color:var(--tm);background:none;
+  border:none;cursor:pointer;display:block;margin:6px auto 0;text-decoration:underline;
+  -webkit-tap-highlight-color:transparent;
+}
+.q-skip-btn:hover{color:var(--tl)}
+/* Question answer timer */
+.q-timer-bar-wrap{
+  height:7px;background:rgba(255,255,255,.15);border-radius:var(--rfl);
+  overflow:hidden;margin-bottom:14px;
+}
+.q-timer-bar-fill{
+  height:100%;border-radius:var(--rfl);transform-origin:left;
+  background:linear-gradient(90deg,var(--cg),var(--cy));
+  transition:background .4s;
+}
+.q-timer-bar-fill.warn{background:linear-gradient(90deg,var(--cy),var(--co))}
+.q-timer-bar-fill.danger{background:linear-gradient(90deg,var(--co),var(--cr))}
+/* Config toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.toggle-label{font-family:var(--fd);font-size:1.1rem;color:#fff}
+.toggle-switch{
+  width:52px;height:28px;border-radius:14px;background:rgba(255,255,255,.15);
+  border:1.5px solid rgba(255,255,255,.25);cursor:pointer;position:relative;
+  transition:background .2s;-webkit-tap-highlight-color:transparent;flex-shrink:0;
+}
+.toggle-switch.on{background:var(--cg);border-color:var(--cg)}
+.toggle-knob{
+  position:absolute;top:3px;left:3px;width:20px;height:20px;
+  border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.3);
+  transition:transform .2s;
+}
+.toggle-switch.on .toggle-knob{transform:translateX(24px)}
+.q-config-area{display:none;margin-top:2px}
+.q-config-area.visible{display:block}
+.subject-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.subject-pill{
+  font-family:var(--fd);font-size:.88rem;padding:8px 6px;text-align:center;
+  border-radius:var(--rmd);border:2px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06);color:#fff;cursor:pointer;
+  transition:all .15s;-webkit-tap-highlight-color:transparent;
+}
+.subject-pill.selected{
+  border-color:var(--ct);background:rgba(46,196,182,.2);color:var(--ct);
+  box-shadow:0 0 12px rgba(46,196,182,.3);
+}
+.age-pills{display:flex;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<!-- ═══ SCREEN 1 — SETUP ═══ -->
+<div id="screen-setup" class="screen active">
+  <div style="margin-bottom:22px;text-align:center">
+    <h1 class="title-glow">
+      <span class="gurmukhi">ਡੰਗਰ</span> DICE
+    </h1>
+    <p class="subtitle" style="margin-top:10px">Roll animals · Rack up points · WIN! 🏆</p>
+  </div>
+  <div class="card">
+    <p class="section-label">👥 How many players?</p>
+    <div class="player-counter">
+      <button class="counter-btn" onclick="changeCount(-1)">−</button>
+      <span class="counter-num" id="countDisp">2</span>
+      <button class="counter-btn" onclick="changeCount(+1)">+</button>
+    </div>
+    <p class="section-label">🎲 Which dice?</p>
+    <div class="dice-choice">
+      <div class="dice-card selected" id="dc-virtual" onclick="chooseDice('virtual')">
+        <span class="dc-icon">📱</span>
+        <span class="dc-label">Virtual Dice</span>
+        <span class="dc-sub">Tap or shake!</span>
+      </div>
+      <div class="dice-card" id="dc-physical" onclick="chooseDice('physical')">
+        <span class="dc-icon">🎲</span>
+        <span class="dc-label">Physical Dice</span>
+        <span class="dc-sub">Pick the face</span>
+      </div>
+    </div>
+    <div class="setup-actions">
+      <button class="btn btn-yellow btn-full btn-lg" onclick="goGameConfig()">Next ➡️</button>
+      <button class="btn btn-ghost btn-full" onclick="showHistory()">📜 Game History</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 2 — GAME CONFIG ═══ -->
+<div id="screen-gameconfig" class="screen">
+  <div style="margin-bottom:18px;text-align:center">
+    <h1 class="title-glow" style="font-size:clamp(2rem,8vw,3rem)">⚙️ Game Settings</h1>
+  </div>
+  <div class="card">
+    <!-- Win condition -->
+    <div class="config-section">
+      <span class="config-label">🏆 How do you win?</span>
+      <div class="win-type-grid">
+        <div class="win-type-card selected" id="wt-rounds" onclick="selectWinType('rounds')">
+          <span class="wtc-icon">🔁</span><span class="wtc-label">Round Limit</span>
+        </div>
+        <div class="win-type-card" id="wt-score" onclick="selectWinType('score')">
+          <span class="wtc-icon">🎯</span><span class="wtc-label">Score Target</span>
+        </div>
+        <div class="win-type-card" id="wt-unlimited" onclick="selectWinType('unlimited')">
+          <span class="wtc-icon">♾️</span><span class="wtc-label">Unlimited</span>
+        </div>
+      </div>
+      <div class="win-value-area visible" id="wv-rounds">
+        <div class="option-pills" id="roundPills"></div>
+      </div>
+      <div class="win-value-area" id="wv-score">
+        <div class="option-pills" id="scorePills"></div>
+      </div>
+    </div>
+    <!-- Turn timer -->
+    <div class="config-section">
+      <span class="config-label">⏱️ Turn Timer</span>
+      <div class="option-pills" id="timerPills"></div>
+    </div>
+    <!-- Questions feature -->
+    <div class="config-section">
+      <span class="config-label">🧠 Questions Before Rolling?</span>
+      <div class="toggle-row">
+        <span class="toggle-label">Ask a question each turn</span>
+        <div class="toggle-switch" id="qToggle" onclick="toggleQuestions()">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+      <div class="q-config-area" id="qConfigArea">
+        <span class="section-label" style="font-size:1.1rem;margin-bottom:10px;display:block">📚 Subjects</span>
+        <div class="subject-grid" id="subjectGrid"></div>
+        <span class="section-label" style="font-size:1.1rem;margin-bottom:10px;display:block">🎂 Age Group</span>
+        <div class="age-pills" id="agePills"></div>
+        <span class="section-label" style="font-size:1.1rem;margin:14px 0 10px;display:block">⏱️ Answer Time Limit</span>
+        <div class="option-pills" id="qTimerPills"></div>
+      </div>
+    </div>
+    <div class="config-actions">
+      <button class="btn btn-ghost" style="flex:1" onclick="sndClick();showScreen('screen-setup')">← Back</button>
+      <button class="btn btn-green btn-lg" style="flex:2" onclick="goNames()">Next ➡️</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 3 — PLAYER NAMES ═══ -->
+<div id="screen-names" class="screen">
+  <div style="margin-bottom:18px;text-align:center">
+    <h1 class="title-glow" style="font-size:clamp(2rem,8vw,3.2rem)">👤 Who's Playing?</h1>
+    <p class="subtitle">Tap the circle to pick your avatar!</p>
+  </div>
+  <div class="card">
+    <div class="player-rows" id="playerRows"></div>
+    <div style="display:flex;gap:14px">
+      <button class="btn btn-ghost" onclick="sndClick();showScreen('screen-gameconfig')" style="flex:1">← Back</button>
+      <button class="btn btn-green btn-lg" onclick="startGame()" style="flex:2">🎮 Let's Play!</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 4 — GAME ═══ -->
+<div id="screen-game" class="screen">
+  <div class="game-arena" id="gameArena">
+
+    <!-- Topbar -->
+    <div class="game-topbar">
+      <div class="topbar-left">
+        <span class="round-pill" id="roundPill">Round 1</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-icon" id="scoreboardBtn" onclick="toggleScoreboard()" title="Scoreboard (S)">📊</button>
+        <button class="btn-icon" id="soundToggle" onclick="toggleSound()" title="Sound">🔊</button>
+        <button class="btn-icon" id="shakeBtn" onclick="requestShakePermission()" title="Shake to roll" style="display:none">🤳</button>
+        <button class="btn-icon" onclick="promptExitHome()" title="Exit to home">🏠</button>
+        <button class="btn btn-red btn-sm" onclick="promptStop()">🛑</button>
+      </div>
+    </div>
+
+    <!-- Player cards -->
+    <div id="playersGrid"></div>
+
+    <!-- Turn pointer -->
+    <div class="turn-pointer" id="turnPointer">
+      <div class="pointer-arrow" id="pointerArrow">▲</div>
+    </div>
+
+    <!-- Virtual dice + timer ring -->
+    <div class="dice-center-wrap" id="vDiceWrap">
+      <div class="timer-ring-wrap" id="timerRingWrap">
+        <svg class="timer-svg" id="timerSvg">
+          <circle class="timer-track" id="timerTrack"/>
+          <circle class="timer-arc"   id="timerArc"/>
+        </svg>
+      </div>
+      <div class="timer-secs-warning" id="timerSecsWarn"></div>
+      <div class="virtual-dice" id="vDice" onclick="handleDiceTap()">🎲</div>
+      <div class="dice-tap-hint" id="diceTapHint">Tap to roll!</div>
+    </div>
+
+    <!-- Physical pick panel -->
+    <div class="phys-pick-panel" id="pDiceWrap" style="display:none">
+      <p class="pick-label" id="pickLabel">Which animal came up? 👇</p>
+      <div class="animal-pick-grid" id="animalGrid"></div>
+    </div>
+
+    <!-- Result flash -->
+    <div class="result-flash" id="resultFlash">
+      <span class="rf-emoji" id="rfEmoji">🐯</span>
+      <span class="rf-streak-badge" id="rfStreak" style="display:none">🔥 STREAK! ×1.5</span>
+      <div class="rf-text" id="rfText">Tiger!</div>
+      <div class="rf-pts"  id="rfPts">+200 pts</div>
+      <div class="next-area" id="nextArea" style="display:none">
+        <div class="auto-next-bar"><div class="auto-next-fill" id="autoFill"></div></div>
+        <div class="auto-next-label" id="autoLabel">Next in 3…</div>
+        <div class="next-btns">
+          <button class="btn btn-ghost btn-xs" onclick="undoRoll()">↩ Undo</button>
+          <button class="btn btn-ghost btn-xs" onclick="nextTurn()">Skip ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- In-game scoreboard sheet -->
+    <div class="scoreboard-sheet" id="scoreboardSheet">
+      <div class="sco-header">
+        <span class="sco-title">📊 Standings</span>
+        <button class="btn-icon" style="width:36px;height:36px;font-size:1rem" onclick="toggleScoreboard()">✕</button>
+      </div>
+      <div id="scoList"></div>
+    </div>
+
+    <!-- Question overlay (shown before rolling when questions mode is on) -->
+    <div class="question-overlay" id="questionOverlay">
+      <div class="q-header">
+        <div class="q-subject-badge" id="qSubjectBadge">📚 Maths</div>
+        <div class="q-player" id="qPlayerLabel">Player 1's turn</div>
+      </div>
+      <div id="qBody">
+        <div class="q-loader">
+          <span class="spinner">⚙️</span>
+          Fetching question…
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SCREEN 5 — LEADERBOARD ═══ -->
+<div id="screen-leaderboard" class="screen">
+  <div class="lb-card">
+    <div class="lb-title">🏆 Final Scores!</div>
+    <div class="winner-pod" id="winnerPod"></div>
+    <div class="score-chart" id="scoreChart"></div>
+    <div class="rank-rows" id="rankRows"></div>
+    <div class="lb-actions">
+      <button class="btn btn-purple btn-full btn-lg" onclick="resetGame()">🔄 Play Again!</button>
+      <button class="btn btn-ghost btn-full" onclick="showHistory()">📜 View History</button>
+      <button class="btn btn-ghost btn-full" onclick="doExitHome()">🏠 Main Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 6 — HISTORY ═══ -->
+<div id="screen-history" class="screen">
+  <div class="card" style="max-width:560px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+      <h2 style="font-family:var(--fd);font-size:2.2rem;color:var(--cy)">📜 History</h2>
+      <button class="btn btn-ghost btn-sm" onclick="sndClick();showScreen('screen-setup')">← Back</button>
+    </div>
+    <div id="historyList" style="max-height:62vh;overflow-y:auto"></div>
+    <button class="btn btn-red btn-full btn-sm" style="margin-top:18px" onclick="clearHistory()">🗑️ Clear All</button>
+  </div>
+</div>
+
+<!-- AVATAR MODAL -->
+<div class="modal-overlay" id="avatarModal">
+  <div class="modal-box">
+    <div class="modal-title">🎭 Pick Your Avatar!</div>
+    <div class="avatar-grid" id="avatarGrid"></div>
+    <button class="btn btn-yellow btn-full" onclick="closeAvatarModal()">Done ✓</button>
+  </div>
+</div>
+
+<!-- STOP MODAL -->
+<div class="confirm-modal" id="stopModal">
+  <div class="confirm-box">
+    <span class="confirm-icon">🛑</span>
+    <div class="confirm-title">Stop the Game?</div>
+    <div class="confirm-body">Show final scores and end for everyone!</div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeModal('stopModal')">Keep Playing!</button>
+      <button class="btn btn-red" onclick="endGame()">Yes, Stop!</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIT PLAYER MODAL -->
+<div class="confirm-modal" id="quitModal">
+  <div class="confirm-box">
+    <span class="confirm-icon">😢</span>
+    <div class="confirm-title">Leave the Game?</div>
+    <div class="confirm-body" id="quitBody">This player will leave.</div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeModal('quitModal')">Stay!</button>
+      <button class="btn btn-red" onclick="doQuitPlayer()">Leave 👋</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXIT TO HOME MODAL -->
+<div class="confirm-modal" id="exitHomeModal">
+  <div class="confirm-box">
+    <span class="confirm-icon">🏠</span>
+    <div class="confirm-title">Exit to Main Menu?</div>
+    <div class="confirm-body">Current game progress will be lost.</div>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeModal('exitHomeModal')">Keep Playing</button>
+      <button class="btn btn-yellow" onclick="doExitHome()">Exit 🏠</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ANIMAL DICE ADVENTURE v3 — Full Edition
+   All mutable runtime state lives in G.
+   Turn order is tracked via G.turnOrderPos into getActiveOrder()
+   so round counting is correct regardless of player quit events.
+   ═══════════════════════════════════════════════════════════ */
+
+// ── CONSTANTS ────────────────────────────────────────────────
+const ANIMALS = [
+  { name:'Tiger',    emoji:'🐯', score:200 },
+  { name:'Elephant', emoji:'🐘', score:150 },
+  { name:'Cow',      emoji:'🐄', score:100 },
+  { name:'Pig',      emoji:'🐷', score:50  },
+  { name:'Duck',     emoji:'🦆', score:30  },
+  { name:'Monkey',   emoji:'🐵', score:10  },
+];
+
+const AVATARS = [
+  '🦁','🐺','🦊','🐻','🐼','🐨','🐸','🐧','🦋','🐬',
+  '🦄','🐙','🐠','🦉','🦖','🐳','🦓','🦒','🦘','🐊',
+  '🦝','🦙','🐏','🐦','🦀','🐝','🐢','🐍','🦜','🐞',
+];
+
+/** Eight player colours: border, glow, dark shadow, chart bar. */
+const PLAYER_COLORS = [
+  { main:'#FF4E6A', glow:'rgba(255,78,106,.55)',  dark:'#8B0A20' },
+  { main:'#4A90E2', glow:'rgba(74,144,226,.55)',  dark:'#1A3A72' },
+  { main:'#3DD68C', glow:'rgba(61,214,140,.55)',  dark:'#0A5A28' },
+  { main:'#FFCE47', glow:'rgba(255,206,71,.55)',  dark:'#8A6000' },
+  { main:'#9B5DE5', glow:'rgba(155,93,229,.55)',  dark:'#401080' },
+  { main:'#FF8C42', glow:'rgba(255,140,66,.55)',  dark:'#7A3000' },
+  { main:'#FF85C8', glow:'rgba(255,133,200,.55)', dark:'#8A1560' },
+  { main:'#2EC4B6', glow:'rgba(46,196,182,.55)',  dark:'#0A5050' },
+];
+
+/** Per-animal result flash background + shadow colour. */
+const ANIMAL_FLASH = {
+  Tiger:    { bg:'linear-gradient(135deg,#FFD700,#FF8C00)', shadow:'rgba(255,215,0,.6)'   },
+  Elephant: { bg:'linear-gradient(135deg,#9B5DE5,#6A3CB5)', shadow:'rgba(155,93,229,.5)' },
+  Cow:      { bg:'linear-gradient(135deg,#2EC4B6,#1A8A82)', shadow:'rgba(46,196,182,.5)' },
+  Pig:      { bg:'linear-gradient(135deg,#FF85C8,#D04A90)', shadow:'rgba(255,133,200,.5)'},
+  Duck:     { bg:'linear-gradient(135deg,#4A90E2,#2A5AB2)', shadow:'rgba(74,144,226,.5)' },
+  Monkey:   { bg:'linear-gradient(135deg,#3DD68C,#1AA860)', shadow:'rgba(61,214,140,.5)' },
+};
+
+/**
+ * Clockwise degree positions for player cards around the arena centre.
+ * Index = playerCount - 2.
+ */
+const PLAYER_ANGLES = [
+  [0, 180],
+  [0, 120, 240],
+  [0, 90, 180, 270],
+  [0, 72, 144, 216, 288],
+  [0, 60, 120, 180, 240, 300],
+];
+
+const HISTORY_KEY = 'animalDiceHistory_v1';
+
+const Q_SUBJECTS = [
+  { id:'English',      label:'English',      emoji:'🔤' },
+  { id:'Maths',        label:'Maths',        emoji:'🔢' },
+  { id:'GK',           label:'GK',           emoji:'🌍' },
+  { id:'Computers',    label:'Computers',    emoji:'💻' },
+  { id:'History',      label:'History',      emoji:'📜' },
+  { id:'SikhHistory',  label:'Sikh History', emoji:'🪯' },
+];
+
+const Q_AGE_GROUPS = ['3-7', '8-12', '13-18', '18+'];
+
+/** Badge colours per subject for visual differentiation. */
+const Q_SUBJECT_COLORS = {
+  English:'#4A90E2', Maths:'#3DD68C', GK:'#FF8C42',
+  Computers:'#9B5DE5', History:'#FFCE47', SikhHistory:'#FF85C8',
+};
+
+/**
+ * Open Trivia Database category IDs.
+ * https://opentdb.com/api_config.php
+ * SikhHistory has no OpenTDB category — falls back to Anthropic AI.
+ */
+const OPENTDB_CATEGORIES = {
+  English:   10,   // Books
+  Maths:     19,   // Science: Mathematics
+  GK:         9,   // General Knowledge
+  Computers: 18,   // Science: Computers
+  History:   23,   // History
+};
+
+/** Difficulty by age group for OpenTDB. */
+const OPENTDB_DIFFICULTY = {
+  '3-7':  'easy',
+  '8-12': 'easy',
+  '13-18':'medium',
+  '18+':  'hard',
+};
+
+/**
+ * Built-in offline question bank.
+ * Each entry: { q, o:[A,B,C,D], a:answerIndex(0-based), f:funFact, age:'3+'|'8+'|'13+'|'18+' }
+ * Age tag = MINIMUM age group. The dequeue filter includes all tags ≤ player's age group.
+ * This bank guarantees the game works with ZERO network access.
+ * OpenTDB / AI are optional background enrichment added to the same cache.
+ */
+const BUILTIN_QUESTIONS = {
+  English: [
+    {q:"What letter comes after A in the alphabet?",o:["B","C","D","Z"],a:0,f:"The English alphabet has 26 letters.",age:'3+'},
+    {q:"How many letters are in the English alphabet?",o:["24","25","26","27"],a:2,f:"Memorised as A–Z, 26 letters total.",age:'3+'},
+    {q:"Which word rhymes with 'cat'?",o:["Dog","Mat","Cup","Pen"],a:1,f:"Rhyming words share the same ending sound.",age:'3+'},
+    {q:"What is the opposite of 'hot'?",o:["Warm","Cold","Big","Fast"],a:1,f:"Antonyms are words with opposite meanings.",age:'3+'},
+    {q:"Which of these is a noun?",o:["Run","Blue","Quickly","Book"],a:3,f:"Nouns name a person, place, or thing.",age:'8+'},
+    {q:"What punctuation mark ends a question?",o:[".","!","?",","],a:2,f:"Question marks end interrogative sentences.",age:'8+'},
+    {q:"What is a verb?",o:["A describing word","An action word","A naming word","A connecting word"],a:1,f:"Verbs describe actions or states of being.",age:'8+'},
+    {q:"What is a synonym for 'happy'?",o:["Sad","Angry","Joyful","Tired"],a:2,f:"Synonyms are words with similar meanings.",age:'8+'},
+    {q:"Which literary device is 'the wind whispered'?",o:["Simile","Metaphor","Personification","Alliteration"],a:2,f:"Personification gives human traits to non-human things.",age:'13+'},
+    {q:"What is an oxymoron?",o:["Two similar words","Two contradictory words together","A rhyming pair","A long word"],a:1,f:"'Deafening silence' is a classic oxymoron.",age:'13+'},
+    {q:"What does a metaphor do?",o:["Compares using 'like' or 'as'","Directly states one thing IS another","Exaggerates for effect","Repeats a sound"],a:1,f:"'Life is a journey' is a metaphor.",age:'13+'},
+    {q:"What is an adjective?",o:["An action word","A naming word","A describing word","A joining word"],a:2,f:"Adjectives modify nouns — e.g. 'tall' tree.",age:'8+'},
+  ],
+  Maths: [
+    {q:"What is 2 + 2?",o:["3","4","5","6"],a:1,f:"Basic addition combines two or more numbers.",age:'3+'},
+    {q:"What is 5 × 2?",o:["7","8","10","12"],a:2,f:"Multiplication is repeated addition.",age:'3+'},
+    {q:"How many sides does a triangle have?",o:["2","3","4","5"],a:1,f:"Triangles always have exactly 3 sides and 3 angles.",age:'3+'},
+    {q:"What is 10 − 4?",o:["5","6","7","8"],a:1,f:"Subtraction finds the difference between numbers.",age:'3+'},
+    {q:"What is 12 ÷ 4?",o:["2","3","4","6"],a:1,f:"Division splits a number into equal groups.",age:'8+'},
+    {q:"What is 15% of 100?",o:["5","10","15","20"],a:2,f:"'Percent' means per hundred — 15% = 15/100.",age:'8+'},
+    {q:"What is the area of a 4×5 rectangle?",o:["18","20","24","22"],a:1,f:"Area = length × width.",age:'8+'},
+    {q:"What is the square root of 64?",o:["6","7","8","9"],a:2,f:"√64 = 8 because 8 × 8 = 64.",age:'8+'},
+    {q:"How many degrees in a right angle?",o:["45","60","90","120"],a:2,f:"A right angle is exactly 90° — a quarter turn.",age:'8+'},
+    {q:"What is 7²?",o:["14","42","49","56"],a:2,f:"7² means 7 × 7 = 49.",age:'8+'},
+    {q:"What is π (pi) approximately equal to?",o:["2.14","3.14","4.14","5.14"],a:1,f:"Pi is the ratio of a circle's circumference to its diameter.",age:'13+'},
+    {q:"What is the formula for a circle's area?",o:["2πr","πr²","πd","2πd"],a:1,f:"A = πr² where r is the radius.",age:'13+'},
+    {q:"What is the sum of angles in a triangle?",o:["90°","120°","180°","360°"],a:2,f:"All triangles' interior angles sum to 180°.",age:'13+'},
+  ],
+  GK: [
+    {q:"How many legs does a spider have?",o:["4","6","8","10"],a:2,f:"Spiders are arachnids — all arachnids have 8 legs.",age:'3+'},
+    {q:"What colour is grass?",o:["Blue","Red","Green","Yellow"],a:2,f:"Chlorophyll makes plants appear green.",age:'3+'},
+    {q:"Which animal is known as the King of the Jungle?",o:["Tiger","Elephant","Lion","Cheetah"],a:2,f:"Lions live in savannahs, not jungles, but the title stuck.",age:'3+'},
+    {q:"Which planet is closest to the Sun?",o:["Earth","Venus","Mercury","Mars"],a:2,f:"Mercury is the smallest and innermost planet.",age:'8+'},
+    {q:"What is the capital of India?",o:["Mumbai","New Delhi","Kolkata","Chennai"],a:1,f:"New Delhi has been India's capital since 1911.",age:'8+'},
+    {q:"How many bones does an adult human body have?",o:["196","206","216","226"],a:1,f:"Babies have ~270 bones; some fuse as we grow.",age:'8+'},
+    {q:"What gas do plants absorb from the air?",o:["Oxygen","Nitrogen","Carbon dioxide","Hydrogen"],a:2,f:"Plants use CO₂ during photosynthesis to make food.",age:'8+'},
+    {q:"Which is the largest ocean on Earth?",o:["Atlantic","Indian","Arctic","Pacific"],a:3,f:"The Pacific Ocean covers over 30% of Earth's surface.",age:'8+'},
+    {q:"What is the hardest natural substance?",o:["Gold","Iron","Diamond","Quartz"],a:2,f:"Diamond scores 10 on the Mohs hardness scale.",age:'8+'},
+    {q:"Which country invented paper?",o:["Egypt","India","China","Greece"],a:2,f:"Paper was invented in China around 105 AD by Cai Lun.",age:'13+'},
+    {q:"How many chambers does the human heart have?",o:["2","3","4","5"],a:2,f:"Two atria receive blood; two ventricles pump it out.",age:'13+'},
+    {q:"What is the chemical symbol for water?",o:["CO₂","O₂","H₂O","NaCl"],a:2,f:"H₂O = two hydrogen atoms and one oxygen atom.",age:'8+'},
+  ],
+  Computers: [
+    {q:"What does CPU stand for?",o:["Computer Processing Unit","Central Processing Unit","Core Power Unit","Central Program Utility"],a:1,f:"The CPU is often called the brain of the computer.",age:'8+'},
+    {q:"How many bits are in one byte?",o:["4","8","16","32"],a:1,f:"8 bits = 1 byte. A bit is a single 0 or 1.",age:'8+'},
+    {q:"What does 'www' stand for?",o:["World Wide Web","World Web Watcher","Wide World Web","Web World Wide"],a:0,f:"Tim Berners-Lee invented the World Wide Web in 1989.",age:'8+'},
+    {q:"Which language is used for styling web pages?",o:["HTML","JavaScript","CSS","Python"],a:2,f:"CSS controls colours, fonts, layout, and visual design.",age:'8+'},
+    {q:"What is RAM used for?",o:["Permanent storage","Temporary fast storage","Powering the screen","Connecting to the internet"],a:1,f:"RAM stores data for programs currently running.",age:'8+'},
+    {q:"What does HTML stand for?",o:["HyperText Markup Language","High Text Making Language","HyperText Making Links","Hyper Transfer Markup Link"],a:0,f:"HTML provides the structure of every web page.",age:'13+'},
+    {q:"What number system do computers use internally?",o:["Base 8","Base 10","Base 2","Base 16"],a:2,f:"Binary (base 2) uses only 0s and 1s.",age:'13+'},
+    {q:"Which company made the first iPhone?",o:["Samsung","Google","Apple","Microsoft"],a:2,f:"Apple released the first iPhone on 29 June 2007.",age:'8+'},
+    {q:"What is a 'bug' in programming?",o:["A type of virus","An error or flaw in code","A slow program","A missing file"],a:1,f:"The term dates to a moth found in a 1947 Harvard computer.",age:'8+'},
+    {q:"What does AI stand for?",o:["Automated Internet","Artificial Intelligence","Advanced Input","Automatic Integration"],a:1,f:"AI enables machines to learn, reason, and make decisions.",age:'8+'},
+    {q:"Which file extension is common for images?",o:[".mp3",".pdf",".jpg",".docx"],a:2,f:".jpg (JPEG) is one of the most common image formats.",age:'8+'},
+  ],
+  History: [
+    {q:"Who was the first human to walk on the Moon?",o:["Buzz Aldrin","Yuri Gagarin","Neil Armstrong","John Glenn"],a:2,f:"Neil Armstrong stepped onto the Moon on 20 July 1969.",age:'8+'},
+    {q:"In which year did World War 2 end?",o:["1943","1944","1945","1946"],a:2,f:"WW2 ended on 2 September 1945 with Japan's formal surrender.",age:'8+'},
+    {q:"Who was the first US president?",o:["Abraham Lincoln","Thomas Jefferson","George Washington","John Adams"],a:2,f:"Washington served as president from 1789 to 1797.",age:'8+'},
+    {q:"Which empire was ruled by Julius Caesar?",o:["Greek","Ottoman","Roman","Persian"],a:2,f:"Caesar was a key figure in the transition from Republic to Empire.",age:'13+'},
+    {q:"Where did the Industrial Revolution begin?",o:["France","Germany","USA","Britain"],a:3,f:"Britain's industrial revolution began in the 1760s.",age:'13+'},
+    {q:"What year did India gain independence?",o:["1945","1947","1949","1950"],a:1,f:"India became independent on 15 August 1947.",age:'8+'},
+    {q:"Who wrote the Magna Carta?",o:["King Henry VIII","King John","King Richard I","King Edward I"],a:1,f:"King John signed the Magna Carta in 1215 at Runnymede.",age:'13+'},
+    {q:"Which ancient wonder stood in Alexandria, Egypt?",o:["Colosseum","Great Lighthouse","Hanging Gardens","Great Wall"],a:1,f:"The Lighthouse of Alexandria was one of the 7 Ancient Wonders.",age:'8+'},
+    {q:"Who painted the Mona Lisa?",o:["Michelangelo","Raphael","Leonardo da Vinci","Botticelli"],a:2,f:"Leonardo painted the Mona Lisa between 1503 and 1519.",age:'8+'},
+    {q:"What was the name of the first artificial satellite?",o:["Apollo","Sputnik","Explorer","Vostok"],a:1,f:"Sputnik 1 was launched by the Soviet Union in 1957.",age:'13+'},
+  ],
+  SikhHistory: [
+    {q:"Who was the first Sikh Guru?",o:["Guru Nanak Dev Ji","Guru Angad Dev Ji","Guru Gobind Singh Ji","Guru Granth Sahib Ji"],a:0,f:"Guru Nanak Dev Ji was born in 1469 at Nankana Sahib.",age:'3+'},
+    {q:"How many human Sikh Gurus were there?",o:["8","9","10","12"],a:2,f:"10 human Gurus guided the Sikh faith from 1469 to 1708.",age:'3+'},
+    {q:"What is the Sikh holy scripture called?",o:["Vedas","Sri Guru Granth Sahib Ji","Quran","Bible"],a:1,f:"Sri Guru Granth Sahib Ji is the eternal living Guru of the Sikhs.",age:'3+'},
+    {q:"Where is the Golden Temple located?",o:["Delhi","Lahore","Amritsar","Patiala"],a:2,f:"Harmandir Sahib (Golden Temple) is in Amritsar, Punjab, India.",age:'3+'},
+    {q:"What is the Sikh symbol called?",o:["Star of David","Cross","Khanda","Crescent"],a:2,f:"The Khanda represents spiritual and temporal power united.",age:'8+'},
+    {q:"Who founded the Khalsa Panth?",o:["Guru Nanak Dev Ji","Guru Hargobind Ji","Guru Gobind Singh Ji","Guru Tegh Bahadur Ji"],a:2,f:"Guru Gobind Singh Ji created the Khalsa on Vaisakhi 1699.",age:'8+'},
+    {q:"What is the community kitchen in a Gurdwara called?",o:["Mandir","Langar","Diwan","Sangat"],a:1,f:"Langar serves free food to all, regardless of background.",age:'3+'},
+    {q:"Which Guru compiled the first Adi Granth?",o:["Guru Nanak Dev Ji","Guru Ram Das Ji","Guru Arjan Dev Ji","Guru Gobind Singh Ji"],a:2,f:"Guru Arjan Dev Ji completed the Adi Granth in 1604.",age:'8+'},
+    {q:"What does 'Waheguru' mean?",o:["God is great","Wondrous Teacher — God","Praise the Lord","Holy One"],a:1,f:"'Wahe' = wondrous, 'Guru' = teacher. The Wondrous Divine Teacher.",age:'8+'},
+    {q:"Who was martyred at Lahore in 1606?",o:["Guru Nanak Dev Ji","Guru Hargobind Ji","Guru Arjan Dev Ji","Guru Gobind Singh Ji"],a:2,f:"Guru Arjan Dev Ji is considered the first martyr of the Sikh faith.",age:'8+'},
+    {q:"What are the 5 Ks (Panj Kakars)?",o:["Kesh Kara Kanga Kachera Kirpan","Kirpan Kesh Koran Karo Kasha","Kesh Karo Katas Kara Kirpa","Kesh Kashi Kara Karha Kirat"],a:0,f:"The Panj Kakars are articles of faith worn by initiated Sikhs (Khalsa).",age:'8+'},
+    {q:"What does 'Gurdwara' mean?",o:["Place of worship","Gateway to the Guru","Sikh festival","Holy scripture"],a:1,f:"Gurdwara = 'Guru's door' — a place of Sikh worship.",age:'3+'},
+    {q:"What does 'Sat Sri Akal' mean?",o:["God is one","Truth is Timeless / God is Eternal","Praise the Guru","Waheguru is great"],a:1,f:"Sat=Truth, Sri=Great, Akal=Timeless — a Sikh greeting.",age:'8+'},
+    {q:"Where was Guru Nanak Dev Ji born?",o:["Amritsar","Patiala","Nankana Sahib","Anandpur Sahib"],a:2,f:"Nankana Sahib is now in Pakistan — birthplace of Guru Nanak Dev Ji.",age:'8+'},
+    {q:"Who was the last human Sikh Guru?",o:["Guru Tegh Bahadur Ji","Guru Gobind Singh Ji","Guru Nanak Dev Ji","Guru Granth Sahib Ji"],a:1,f:"Guru Gobind Singh Ji (10th Guru) bestowed Guruship to Sri Guru Granth Sahib Ji.",age:'8+'},
+    {q:"What is Amrit Sanchar?",o:["A Sikh prayer","Sikh initiation ceremony","A Sikh festival","A form of langar"],a:1,f:"Amrit Sanchar (Amrit Pahul) is the ceremony for entering the Khalsa.",age:'13+'},
+    {q:"What are the Panj Pyare (Five Beloved)?",o:["5 close relatives","First 5 Khalsa initiated by Guru Gobind Singh Ji","5 Sikh Gurus","5 prayers"],a:1,f:"Bhai Daya Singh was first; all 5 offered their heads to the Guru.",age:'8+'},
+  ],
+};
+
+/**
+ * Returns the subset of built-in questions eligible for the given age group.
+ * Age tags are cumulative: '8-12' includes '3+' and '8+' questions.
+ * @param {string} subject
+ * @param {string} ageGroup
+ * @returns {Array}
+ */
+function builtinEligible(subject, ageGroup) {
+  const bank = BUILTIN_QUESTIONS[subject] || [];
+  const allow = new Set(['3+']);
+  if (['8-12','13-18','18+'].includes(ageGroup)) allow.add('8+');
+  if (['13-18','18+'].includes(ageGroup))        allow.add('13+');
+  if (ageGroup === '18+')                         allow.add('18+');
+  return bank.filter(q => allow.has(q.age));
+}
+
+/**
+ * Shuffles an array in-place (Fisher-Yates) and returns it.
+ * @template T
+ * @param {T[]} arr
+ * @returns {T[]}
+ */
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/**
+ * Converts a built-in bank entry to the normalised question format,
+ * randomising the position of the correct answer to prevent position bias.
+ * @param {{ q, o, a, f }} entry
+ * @returns {{ question, options, answerIndex, funFact }}
+ */
+function normaliseBuiltin(entry) {
+  const opts    = [...entry.o];
+  const correct = opts[entry.a];
+  // Shuffle options
+  for (let i = opts.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [opts[i], opts[j]] = [opts[j], opts[i]];
+  }
+  return {
+    question:    entry.q,
+    options:     opts,
+    answerIndex: opts.indexOf(correct),
+    funFact:     entry.f || '',
+  };
+}
+
+const Q_TIMER_OPTIONS = [
+  { label:'OFF',  val:0   },
+  { label:'15s',  val:15  },
+  { label:'30s',  val:30  },
+  { label:'45s',  val:45  },
+  { label:'60s',  val:60  },
+  { label:'90s',  val:90  },
+  { label:'2 min',val:120 },
+];
+
+/** Discrete game states — prevents concurrent transitions. */
+const STATE = { IDLE:'IDLE', QUESTION:'QUESTION', ROLLING:'ROLLING', RESULT:'RESULT' };
+
+// ── GAME STATE ───────────────────────────────────────────────
+let G = freshState();
+function freshState() {
+  return {
+    // Config
+    playerCount:  2,
+    diceType:     'virtual',
+    winType:      'rounds',    // 'rounds' | 'score' | 'unlimited'
+    winValue:     10,
+    timerEnabled: true,
+    timerSeconds: 15,
+    // Questions feature
+    questionsEnabled:  false,
+    questionSubjects:  ['Maths'],
+    questionAgeGroup:  '8-12',
+    qTimerEnabled:     true,
+    qTimerSeconds:     30,
+    // Runtime
+    state:        STATE.IDLE,
+    players:      [],
+    activeIndex:  0,
+    turnOrderPos: 0,
+    round:        1,
+    undoSnapshot: null,
+    quitTarget:   null,
+    avatarTarget: null,
+    pendingAvatar:null,
+    // Timer internals
+    _timerCirc:       0,
+    _autoNextTimer:   null,
+    _countdownInterval: null,
+    // Question cache
+    _questionCache:   {},
+    _otdbToken:       null,
+    _currentQuestion: null,  // active question object — avoids string-in-onclick bugs
+  };
+}
+
+// ── SOUND ENGINE ─────────────────────────────────────────────
+let audioCtx = null;
+let soundEnabled = true;
+
+function ensureAudio() {
+  if (!soundEnabled) return null;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  } catch(e) { soundEnabled = false; return null; }
+}
+
+function sndClick() {
+  const c = ensureAudio(); if (!c) return;
+  const t = c.currentTime, o = c.createOscillator(), g = c.createGain();
+  o.type = 'square';
+  o.frequency.setValueAtTime(700,t); o.frequency.exponentialRampToValueAtTime(250,t+.06);
+  g.gain.setValueAtTime(.07,t); g.gain.exponentialRampToValueAtTime(.001,t+.07);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+.07);
+}
+
+function sndTick() {
+  const c = ensureAudio(); if (!c) return;
+  const t = c.currentTime, sz = Math.floor(c.sampleRate*.035);
+  const buf = c.createBuffer(1,sz,c.sampleRate), d = buf.getChannelData(0);
+  for (let i=0;i<sz;i++) d[i]=Math.random()*2-1;
+  const src=c.createBufferSource(), flt=c.createBiquadFilter(), gn=c.createGain();
+  src.buffer=buf; flt.type='bandpass'; flt.frequency.value=500+Math.random()*1000; flt.Q.value=4;
+  gn.gain.setValueAtTime(.14,t); gn.gain.exponentialRampToValueAtTime(.001,t+.04);
+  src.connect(flt); flt.connect(gn); gn.connect(c.destination); src.start(t); src.stop(t+.04);
+}
+
+function sndRoll() {
+  const c = ensureAudio(); if (!c) return;
+  const t = c.currentTime, o = c.createOscillator(), go = c.createGain();
+  o.type = 'sawtooth';
+  o.frequency.setValueAtTime(120,t); o.frequency.exponentialRampToValueAtTime(680,t+.28);
+  go.gain.setValueAtTime(.12,t); go.gain.exponentialRampToValueAtTime(.001,t+.32);
+  o.connect(go); go.connect(c.destination); o.start(t); o.stop(t+.32);
+  const sz=Math.floor(c.sampleRate*.32), buf=c.createBuffer(1,sz,c.sampleRate);
+  const d=buf.getChannelData(0); for(let i=0;i<sz;i++) d[i]=Math.random()*2-1;
+  const src=c.createBufferSource(), flt=c.createBiquadFilter(), gn=c.createGain();
+  src.buffer=buf; flt.type='highpass'; flt.frequency.value=150;
+  gn.gain.setValueAtTime(.18,t); gn.gain.exponentialRampToValueAtTime(.001,t+.3);
+  src.connect(flt); flt.connect(gn); gn.connect(c.destination); src.start(t); src.stop(t+.32);
+}
+
+function sndScore(pts) {
+  const c = ensureAudio(); if (!c) return;
+  const t = c.currentTime;
+  const chords = {10:[261,329,392],30:[329,415,523],50:[349,440,587],100:[392,494,659],150:[440,554,740],200:[523,659,784,1047]};
+  (chords[pts]||[440]).forEach((freq,i) => {
+    const o=c.createOscillator(), g=c.createGain(); o.type='triangle'; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,t+i*.07); g.gain.linearRampToValueAtTime(.15,t+i*.07+.03); g.gain.exponentialRampToValueAtTime(.001,t+i*.07+.55);
+    o.connect(g); g.connect(c.destination); o.start(t+i*.07); o.stop(t+i*.07+.6);
+  });
+  if (pts === 200) {
+    [1047,1319,1568,2093].forEach((f,i) => {
+      const o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(.08,t+.32+i*.09); g.gain.exponentialRampToValueAtTime(.001,t+.32+i*.09+.22);
+      o.connect(g); g.connect(c.destination); o.start(t+.32+i*.09); o.stop(t+.32+i*.09+.25);
+    });
+  }
+}
+
+function sndStreak() {
+  const c = ensureAudio(); if (!c) return;
+  const t = c.currentTime;
+  [523,659,784,1047,1319].forEach((f,i) => {
+    const o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(.12,t+i*.065); g.gain.exponentialRampToValueAtTime(.001,t+i*.065+.18);
+    o.connect(g); g.connect(c.destination); o.start(t+i*.065); o.stop(t+i*.065+.2);
+  });
+}
+
+function sndTimerEnd() {
+  const c = ensureAudio(); if (!c) return;
+  const t = c.currentTime;
+  [880,660,440,220].forEach((f,i) => {
+    const o=c.createOscillator(),g=c.createGain(); o.type='sawtooth'; o.frequency.value=f;
+    g.gain.setValueAtTime(.18,t+i*.12); g.gain.exponentialRampToValueAtTime(.001,t+i*.12+.1);
+    o.connect(g); g.connect(c.destination); o.start(t+i*.12); o.stop(t+i*.12+.13);
+  });
+}
+
+function sndWin() {
+  const c = ensureAudio(); if (!c) return;
+  const t = c.currentTime;
+  const notes=[523,659,784,659,784,1047,784,1047,1568], durs=[.14,.1,.1,.1,.1,.14,.1,.14,.45];
+  let off=0;
+  notes.forEach((freq,i) => {
+    const o=c.createOscillator(),g=c.createGain(); o.type='triangle'; o.frequency.value=freq;
+    g.gain.setValueAtTime(.18,t+off); g.gain.exponentialRampToValueAtTime(.001,t+off+durs[i]*.88);
+    o.connect(g); g.connect(c.destination); o.start(t+off); o.stop(t+off+durs[i]);
+    off+=durs[i]*.82;
+  });
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
+  if (soundEnabled) sndClick();
+}
+
+// ── HAPTICS ──────────────────────────────────────────────────
+/** Vibrate device if supported. pattern matches navigator.vibrate() spec. */
+function haptic(pattern) {
+  if (!navigator.vibrate) return;
+  try { navigator.vibrate(pattern); } catch(e) {}
+}
+
+// ── TIMER MODULE ─────────────────────────────────────────────
+let _timerRAF = null;
+let _timerStart = 0;
+let _timerDuration = 0;
+let _timerSecsShown = -1;
+
+function timerStart() {
+  timerStop();
+  if (!G.timerEnabled || G.diceType !== 'virtual') return;
+  _timerDuration = G.timerSeconds * 1000;
+  _timerStart = performance.now();
+  _timerSecsShown = G.timerSeconds;
+  const w = document.getElementById('timerSecsWarn');
+  if (w) { w.style.display = 'none'; }
+  _timerFrame();
+}
+
+function _timerFrame() {
+  const progress = Math.min((performance.now() - _timerStart) / _timerDuration, 1);
+  const arc = document.getElementById('timerArc');
+  if (arc && G._timerCirc) {
+    arc.setAttribute('stroke-dashoffset', G._timerCirc * (1 - progress));
+    if      (progress < .5)  arc.setAttribute('stroke','#3DD68C');
+    else if (progress < .75) arc.setAttribute('stroke','#FFCE47');
+    else                     arc.setAttribute('stroke','#FF4E6A');
+  }
+  // Warning countdown for last 5 seconds
+  const secsLeft = Math.ceil((1 - progress) * G.timerSeconds);
+  if (secsLeft <= 5 && secsLeft !== _timerSecsShown) {
+    _timerSecsShown = secsLeft;
+    const w = document.getElementById('timerSecsWarn');
+    if (w && G.state === STATE.IDLE) {
+      w.textContent = secsLeft > 0 ? secsLeft : '⏰';
+      w.style.display = 'block';
+      haptic(50);
+    }
+  }
+  if (progress < 1) {
+    _timerRAF = requestAnimationFrame(_timerFrame);
+  } else {
+    // Time expired — pulse warning, but DO NOT auto-advance.
+    // Players must interact; automation would ruin the table-game experience.
+    const w = document.getElementById('timerSecsWarn');
+    if (w) { w.textContent = '⏰'; w.style.display = 'block'; }
+    sndTimerEnd();
+    haptic([100, 50, 100]);
+    // Flash the dice hint so the player knows it's their turn
+    const hint = document.getElementById('diceTapHint');
+    if (hint) hint.textContent = '⏰ Tap to roll!';
+  }
+}
+
+function timerStop() {
+  cancelAnimationFrame(_timerRAF);
+  _timerRAF = null;
+  const arc = document.getElementById('timerArc');
+  if (arc && G._timerCirc) {
+    arc.setAttribute('stroke-dashoffset', G._timerCirc);
+    arc.setAttribute('stroke','#3DD68C');
+  }
+  const w = document.getElementById('timerSecsWarn');
+  if (w) w.style.display = 'none';
+}
+
+// ── SHAKE TO ROLL ────────────────────────────────────────────
+let _lastShakeTime = 0;
+let _lastAccel = { x:0, y:0, z:0 };
+
+/** Attach motion listener — safe to call multiple times (deduped). */
+function attachMotionListener() {
+  window.removeEventListener('devicemotion', _onMotion);
+  window.addEventListener('devicemotion', _onMotion);
+}
+
+function _onMotion(e) {
+  const a = e.accelerationIncludingGravity;
+  if (!a) return;
+  const dx = Math.abs((a.x||0) - _lastAccel.x);
+  const dy = Math.abs((a.y||0) - _lastAccel.y);
+  const dz = Math.abs((a.z||0) - _lastAccel.z);
+  _lastAccel = { x:a.x||0, y:a.y||0, z:a.z||0 };
+  const now = Date.now();
+  if ((dx + dy + dz > 28) && (now - _lastShakeTime > 1200)) {
+    _lastShakeTime = now;
+    if (G.state === STATE.IDLE && G.diceType === 'virtual'
+        && document.getElementById('screen-game').classList.contains('active')) {
+      handleDiceTap();
+    }
+  }
+}
+
+/**
+ * Called by the 🤳 button. On iOS 13+ DeviceMotion requires explicit permission.
+ * On Android the event fires without permission.
+ */
+async function requestShakePermission() {
+  if (typeof DeviceMotionEvent !== 'undefined' &&
+      typeof DeviceMotionEvent.requestPermission === 'function') {
+    try {
+      const result = await DeviceMotionEvent.requestPermission();
+      if (result === 'granted') {
+        attachMotionListener();
+        document.getElementById('shakeBtn').style.display = 'none';
+      }
+    } catch(e) {}
+  } else {
+    attachMotionListener();
+    document.getElementById('shakeBtn').style.display = 'none';
+  }
+  sndClick();
+}
+
+function initShake() {
+  if (typeof DeviceMotionEvent === 'undefined') return;
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    // iOS 13+ — show permission button
+    const btn = document.getElementById('shakeBtn');
+    if (btn) btn.style.display = 'flex';
+  } else {
+    // Android / desktop — attach directly
+    attachMotionListener();
+  }
+}
+
+// ── HISTORY ENGINE ───────────────────────────────────────────
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+  catch { return []; }
+}
+
+/** Saves the completed game as a history record. Keeps newest 50. */
+function saveGameToHistory() {
+  const sorted = [...G.players].sort((a,b) => b.score - a.score);
+  const record = {
+    date:    new Date().toISOString(),
+    mode:    G.winType === 'rounds' ? `${G.winValue} rounds`
+           : G.winType === 'score'  ? `First to ${G.winValue}`
+           : 'Unlimited',
+    diceType: G.diceType,
+    rounds:   G.round,
+    players:  sorted.map(p => ({ name:p.name, avatar:p.avatar, score:p.score, active:p.active, colorIdx:p.colorIdx })),
+  };
+  const hist = loadHistory();
+  hist.unshift(record);
+  if (hist.length > 50) hist.length = 50;
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(hist)); }
+  catch(e) { console.warn('History save failed:', e); }
+}
+
+function clearHistory() {
+  if (!confirm('Clear all game history? Cannot be undone.')) return;
+  try { localStorage.removeItem(HISTORY_KEY); } catch(e) {}
+  buildHistoryScreen();
+  sndClick();
+}
+
+function showHistory() { buildHistoryScreen(); showScreen('screen-history'); sndClick(); }
+
+function buildHistoryScreen() {
+  const list = document.getElementById('historyList');
+  const hist = loadHistory();
+  if (!hist.length) {
+    list.innerHTML = `<div class="history-empty">
+      <span class="he-icon">📭</span>
+      <div class="he-text">No games yet!</div>
+      <div class="he-sub">Play a game to see history here.</div></div>`;
+    return;
+  }
+  list.innerHTML = '';
+  hist.forEach((game, gi) => {
+    const d  = new Date(game.date);
+    const dStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    const tStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const w  = game.players[0];
+    const wColor = PLAYER_COLORS[w.colorIdx ?? 0].main;
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    const detailId = `hd${gi}`;
+    card.innerHTML = `
+      <div class="hc-header">
+        <div class="hc-winner" onclick="toggleHistDetail('${detailId}',this)">
+          <span class="hc-ava">${w.avatar}</span>
+          <div>
+            <div class="hc-name" style="color:${wColor}">🏆 ${w.name}</div>
+            <div class="hc-score" style="color:${wColor}">${w.score} pts</div>
+          </div>
+        </div>
+        <div class="hc-meta">
+          <div>${dStr} ${tStr}</div>
+          <div>${game.players.length} players · ${game.mode}</div>
+          <div>${game.diceType==='virtual'?'📱':'🎲'} · Rd ${game.rounds}</div>
+        </div>
+        <button class="hc-toggle-btn" id="tBtn${detailId}" onclick="toggleHistDetail('${detailId}',document.getElementById('tBtn${detailId}').closest('.hc-header').querySelector('.hc-winner'))">▼</button>
+      </div>
+      <div class="hc-detail" id="${detailId}">
+        ${game.players.map((p,pi) => {
+          const pc = PLAYER_COLORS[p.colorIdx ?? pi % PLAYER_COLORS.length].main;
+          const medals = ['🥇','🥈','🥉'];
+          return `<div class="hc-rank-row">
+            <span class="hcr-medal">${pi<3?medals[pi]:'#'+(pi+1)}</span>
+            <span class="hcr-ava">${p.avatar}</span>
+            <span class="hcr-name">${p.name}${!p.active?'<span style="color:var(--cr);font-size:.7rem"> (left)</span>':''}</span>
+            <span class="hcr-pts" style="color:${pc}">${p.score}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function toggleHistDetail(id, triggerEl) {
+  const detail = document.getElementById(id);
+  if (!detail) return;
+  const isOpen = detail.classList.contains('open');
+  detail.classList.toggle('open');
+  // Update toggle button text
+  const card = detail.closest('.history-card');
+  if (card) {
+    const tBtn = card.querySelector('.hc-toggle-btn');
+    if (tBtn) tBtn.textContent = isOpen ? '▼' : '▲';
+  }
+}
+
+// ── SCREEN MANAGEMENT ────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── LAYOUT ENGINE ────────────────────────────────────────────
+/**
+ * Returns arena dimensions and the dice size.
+ * All card geometry is computed per-player via getSectorCardLayout().
+ * @returns {{ W, H, diceSize, cx, cy }}
+ */
+function calcLayout() {
+  const arena = document.getElementById('gameArena');
+  const W = arena ? arena.clientWidth  : window.innerWidth;
+  const H = arena ? arena.clientHeight : window.innerHeight;
+  // Dice occupies the inner protected circle C.
+  // Size it as a fraction of the smaller dimension so it stays proportional
+  // on any screen shape without crowding the player cards.
+  const m        = Math.min(W, H);
+  const diceSize = Math.max(110, Math.min(m * .24, 260));
+  return { W, H, diceSize, cx: W / 2, cy: H / 2 };
+}
+
+/**
+ * Distance (px) from the arena centre to the screen boundary along a ray
+ * pointing in direction thetaDeg (0 = up, 90 = right, 180 = down, 270 = left).
+ *
+ * The top boundary is pushed down by TOPBAR_H so cards never slide under
+ * the control bar.
+ *
+ * @param {number} thetaDeg
+ * @param {number} W  Arena width.
+ * @param {number} H  Arena height.
+ * @returns {number} Distance in px.
+ */
+function distToScreenEdge(thetaDeg, W, H) {
+  const TOPBAR_H = 64;
+  const theta = thetaDeg * Math.PI / 180;
+  const sinT  =  Math.sin(theta);   // positive = rightward
+  const cosT  =  Math.cos(theta);   // positive = upward (screen y inverted)
+  const cx = W / 2, cy = H / 2;
+
+  const candidates = [];
+  // Top boundary (accounting for topbar)
+  if (cosT > 1e-9)  candidates.push((cy - TOPBAR_H) / cosT);
+  // Bottom boundary
+  if (cosT < -1e-9) candidates.push((H - cy)        / (-cosT));
+  // Right boundary
+  if (sinT > 1e-9)  candidates.push((W - cx)        / sinT);
+  // Left boundary
+  if (sinT < -1e-9) candidates.push(cx              / (-sinT));
+
+  return Math.min(...candidates.filter(t => t > 0));
+}
+
+/**
+ * Computes the maximum card width such that all 4 rotated corners of a
+ * (candidateW × cardH) rectangle centred at (px, py) rotated by rotRad
+ * remain inside the screen rectangle.
+ *
+ * Uses 22-iteration binary search for pixel-accurate result.
+ *
+ * @returns {number} Maximum safe card width in px.
+ */
+function _maxCardWidth(px, py, cardH, rotRad, W, H) {
+  const TOPBAR = 64, MARGIN = 10;
+  const cosR   = Math.cos(rotRad);
+  const sinR   = Math.sin(rotRad);
+  let lo = 20, hi = W - MARGIN * 2;
+  for (let i = 0; i < 22; i++) {
+    const mid = (lo + hi) / 2, hw = mid / 2, hh = cardH / 2;
+    const fits = [1, -1].every(sx =>
+      [1, -1].every(sy => {
+        const scrX = px + hw * sx * cosR - hh * sy * sinR;
+        const scrY = py + hw * sx * sinR + hh * sy * cosR;
+        return scrX >= MARGIN && scrX <= W - MARGIN
+            && scrY >= TOPBAR + MARGIN && scrY <= H - MARGIN;
+      })
+    );
+    if (fits) lo = mid; else hi = mid;
+  }
+  return Math.floor(lo);
+}
+
+/**
+ * Computes position and dimensions for a player card using the
+ * SECTOR GEOMETRY model:
+ *
+ *   • The screen is divided into N equal angular wedges (360°/N each).
+ *   • Each wedge has an inner boundary at circle C (radius = diceSize/2 + pad)
+ *     and an outer boundary at the rectangle edge R.
+ *   • Card height fills the radial lane; card width = sector chord at r_card,
+ *     clamped so all 4 rotated corners stay within the screen.
+ *   • For diagonal sectors (not near axis-aligned), the card height is
+ *     iteratively reduced until a minimum readable width is achievable.
+ *     Narrow cards switch to a vertical (portrait) layout automatically.
+ *
+ * @param {number} thetaDeg    Sector centre angle (deg CW from top).
+ * @param {number} playerCount Total number of players (determines sector width).
+ * @param {number} W           Arena width px.
+ * @param {number} H           Arena height px.
+ * @param {number} diceSize    Dice square side px.
+ * @returns {{ x, y, cardW, cardH, rotation, isPortrait }}
+ */
+function getSectorCardLayout(thetaDeg, playerCount, W, H, diceSize) {
+  const INNER_PAD  = 20;
+  const OUTER_PAD  = 12;
+  const CHORD_FILL = 0.88;
+
+  const r_inner  = diceSize / 2 + INNER_PAD;
+  const d_edge   = distToScreenEdge(thetaDeg, W, H) - OUTER_PAD;
+  const laneLen  = Math.max(40, d_edge - r_inner);
+
+  // Card centre at midpoint of the radial lane
+  const r_card  = r_inner + laneLen / 2;
+
+  // Ideal sector chord at this radius
+  const halfSector  = Math.PI / playerCount;
+  const sectorChord = 2 * r_card * Math.sin(halfSector) * CHORD_FILL;
+
+  // Card centre in screen coordinates
+  const theta = thetaDeg * Math.PI / 180;
+  const cx = W / 2, cy = H / 2;
+  const px = cx + r_card * Math.sin(theta);
+  const py = cy - r_card * Math.cos(theta);
+
+  const rotation = thetaDeg + 180;
+  const rotRad   = rotation * Math.PI / 180;
+
+  // Target minimum readable card width (50 % of ideal chord)
+  const minW = Math.max(80, Math.round(sectorChord * 0.50));
+
+  // Start with maximum height from lane, cap at 280 px
+  let cardH = Math.max(52, Math.min(laneLen - 2, 280));
+  let cardW = _maxCardWidth(px, py, cardH, rotRad, W, H);
+
+  // If diagonal positioning forces a narrow card, shrink cardH iteratively
+  // (up to 8 steps of 15% each) until the width reaches the minimum target.
+  let safety = 0;
+  while (cardW < minW && cardH > 56 && safety++ < 8) {
+    cardH = Math.max(56, Math.floor(cardH * 0.85));
+    cardW = _maxCardWidth(px, py, cardH, rotRad, W, H);
+  }
+  cardW = Math.max(60, cardW);
+
+  // isPortrait: card is taller than wide → use column layout in renderer
+  const isPortrait = cardH > cardW * 0.9;
+
+  return {
+    x: px, y: py,
+    cardW: Math.round(cardW),
+    cardH: Math.round(cardH),
+    rotation,
+    isPortrait,
+  };
+}
+
+
+/** Applies computed sizes to the dice, timer SVG ring, and hint text. */
+function applyDiceSize() {
+  const { diceSize, W, H } = calcLayout();
+  // Arrow tip sits just outside the inner-circle boundary
+  const arrowDist = diceSize / 2 + 24;
+
+  const dice = document.getElementById('vDice');
+  if (dice) {
+    dice.style.width       = diceSize + 'px';
+    dice.style.height      = diceSize + 'px';
+    dice.style.fontSize    = (diceSize * .55) + 'px';
+    dice.style.borderRadius= (diceSize * .17) + 'px';
+    dice.style.boxShadow   = `0 ${Math.round(diceSize*.05)}px 0 #aaa,0 ${Math.round(diceSize*.06)}px ${Math.round(diceSize*.18)}px rgba(0,0,0,.45)`;
+  }
+
+  const hint = document.getElementById('diceTapHint');
+  if (hint) hint.style.fontSize = Math.max(.88, Math.min(diceSize*.074, 1.3)) + 'rem';
+
+  const arrow = document.getElementById('pointerArrow');
+  if (arrow) arrow.style.top = `-${arrowDist}px`;
+
+  // Timer SVG ring — sized to sit 18px outside each edge of the dice
+  const ringPad = 22;
+  const ringSize = diceSize + ringPad * 2;
+  const r = ringSize / 2 - 9; // stroke-width/2 inset
+  const circ = 2 * Math.PI * r;
+  G._timerCirc = circ;
+  const svg = document.getElementById('timerSvg');
+  const track = document.getElementById('timerTrack');
+  const arc   = document.getElementById('timerArc');
+  if (svg && track && arc) {
+    svg.setAttribute('width',  ringSize);
+    svg.setAttribute('height', ringSize);
+    svg.setAttribute('viewBox', `0 0 ${ringSize} ${ringSize}`);
+    const cx = ringSize / 2, cy = ringSize / 2;
+    [track, arc].forEach(el => {
+      el.setAttribute('cx', cx); el.setAttribute('cy', cy); el.setAttribute('r', r);
+    });
+    track.setAttribute('stroke-width', '9');
+    arc.setAttribute('stroke-width', '9');
+    arc.setAttribute('stroke-dasharray', circ);
+    arc.setAttribute('stroke-dashoffset', circ); // starts empty
+  }
+
+  // Warning number position
+  const warn = document.getElementById('timerSecsWarn');
+  if (warn) {
+    warn.style.width  = diceSize + 'px';
+    warn.style.height = diceSize + 'px';
+    warn.style.fontSize = (diceSize * .36) + 'px';
+    warn.style.borderRadius = (diceSize * .17) + 'px';
+    warn.style.background = 'rgba(255,78,106,.22)';
+  }
+}
+
+/**
+ * Rotates the turn-pointer arrow toward the current active player.
+ * The arrow lives at the centre and rotates to the angle of the active slot.
+ */
+function updateDicePointer() {
+  const angles = PLAYER_ANGLES[G.playerCount - 2];
+  if (!angles) return;
+  const angle = angles[G.activeIndex] ?? 0;
+  const ptr = document.getElementById('turnPointer');
+  const col = PLAYER_COLORS[G.players[G.activeIndex]?.colorIdx ?? 0];
+  if (ptr) {
+    ptr.style.transform = `translate(-50%,-50%) rotate(${angle}deg)`;
+  }
+  const arrow = document.getElementById('pointerArrow');
+  if (arrow) arrow.style.color = col.main;
+}
+
+// ── SETUP ────────────────────────────────────────────────────
+function changeCount(delta) {
+  G.playerCount = Math.max(2, Math.min(6, G.playerCount + delta));
+  document.getElementById('countDisp').textContent = G.playerCount;
+  sndClick();
+}
+
+function chooseDice(type) {
+  G.diceType = type;
+  document.getElementById('dc-virtual').classList.toggle('selected', type === 'virtual');
+  document.getElementById('dc-physical').classList.toggle('selected', type === 'physical');
+  sndClick();
+}
+
+// ── GAME CONFIG SCREEN ───────────────────────────────────────
+const ROUND_OPTIONS  = [5, 10, 15, 20];
+const SCORE_OPTIONS  = [500, 1000, 2000, 5000];
+const TIMER_OPTIONS  = [{ label:'OFF', val:0 }, { label:'10s', val:10 }, { label:'15s', val:15 }, { label:'20s', val:20 }, { label:'30s', val:30 }];
+
+function goGameConfig() {
+  buildConfigScreen();
+  showScreen('screen-gameconfig');
+  sndClick();
+}
+
+function buildConfigScreen() {
+  // Round pills
+  const rp = document.getElementById('roundPills');
+  rp.innerHTML = ROUND_OPTIONS.map(v =>
+    `<button class="opt-pill${G.winType==='rounds'&&G.winValue===v?' selected':''}"
+      onclick="selectWinValue(${v},'rounds')">${v} Rounds</button>`
+  ).join('');
+
+  // Score pills
+  const sp = document.getElementById('scorePills');
+  sp.innerHTML = SCORE_OPTIONS.map(v =>
+    `<button class="opt-pill${G.winType==='score'&&G.winValue===v?' selected':''}"
+      onclick="selectWinValue(${v},'score')">${v} pts</button>`
+  ).join('');
+
+  // Timer pills
+  const tp = document.getElementById('timerPills');
+  tp.innerHTML = TIMER_OPTIONS.map(o =>
+    `<button class="opt-pill${(o.val===0&&!G.timerEnabled)||(o.val===G.timerSeconds&&G.timerEnabled)?' selected':''}"
+      onclick="selectTimer(${o.val})">${o.label}</button>`
+  ).join('');
+
+  // Show/hide win value areas
+  refreshWinTypeUI();
+  // Questions config
+  buildQuestionConfigUI();
+}
+
+function selectWinType(type) {
+  G.winType = type;
+  if (type === 'rounds' && !ROUND_OPTIONS.includes(G.winValue)) G.winValue = 10;
+  if (type === 'score'  && !SCORE_OPTIONS.includes(G.winValue)) G.winValue = 1000;
+  ['rounds','score','unlimited'].forEach(t => {
+    document.getElementById(`wt-${t}`).classList.toggle('selected', t === type);
+  });
+  refreshWinTypeUI();
+  sndClick();
+}
+
+function refreshWinTypeUI() {
+  document.getElementById('wv-rounds').classList.toggle('visible', G.winType === 'rounds');
+  document.getElementById('wv-score').classList.toggle('visible', G.winType === 'score');
+}
+
+function selectWinValue(val, type) {
+  G.winValue = val;
+  // Re-highlight pills in the appropriate group
+  const groupId = type === 'rounds' ? 'roundPills' : 'scorePills';
+  document.getElementById(groupId).querySelectorAll('.opt-pill').forEach((btn, i) => {
+    const v = type === 'rounds' ? ROUND_OPTIONS[i] : SCORE_OPTIONS[i];
+    btn.classList.toggle('selected', v === val);
+  });
+  sndClick();
+}
+
+function selectTimer(seconds) {
+  G.timerEnabled = seconds > 0;
+  G.timerSeconds = seconds > 0 ? seconds : 15;
+  document.getElementById('timerPills').querySelectorAll('.opt-pill').forEach((btn, i) => {
+    const o = TIMER_OPTIONS[i];
+    btn.classList.toggle('selected', (o.val === 0 && !G.timerEnabled) || (o.val === G.timerSeconds && G.timerEnabled));
+  });
+  sndClick();
+}
+
+// ── QUESTION CONFIG ───────────────────────────────────────────
+function toggleQuestions() {
+  G.questionsEnabled = !G.questionsEnabled;
+  const tog = document.getElementById('qToggle');
+  const area = document.getElementById('qConfigArea');
+  if (tog) tog.classList.toggle('on', G.questionsEnabled);
+  if (area) area.classList.toggle('visible', G.questionsEnabled);
+  buildQuestionConfigUI();
+  sndClick();
+}
+
+function buildQuestionConfigUI() {
+  // Subject grid
+  const sg = document.getElementById('subjectGrid');
+  if (sg) {
+    sg.innerHTML = Q_SUBJECTS.map(s => `
+      <div class="subject-pill${G.questionSubjects.includes(s.id) ? ' selected' : ''}"
+           onclick="toggleSubject('${s.id}')">${s.emoji} ${s.label}</div>
+    `).join('');
+  }
+  // Age pills
+  const ap = document.getElementById('agePills');
+  if (ap) {
+    ap.innerHTML = Q_AGE_GROUPS.map(ag => `
+      <button class="opt-pill${G.questionAgeGroup === ag ? ' selected' : ''}"
+              onclick="selectAgeGroup('${ag}')">${ag} yrs</button>
+    `).join('');
+  }
+  // Question timer pills
+  const qt = document.getElementById('qTimerPills');
+  if (qt) {
+    qt.innerHTML = Q_TIMER_OPTIONS.map(o => `
+      <button class="opt-pill${(o.val===0&&!G.qTimerEnabled)||(o.val===G.qTimerSeconds&&G.qTimerEnabled)?
+        ' selected':''}" onclick="selectQTimer(${o.val})">${o.label}</button>
+    `).join('');
+  }
+  // Toggle state
+  const tog  = document.getElementById('qToggle');
+  const area = document.getElementById('qConfigArea');
+  if (tog)  tog.classList.toggle('on', G.questionsEnabled);
+  if (area) area.classList.toggle('visible', G.questionsEnabled);
+}
+
+function toggleSubject(id) {
+  if (G.questionSubjects.includes(id)) {
+    if (G.questionSubjects.length > 1) // always keep at least one
+      G.questionSubjects = G.questionSubjects.filter(s => s !== id);
+  } else {
+    G.questionSubjects = [...G.questionSubjects, id];
+  }
+  buildQuestionConfigUI();
+  sndClick();
+}
+
+function selectAgeGroup(ag) {
+  G.questionAgeGroup = ag;
+  // Clear cache when age group changes — questions need re-fetched at new difficulty
+  G._questionCache  = {};
+  G._otdbToken      = null;
+  buildQuestionConfigUI();
+  sndClick();
+}
+
+function selectQTimer(val) {
+  G.qTimerEnabled = val > 0;
+  G.qTimerSeconds = val > 0 ? val : 20;
+  buildQuestionConfigUI();
+  sndClick();
+}
+
+// ── NAMES SCREEN ─────────────────────────────────────────────
+function goNames() {
+  // Ensure G.players is sized to playerCount, preserving existing entries
+  while (G.players.length < G.playerCount) {
+    const i = G.players.length;
+    G.players.push({
+      name:       `Player ${i + 1}`,
+      avatar:     AVATARS[Math.floor(Math.random() * AVATARS.length)],
+      colorIdx:   i % PLAYER_COLORS.length,
+      score:      0, active:true, lastAnimal:null, streak:0,
+    });
+  }
+  G.players = G.players.slice(0, G.playerCount);
+  buildNameRows();
+  showScreen('screen-names');
+  sndClick();
+}
+
+function buildNameRows() {
+  const container = document.getElementById('playerRows');
+  container.innerHTML = '';
+  for (let i = 0; i < G.playerCount; i++) {
+    const p   = G.players[i];
+    const col = PLAYER_COLORS[p.colorIdx].main;
+    const row = document.createElement('div');
+    row.className = 'player-row';
+    row.style.borderColor = col + '55';
+    row.innerHTML = `
+      <div class="p-badge" style="background:${col}">${i + 1}</div>
+      <div class="avatar-pick" id="avPick${i}"
+           style="border-color:${col}"
+           onclick="openAvatarModal(${i})">${p.avatar}</div>
+      <input class="name-input" id="nameInp${i}" type="text"
+             placeholder="Player ${i + 1}" value="${p.name}" maxlength="12"
+             style="border-color:${col}55">`;
+    container.appendChild(row);
+  }
+}
+
+// ── AVATAR MODAL ─────────────────────────────────────────────
+function openAvatarModal(idx) {
+  G.avatarTarget  = idx;
+  G.pendingAvatar = G.players[idx].avatar;
+  const grid = document.getElementById('avatarGrid');
+  grid.innerHTML = '';
+  AVATARS.forEach(av => {
+    const el = document.createElement('div');
+    el.className = 'av-option' + (av === G.pendingAvatar ? ' chosen' : '');
+    el.textContent = av;
+    el.onclick = () => {
+      document.querySelectorAll('.av-option').forEach(a => a.classList.remove('chosen'));
+      el.classList.add('chosen');
+      G.pendingAvatar = av;
+      sndClick();
+    };
+    grid.appendChild(el);
+  });
+  document.getElementById('avatarModal').classList.add('open');
+  sndClick();
+}
+
+function closeAvatarModal() {
+  const i = G.avatarTarget;
+  if (i !== null && G.pendingAvatar) {
+    G.players[i].avatar = G.pendingAvatar;
+    document.getElementById(`avPick${i}`).textContent = G.pendingAvatar;
+  }
+  document.getElementById('avatarModal').classList.remove('open');
+  sndClick();
+}
+
+// ── START GAME ───────────────────────────────────────────────
+function startGame() {
+  for (let i = 0; i < G.playerCount; i++) {
+    const inp = document.getElementById(`nameInp${i}`);
+    G.players[i].name       = inp ? (inp.value.trim() || `Player ${i + 1}`) : `Player ${i + 1}`;
+    G.players[i].score      = 0;
+    G.players[i].active     = true;
+    G.players[i].lastAnimal = null;
+    G.players[i].streak     = 0;
+  }
+  G.state        = STATE.IDLE;
+  G.round        = 1;
+  G.turnOrderPos = 0;
+  G.activeIndex  = getActiveOrder()[0];
+  G.undoSnapshot = null;
+
+  showScreen('screen-game');
+  requestAnimationFrame(() => {
+    applyDiceSize();
+    buildGameScreen();
+    initShake();
+  });
+  // Pre-warm question cache synchronously from built-in bank (no network needed)
+  // then background-enrich with OpenTDB if questions are enabled.
+  if (G.questionsEnabled) {
+    G._questionCache = {};
+    G.questionSubjects.forEach(subj => {
+      const key      = `${subj}__${G.questionAgeGroup}`;
+      const eligible = builtinEligible(subj, G.questionAgeGroup);
+      if (eligible.length > 0) {
+        G._questionCache[key] = shuffle(eligible.map(normaliseBuiltin));
+      }
+    });
+    // Background network enrichment — purely additive, never blocks play
+    fetchOTDBToken().then(tok => {
+      G._otdbToken = tok;
+      G.questionSubjects.filter(s => s !== 'SikhHistory').forEach(subj => {
+        fetchOTDBBatch(subj, G.questionAgeGroup, G._otdbToken).then(batch => {
+          if (batch.length) {
+            const key = `${subj}__${G.questionAgeGroup}`;
+            G._questionCache[key] = [...(G._questionCache[key] || []), ...batch];
+          }
+        }).catch(() => {});
+      });
+    }).catch(() => {});
+  }
+  sndClick();
+}
+
+// ── ACTIVE PLAYER ORDER ──────────────────────────────────────
+/**
+ * Returns indices of active players in their original creation order.
+ * This is the canonical turn sequence; turnOrderPos indexes into this array.
+ * @returns {number[]}
+ */
+function getActiveOrder() {
+  return G.players.map((p,i) => p.active ? i : -1).filter(i => i >= 0);
+}
+
+// ── GAME SCREEN BUILD ────────────────────────────────────────
+function buildGameScreen() {
+  renderPlayerCards();
+  renderDiceArea();
+  updateTurnLabel();
+  updateRoundPill();
+  document.getElementById('resultFlash').classList.remove('show');
+  document.getElementById('nextArea').style.display = 'none';
+  if (G.questionsEnabled) {
+    // Slight delay lets the screen transition settle before the overlay appears
+    setTimeout(showQuestion, 500);
+  } else {
+    timerStart();
+  }
+}
+
+/** Updates the round counter pill, including target indicator if applicable. */
+function updateRoundPill() {
+  const pill = document.getElementById('roundPill');
+  if (!pill) return;
+  if (G.winType === 'rounds')
+    pill.textContent = `Round ${G.round} / ${G.winValue}`;
+  else
+    pill.textContent = `Round ${G.round}`;
+}
+
+/**
+ * Renders all player cards using the sector-geometry model.
+ *
+ * Each player owns a 360°/N wedge of the screen.
+ * The card fills the radial lane between inner circle C and screen edge R
+ * within that wedge, and is rotated (angle + 180°) so text faces outward.
+ */
+function renderPlayerCards() {
+  const { W, H, diceSize, cx, cy } = calcLayout();
+  const angles = PLAYER_ANGLES[G.playerCount - 2];
+  const grid   = document.getElementById('playersGrid');
+  grid.innerHTML = '';
+
+  G.players.forEach((p, i) => {
+    const isActive = (i === G.activeIndex) && p.active;
+    const col      = PLAYER_COLORS[p.colorIdx];
+    const angle    = angles[i] ?? 0;
+    const { x, y, cardW, cardH, rotation, isPortrait } = getSectorCardLayout(
+      angle, G.playerCount, W, H, diceSize
+    );
+    const scale = isActive ? 1.04 : 1;
+
+    // Font sizes: base on the card's shorter dimension for portrait cards,
+    // wider dimension component for landscape cards.
+    const refH  = Math.min(cardH, 240);
+    const refW  = Math.min(cardW, 360);
+    const avFS  = Math.max(1.8, Math.min(refH * (isPortrait ? .26 : .28), isPortrait ? 3.4 : 4.0));
+    const nmFS  = Math.max(.70, Math.min(refW * .053, 1.10));
+    const scFS  = Math.max(1.4, Math.min(refH * (isPortrait ? .21 : .22), isPortrait ? 2.8 : 3.0));
+    const ltFS  = Math.max(.58, Math.min(refW * .046, .84));
+
+    const card = document.createElement('div');
+    card.className = `p-card${isActive?' is-active':''}${!p.active?' is-quit':''}`;
+    card.id = `pCard${i}`;
+    card.style.cssText = `
+      left:${x}px;top:${y}px;
+      width:${cardW}px;height:${cardH}px;
+      transform:translate(-50%,-50%) rotate(${rotation}deg) scale(${scale});
+      border-color:${isActive ? col.main : col.main+'44'};
+      display:flex;
+      flex-direction:${isPortrait ? 'column' : 'row'};
+      align-items:center;
+      justify-content:center;
+      gap:${isPortrait ? 4 : 10}px;
+      padding:${isPortrait ? '8px 6px' : '10px 12px'};
+      text-align:${isPortrait ? 'center' : 'left'};
+      overflow:hidden;
+      ${isActive ? `box-shadow:0 0 28px ${col.glow},0 0 60px ${col.glow.replace('.55','.18')};` : ''}`;
+
+    const progPct = G.winType === 'score'
+      ? Math.min(Math.round(p.score / G.winValue * 100), 100)
+      : 0;
+
+    card.innerHTML = `
+      ${p.active ? `<button class="quit-x" onclick="promptQuit(${i})">✕</button>` : ''}
+      <span class="pc-avatar" style="font-size:${avFS}rem;flex-shrink:0;line-height:1">${p.avatar}</span>
+      <div style="flex:${isPortrait?'0 0 auto':'1'};min-width:0;overflow:hidden;
+                  text-align:${isPortrait?'center':'left'};max-width:100%">
+        <span style="font-family:var(--fd);font-size:${nmFS}rem;color:#fff;display:block;
+                     white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</span>
+        <span style="font-family:var(--fd);font-size:${scFS}rem;color:${col.main};
+                     display:block;line-height:1.1" id="pScore${i}">${p.score}</span>
+        ${isPortrait ? '' : `<span style="font-size:${ltFS}rem;color:rgba(255,255,255,.5);display:block;
+                     white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          ${p.lastAnimal ? p.lastAnimal.emoji+' '+p.lastAnimal.name : '—'}${p.streak >= 2 ? ` 🔥×${p.streak}` : ''}
+        </span>`}
+        ${G.winType==='score' ? `<div class="pc-prog" style="margin-top:4px"><div class="pc-prog-fill" style="width:${progPct}%;background:${col.main}"></div></div>` : ''}
+      </div>`;
+
+    grid.appendChild(card);
+  });
+
+  updateDicePointer();
+}
+
+function renderDiceArea() {
+  const isVirtual = G.diceType === 'virtual';
+  document.getElementById('vDiceWrap').style.display = isVirtual ? '' : 'none';
+  document.getElementById('pDiceWrap').style.display = isVirtual ? 'none' : '';
+  // Always reset the dice face so it returns to 🎲 after each roll result
+  const vDice = document.getElementById('vDice');
+  if (vDice) { vDice.textContent = '🎲'; vDice.classList.remove('rolling'); }
+  if (!isVirtual) buildAnimalGrid();
+}
+
+function buildAnimalGrid() {
+  const grid = document.getElementById('animalGrid');
+  grid.innerHTML = '';
+  ANIMALS.forEach(animal => {
+    const btn = document.createElement('button');
+    btn.className = 'animal-btn';
+    btn.disabled  = G.state !== STATE.IDLE;
+    btn.innerHTML = `
+      <span class="ab-emoji">${animal.emoji}</span>
+      <span class="ab-name">${animal.name}</span>
+      <span class="ab-score">+${animal.score}</span>`;
+    btn.onclick = () => { sndClick(); haptic([40]); applyScore(animal); };
+    grid.appendChild(btn);
+  });
+}
+
+function updateTurnLabel() {
+  const p = G.players[G.activeIndex];
+  if (!p) return;
+  const hint = document.getElementById('diceTapHint');
+  if (hint && G.diceType === 'virtual') hint.textContent = `${p.avatar} ${p.name} — tap!`;
+  const pl = document.getElementById('pickLabel');
+  if (pl) pl.innerHTML = `${p.avatar} <strong>${p.name}</strong> — which animal? 👇`;
+}
+
+// ── VIRTUAL DICE ROLL ────────────────────────────────────────
+let _rolling = false;
+
+function handleDiceTap() {
+  if (_rolling || G.state !== STATE.IDLE) return;
+  rollVirtual();
+}
+
+// ── QUESTION ENGINE ──────────────────────────────────────────
+/*
+  Question source priority:
+    1. G._questionCache[subject]  — pre-fetched OpenTDB questions (batch of 20)
+    2. OpenTDB API fetch           — all subjects except SikhHistory
+    3. Anthropic AI                — SikhHistory only (no OpenTDB category)
+    4. Graceful fallback           — on any error, roll proceeds unblocked
+
+  Cache + session token strategy:
+    - G._questionCache  = { [subjectId]: [ ...normalised question objects ] }
+    - G._otdbToken      = session token string (prevents OpenTDB repeats per session)
+    - On game start, pre-fetch a batch for each selected subject
+    - When a subject's cache drops to ≤3, background-refill it
+
+  Question object (normalised from any source):
+    { question:string, options:string[4], answerIndex:number, funFact:string }
+
+  Question timer:
+    - G.qTimerEnabled / G.qTimerSeconds
+    - Visual drain bar inside the overlay
+    - Uses requestAnimationFrame for smooth animation
+    - On expiry: answer treated as wrong → nextTurn()
+*/
+
+let _qTimerRAF      = null;
+let _qTimerStart    = 0;
+let _qTimerDuration = 0;
+
+/** Picks a random subject from G.questionSubjects. */
+function pickSubject() {
+  return G.questionSubjects[Math.floor(Math.random() * G.questionSubjects.length)];
+}
+
+/** Requests an OpenTDB session token (prevents question repeats within a session). */
+async function fetchOTDBToken() {
+  try {
+    const r = await fetch('https://opentdb.com/api_token.php?command=request');
+    const d = await r.json();
+    return d.response_code === 0 ? d.token : null;
+  } catch { return null; }
+}
+
+/**
+ * Fetches a batch of questions from OpenTDB and normalises them.
+ * @param {string} subject
+ * @param {string} ageGroup
+ * @param {string|null} token  Session token
+ * @returns {Promise<Array>}   Array of normalised question objects
+ */
+async function fetchOTDBBatch(subject, ageGroup, token) {
+  const catId = OPENTDB_CATEGORIES[subject];
+  if (!catId) return [];  // SikhHistory — handled by AI
+  const diff  = OPENTDB_DIFFICULTY[ageGroup] || 'easy';
+  let url = `https://opentdb.com/api.php?amount=20&category=${catId}&difficulty=${diff}&type=multiple`;
+  if (token) url += `&token=${token}`;
+
+  const r = await fetch(url);
+  const d = await r.json();
+
+  // response_code 4 = token depleted; reset and retry once without token
+  if (d.response_code === 4 && token) {
+    G._otdbToken = null;
+    const r2 = await fetch(`https://opentdb.com/api.php?amount=20&category=${catId}&difficulty=${diff}&type=multiple`);
+    const d2  = await r2.json();
+    if (d2.response_code !== 0) return [];
+    return d2.results.map(normaliseOTDB);
+  }
+  if (d.response_code !== 0) return [];
+  return d.results.map(normaliseOTDB);
+}
+
+/**
+ * Converts an OpenTDB result to the internal question format.
+ * OpenTDB HTML-encodes all strings.
+ * @param {Object} r  Raw OpenTDB result
+ * @returns {{ question, options, answerIndex, funFact }}
+ */
+function normaliseOTDB(r) {
+  const decode = s => {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = s;
+    return txt.value;
+  };
+  const correct     = decode(r.correct_answer);
+  const incorrects  = r.incorrect_answers.map(decode);
+  // Insert the correct answer at a random position
+  const insertAt    = Math.floor(Math.random() * 4);
+  const options     = [...incorrects];
+  options.splice(insertAt, 0, correct);
+  return {
+    question:    decode(r.question),
+    options,
+    answerIndex: insertAt,
+    funFact:     '',   // OpenTDB doesn't provide fun facts; omit gracefully
+  };
+}
+
+/**
+ * Returns the next question for a subject, guaranteeing a result even offline.
+ *
+ * Priority:
+ *   1. Built-in bank (always available, offline-first)
+ *   2. OpenTDB enrichment cache  (added in background when network available)
+ *   3. Anthropic AI              (SikhHistory supplementation only)
+ *
+ * The built-in bank is shuffled per game start. Once all built-in questions
+ * for a subject are shown, they reshuffle so the game never runs dry.
+ * Network questions are appended to the same queue as a bonus.
+ *
+ * @param {string} subject
+ * @param {string} ageGroup
+ * @returns {Promise<Object>}  Always resolves — never rejects.
+ */
+async function dequeueQuestion(subject, ageGroup) {
+  if (!G._questionCache) G._questionCache = {};
+
+  const key = `${subject}__${ageGroup}`;
+
+  // Build or refill the cache from the built-in bank
+  if (!G._questionCache[key] || G._questionCache[key].length === 0) {
+    const eligible = builtinEligible(subject, ageGroup);
+    if (eligible.length > 0) {
+      G._questionCache[key] = shuffle(eligible.map(normaliseBuiltin));
+    }
+  }
+
+  // Pop from the front (guaranteed if built-in bank has entries)
+  if (G._questionCache[key] && G._questionCache[key].length > 0) {
+    const q = G._questionCache[key].shift();
+    // Background-enrich: append OpenTDB/AI questions when cache drops low
+    if (G._questionCache[key].length <= 3) {
+      _enrichCacheBackground(subject, ageGroup, key);
+    }
+    return q;
+  }
+
+  // Fallback: if somehow no built-in questions exist (shouldn't happen), try AI
+  return fetchAIQuestion(subject, ageGroup);
+}
+
+/**
+ * Fetches additional questions in the background (non-blocking) and appends
+ * them to the cache. Failures are silently swallowed — built-in bank suffices.
+ * @param {string} subject
+ * @param {string} ageGroup
+ * @param {string} key  Cache key
+ */
+function _enrichCacheBackground(subject, ageGroup, key) {
+  if (!G._questionCache) return;
+  const enrichFn = subject === 'SikhHistory'
+    ? fetchAIQuestion(subject, ageGroup)
+    : (async () => {
+        if (!G._otdbToken) G._otdbToken = await fetchOTDBToken().catch(() => null);
+        const batch = await fetchOTDBBatch(subject, ageGroup, G._otdbToken);
+        return batch.length > 0 ? batch : null;
+      })();
+
+  (Array.isArray(enrichFn) ? Promise.resolve(enrichFn) : enrichFn)
+    .then(result => {
+      if (!result) return;
+      const items = Array.isArray(result) ? result : [result];
+      G._questionCache[key] = [...(G._questionCache[key] || []), ...items];
+    })
+    .catch(() => {}); // always silent — built-in bank is the floor
+}
+
+/**
+ * Anthropic AI fallback — used for SikhHistory and when OpenTDB fails.
+ * Requests a fresh question from the API.
+ */
+async function fetchAIQuestion(subject, ageGroup) {
+  const subjLabel = Q_SUBJECTS.find(s => s.id === subject)?.label || subject;
+  const prompt = `You are a friendly quiz host for a kids' dice board game called ਡੰਗਰ DICE.
+Generate ONE unique ${subjLabel} question suitable for age group ${ageGroup}.
+${subject === 'SikhHistory' ? 'Focus on Sikh Gurus, Gurbani, Sikh history, Punjabi culture, or key Sikh events.' : ''}
+Return ONLY valid compact JSON — no markdown, no extra text:
+{"question":"question text","options":["A","B","C","D"],"answerIndex":0,"funFact":"short fact under 20 words"}
+Rules: exactly 4 options, one correct, answerIndex 0-based, difficulty matches age ${ageGroup}.`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model:    'claude-sonnet-4-20250514',
+      max_tokens: 350,
+      messages: [{ role:'user', content: prompt }],
+    }),
+  });
+  if (!res.ok) throw new Error('AI API ' + res.status);
+  const data  = await res.json();
+  const raw   = data.content?.find(b => b.type === 'text')?.text?.trim() || '';
+  const clean = raw.replace(/^```json\s*/i,'').replace(/```\s*$/,'').trim();
+  return JSON.parse(clean);
+}
+
+// ── QUESTION UI ──────────────────────────────────────────────
+
+/** Shows the question overlay, fetches from cache/API, starts answer timer. */
+function showQuestion() {
+  if (G.state !== STATE.IDLE) return;
+  G.state = STATE.QUESTION;
+  timerStop();
+  haptic([20]);
+
+  // Hide physical pick panel so animal buttons can't be tapped during the question
+  const pWrap = document.getElementById('pDiceWrap');
+  if (pWrap) pWrap.style.display = 'none';
+
+  const p      = G.players[G.activeIndex];
+  const subj   = pickSubject();
+  const col    = Q_SUBJECT_COLORS[subj] || '#FFCE47';
+  const subjObj= Q_SUBJECTS.find(s => s.id === subj) || Q_SUBJECTS[0];
+
+  const badge = document.getElementById('qSubjectBadge');
+  if (badge) {
+    badge.textContent   = subjObj.emoji + ' ' + subjObj.label;
+    badge.style.color   = col;
+    badge.style.borderColor = col + '88';
+  }
+  const lbl = document.getElementById('qPlayerLabel');
+  if (lbl) lbl.textContent = `${p.avatar} ${p.name}'s turn`;
+
+  const body = document.getElementById('qBody');
+  if (body) body.innerHTML = `<div class="q-loader"><span class="spinner">⚙️</span>Fetching question…</div>`;
+
+  document.getElementById('questionOverlay').classList.add('show');
+
+  dequeueQuestion(subj, G.questionAgeGroup).then(q => {
+    if (G.state === STATE.QUESTION) renderQuestion(q);
+  }).catch(() => {
+    // dequeueQuestion should never reject (built-in bank is the floor),
+    // but if it somehow does, return to IDLE without rolling — the player
+    // taps the dice themselves. Never auto-roll; that causes automated loops.
+    if (G.state === STATE.QUESTION) {
+      hideQuestion();
+      const hint = document.getElementById('diceTapHint');
+      if (hint) hint.textContent = '⚠️ Tap to roll!';
+    }
+  });
+}
+
+/**
+ * Renders a question into the overlay and starts the answer timer.
+ *
+ * IMPORTANT: question data is stored in G._currentQuestion rather than
+ * embedded in onclick strings. Inline onclick string interpolation breaks
+ * when fun-fact or option text contains apostrophes/single-quotes, causing
+ * "SyntaxError: missing ) after argument list".
+ *
+ * @param {{ question, options, answerIndex, funFact }} q
+ */
+function renderQuestion(q) {
+  if (G.state !== STATE.QUESTION) return;
+  G._currentQuestion = q;   // stored here — submitAnswer reads it, no string passing
+
+  const letters = ['A','B','C','D'];
+  const body    = document.getElementById('qBody');
+  if (!body) return;
+
+  const timerHTML = G.qTimerEnabled
+    ? `<div class="q-timer-bar-wrap">
+         <div class="q-timer-bar-fill" id="qTimerFill" style="width:100%"></div>
+       </div>
+       <div style="font-family:var(--fd);font-size:.9rem;color:var(--tm);text-align:right;
+                   margin:-10px 0 8px" id="qTimerLabel">${G.qTimerSeconds}s</div>`
+    : '';
+
+  body.innerHTML = `
+    ${timerHTML}
+    <div class="q-text">${escHtml(q.question)}</div>
+    <div class="q-options">
+      ${q.options.map((opt, i) => `
+        <button class="q-option" onclick="submitAnswer(${i})">
+          <span class="q-opt-letter">${letters[i]}</span>
+          <span>${escHtml(opt)}</span>
+        </button>`).join('')}
+    </div>
+    <button class="q-skip-btn" onclick="skipQuestion()">Skip question →</button>`;
+
+  if (G.qTimerEnabled) startQTimer();
+}
+
+// ── QUESTION TIMER ───────────────────────────────────────────
+function startQTimer() {
+  stopQTimer();
+  _qTimerDuration = G.qTimerSeconds * 1000;
+  _qTimerStart    = performance.now();
+  _qTimerFrame();
+}
+
+function _qTimerFrame() {
+  const elapsed   = performance.now() - _qTimerStart;
+  const progress  = Math.min(elapsed / _qTimerDuration, 1);
+  const remaining = Math.max(0, Math.ceil((1 - progress) * G.qTimerSeconds));
+
+  const fill  = document.getElementById('qTimerFill');
+  const label = document.getElementById('qTimerLabel');
+  if (fill) {
+    fill.style.width = (100 * (1 - progress)) + '%';
+    fill.classList.toggle('warn',   progress > 0.5 && progress <= 0.75);
+    fill.classList.toggle('danger', progress > 0.75);
+  }
+  if (label) label.textContent = remaining + 's';
+
+  if (progress < 1) {
+    _qTimerRAF = requestAnimationFrame(_qTimerFrame);
+  } else {
+    stopQTimer();
+    if (G.state === STATE.QUESTION) timeUpQuestion();
+  }
+}
+
+function stopQTimer() {
+  cancelAnimationFrame(_qTimerRAF);
+  _qTimerRAF = null;
+}
+
+/** Called when the answer timer expires. Reads from G._currentQuestion. */
+function timeUpQuestion() {
+  if (G.state !== STATE.QUESTION) return;
+  const q = G._currentQuestion || {};
+  haptic([200]);
+  sndTimerEnd();
+
+  document.querySelectorAll('.q-option').forEach((btn, i) => {
+    btn.classList.toggle('reveal-correct', i === q.answerIndex);
+    btn.disabled = true;
+  });
+  const body = document.getElementById('qBody');
+  const skip = body?.querySelector('.q-skip-btn');
+  if (skip) skip.remove();
+  const bar = document.createElement('div');
+  bar.className = 'q-result-bar wrong';
+  bar.innerHTML = `
+    <span class="q-result-icon">⏰</span>
+    <div>
+      <div class="q-result-text">Time's up! Next player's turn.</div>
+      ${q.funFact ? `<div class="q-fact">💡 ${escHtml(q.funFact)}</div>` : ''}
+    </div>`;
+  body.appendChild(bar);
+  setTimeout(() => { hideQuestion(); nextTurn(); }, 2000);
+}
+
+/**
+ * Handles a player tapping an answer option.
+ * Reads correct answer and fun fact from G._currentQuestion (set by renderQuestion).
+ * No string parameters — eliminates the apostrophe/quote SyntaxError entirely.
+ *
+ * @param {number} chosen  Index of the option the player tapped (0–3).
+ */
+function submitAnswer(chosen) {
+  if (G.state !== STATE.QUESTION) return;
+  stopQTimer();
+
+  const q       = G._currentQuestion || {};
+  const correct = q.answerIndex ?? 0;
+  const funFact = q.funFact || '';
+
+  document.querySelectorAll('.q-option').forEach((btn, i) => {
+    btn.classList.toggle('correct',        i === correct);
+    btn.classList.toggle('wrong',          i === chosen && chosen !== correct);
+    btn.classList.toggle('reveal-correct', i === correct && chosen !== correct);
+    btn.disabled = true;
+  });
+
+  const isCorrect = chosen === correct;
+  haptic(isCorrect ? [40, 20, 80] : [100]);
+  if (isCorrect) sndScore(100); else sndTimerEnd();
+
+  const body = document.getElementById('qBody');
+  const skip = body?.querySelector('.q-skip-btn');
+  if (skip) skip.remove();
+
+  const resultBar = document.createElement('div');
+  resultBar.className = `q-result-bar ${isCorrect ? 'correct' : 'wrong'}`;
+  resultBar.innerHTML = `
+    <span class="q-result-icon">${isCorrect ? '✅' : '❌'}</span>
+    <div>
+      <div class="q-result-text">${isCorrect
+        ? (G.diceType === 'virtual' ? 'Correct! 🎲 Now tap the dice!' : 'Correct! Pick your animal! 🎲')
+        : 'Wrong! Next player\'s turn.'}</div>
+      ${funFact ? `<div class="q-fact">💡 ${escHtml(funFact)}</div>` : ''}
+    </div>`;
+  body.appendChild(resultBar);
+
+  setTimeout(() => {
+    hideQuestion();
+    if (isCorrect) {
+      // ── Manual roll: return to IDLE so the player taps the dice themselves ──
+      // Never auto-roll — that removes player agency and can cause automated loops.
+      if (G.diceType === 'physical') {
+        renderDiceArea();   // show animal pick panel for physical dice
+        timerStart();
+      }
+      // For virtual dice: state is IDLE, vDice is visible, player taps to roll
+    } else {
+      nextTurn();
+    }
+  }, isCorrect ? 1400 : 2200);
+}
+
+/** Skip — returns to IDLE. Player taps the dice themselves (no auto-roll). */
+function skipQuestion() {
+  stopQTimer();
+  hideQuestion();
+  if (G.diceType === 'physical') {
+    renderDiceArea();
+    timerStart();
+  }
+  // Virtual dice: state is now IDLE, player taps vDice to roll
+}
+
+/** Hides and resets the question overlay. */
+function hideQuestion() {
+  stopQTimer();
+  const overlay = document.getElementById('questionOverlay');
+  if (overlay) overlay.classList.remove('show');
+  const body = document.getElementById('qBody');
+  if (body) body.innerHTML = `<div class="q-loader"><span class="spinner">⚙️</span>Fetching question…</div>`;
+  if (G.state === STATE.QUESTION) G.state = STATE.IDLE;
+}
+
+/** Minimal HTML entity escaper — prevents XSS from API/OpenTDB content in innerHTML. */
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function rollVirtual() {
+  haptic([30, 20, 60]);
+  sndRoll();
+
+  const dice = document.getElementById('vDice');
+  dice.classList.add('rolling');
+  const hint = document.getElementById('diceTapHint');
+  if (hint) hint.textContent = 'Rolling…';
+
+  let ticks = 0;
+  const maxTicks = 14;
+  const iv = setInterval(() => {
+    dice.textContent = ANIMALS[Math.floor(Math.random() * ANIMALS.length)].emoji;
+    sndTick();
+    if (++ticks >= maxTicks) {
+      clearInterval(iv);
+      dice.classList.remove('rolling');
+      const result = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+      dice.textContent = result.emoji;
+      _rolling = false;
+      applyScore(result);
+    }
+  }, 72);
+}
+
+// ── SCORE APPLICATION ────────────────────────────────────────
+/**
+ * Records the rolled animal, applies streak multiplier, updates player state,
+ * shows result flash, and starts the auto-advance countdown.
+ * @param {{ name:string, emoji:string, score:number }} animal
+ */
+function applyScore(animal) {
+  if (G.state === STATE.RESULT) return;
+  const p = G.players[G.activeIndex];
+
+  // Save undo snapshot BEFORE modifying player state
+  G.undoSnapshot = {
+    playerIdx:    G.activeIndex,
+    score:        p.score,
+    lastAnimal:   p.lastAnimal,
+    streak:       p.streak,
+    round:        G.round,
+    turnOrderPos: G.turnOrderPos,
+  };
+
+  // Streak calculation
+  const isStreak = p.lastAnimal !== null && p.lastAnimal.name === animal.name;
+  p.streak       = isStreak ? p.streak + 1 : 1;
+  const pts      = isStreak ? Math.round(animal.score * 1.5) : animal.score;
+
+  p.score      += pts;
+  p.lastAnimal  = animal;
+  G.state       = STATE.RESULT;
+
+  // Style result flash per animal
+  const fl = ANIMAL_FLASH[animal.name] || ANIMAL_FLASH.Monkey;
+  const rfEl = document.getElementById('resultFlash');
+  rfEl.style.background = fl.bg;
+  rfEl.style.boxShadow  = `0 10px 50px ${fl.shadow},0 0 100px ${fl.shadow}`;
+
+  document.getElementById('rfEmoji').textContent = animal.emoji;
+  document.getElementById('rfText').textContent  = `${p.name} rolled ${animal.name}!`;
+  document.getElementById('rfPts').textContent   = isStreak ? `+${pts} pts (+50% 🔥)` : `+${pts} pts`;
+
+  const streakBadge = document.getElementById('rfStreak');
+  streakBadge.style.display = isStreak ? 'inline-block' : 'none';
+  if (isStreak) streakBadge.textContent = `🔥 STREAK ×${p.streak}!`;
+
+  rfEl.classList.add('show');
+  if (isStreak) sndStreak();
+  sndScore(animal.score);
+  haptic(animal.score >= 150 ? [40,30,100] : [40]);
+
+  if (animal.name === 'Tiger') spawnTigerSparks();
+  spawnFloatPop(animal.emoji, pts);
+  renderPlayerCards();
+
+  // Animate score counter on the card
+  requestAnimationFrame(() => {
+    const sc = document.getElementById(`pScore${G.activeIndex}`);
+    if (sc) { sc.classList.remove('score-pop'); void sc.offsetWidth; sc.classList.add('score-pop'); }
+  });
+
+  // Check win condition — score target
+  if (G.winType === 'score' && p.score >= G.winValue) {
+    setTimeout(endGame, 1200);
+    return;
+  }
+
+  // Start auto-advance countdown
+  const fillEl  = document.getElementById('autoFill');
+  const labelEl = document.getElementById('autoLabel');
+  fillEl.style.animation = 'none';
+  void fillEl.offsetHeight;
+  fillEl.style.animation = 'drainBar 2.8s linear forwards';
+  document.getElementById('nextArea').style.display = '';
+
+  let secs = 3;
+  labelEl.textContent = `Next in ${secs}…`;
+  clearInterval(G._countdownInterval);
+  G._countdownInterval = setInterval(() => {
+    secs--;
+    labelEl.textContent = secs > 0 ? `Next in ${secs}…` : 'Here we go! 🎲';
+    if (secs <= 0) clearInterval(G._countdownInterval);
+  }, 1000);
+
+  clearTimeout(G._autoNextTimer);
+  G._autoNextTimer = setTimeout(() => {
+    clearInterval(G._countdownInterval);
+    nextTurn();
+  }, 2800);
+}
+
+// ── UNDO ─────────────────────────────────────────────────────
+/** Restores state to before the last roll. Only available during RESULT phase. */
+function undoRoll() {
+  if (!G.undoSnapshot || G.state !== STATE.RESULT) return;
+  clearTimeout(G._autoNextTimer);
+  clearInterval(G._countdownInterval);
+
+  const s = G.undoSnapshot;
+  const p = G.players[s.playerIdx];
+  p.score      = s.score;
+  p.lastAnimal = s.lastAnimal;
+  p.streak     = s.streak;
+  G.round        = s.round;
+  G.turnOrderPos = s.turnOrderPos;
+  G.undoSnapshot = null;
+  G.state        = STATE.IDLE;
+
+  document.getElementById('resultFlash').classList.remove('show');
+  document.getElementById('nextArea').style.display = 'none';
+
+  const dice = document.getElementById('vDice');
+  if (dice) { dice.textContent = '🎲'; dice.classList.remove('rolling'); }
+
+  renderPlayerCards();
+  updateTurnLabel();
+  updateRoundPill();
+  timerStart();
+  sndClick();
+  haptic([20, 10, 20]);
+}
+
+// ── NEXT TURN ────────────────────────────────────────────────
+function nextTurn() {
+  clearTimeout(G._autoNextTimer);
+  clearInterval(G._countdownInterval);
+  G.undoSnapshot = null;
+  G.state = STATE.IDLE;
+
+  document.getElementById('resultFlash').classList.remove('show');
+  document.getElementById('nextArea').style.display = 'none';
+
+  const order = getActiveOrder();
+  if (order.length === 0) { endGame(); return; }
+
+  G.turnOrderPos = (G.turnOrderPos + 1) % order.length;
+
+  // When we wrap back to position 0, a full round has completed
+  if (G.turnOrderPos === 0) {
+    G.round++;
+    updateRoundPill();
+    if (G.winType === 'rounds' && G.round > G.winValue) {
+      endGame(); return;
+    }
+  }
+
+  G.activeIndex = order[G.turnOrderPos];
+  renderPlayerCards();
+  renderDiceArea();
+  updateTurnLabel();
+  sndClick();
+  if (G.questionsEnabled) {
+    setTimeout(showQuestion, 350);
+  } else {
+    timerStart();
+  }
+}
+
+// ── FLOAT POP ────────────────────────────────────────────────
+function spawnFloatPop(emoji, pts) {
+  const el = document.createElement('div');
+  el.className   = 'float-pop';
+  el.textContent = `${emoji} +${pts}`;
+  el.style.left  = `${36 + Math.random() * 28}%`;
+  el.style.top   = `${40 + Math.random() * 20}%`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1800);
+}
+
+function spawnTigerSparks() {
+  const sparks = ['⭐','✨','💥','🌟','💛'];
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className   = 'tiger-spark';
+      el.textContent = sparks[Math.floor(Math.random() * sparks.length)];
+      const angle    = (i / 8) * 360 * Math.PI / 180;
+      const dist     = 100 + Math.random() * 80;
+      el.style.cssText = `left:50%;top:50%;--sx:${Math.cos(angle)*dist}px;--sy:${Math.sin(angle)*dist}px;--sr:${Math.random()*360}deg`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1300);
+    }, i * 60);
+  }
+}
+
+// ── IN-GAME SCOREBOARD ───────────────────────────────────────
+function toggleScoreboard() {
+  const sheet = document.getElementById('scoreboardSheet');
+  const isOpen = sheet.classList.contains('open');
+  if (!isOpen) buildScoreboard();
+  sheet.classList.toggle('open');
+  sndClick();
+}
+
+function buildScoreboard() {
+  const sorted = [...G.players]
+    .map((p,i) => ({ ...p, _origIdx: i }))
+    .filter(p => p.active)
+    .sort((a, b) => b.score - a.score);
+  const all = [...sorted, ...G.players.filter(p => !p.active)];
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('scoList').innerHTML = all.map((p, rank) => {
+    const col = PLAYER_COLORS[p.colorIdx].main;
+    const isActive = p.active && (p._origIdx ?? G.players.indexOf(p)) === G.activeIndex;
+    return `<div class="sco-row">
+      <span class="sco-rank">${rank<3?medals[rank]:'#'+(rank+1)}</span>
+      <span class="sco-ava">${p.avatar}</span>
+      <span class="sco-name">${p.name}${isActive?`<span class="sco-active-tag">▶ Active</span>`:''}${!p.active?'<span class="sco-active-tag" style="color:var(--cr)"> Left</span>':''}</span>
+      <span class="sco-pts" style="color:${col}">${p.score}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── QUIT PLAYER ──────────────────────────────────────────────
+function promptQuit(idx) {
+  G.quitTarget = idx;
+  const p = G.players[idx];
+  document.getElementById('quitBody').textContent =
+    `${p.avatar} ${p.name} will leave the game.`;
+  openModal('quitModal');
+  sndClick();
+}
+
+function doQuitPlayer() {
+  const i = G.quitTarget;
+  if (i === null) return;
+
+  const wasActive = (i === G.activeIndex);
+  G.players[i].active = false;
+  closeModal('quitModal');
+  sndClick();
+  haptic([80]);
+
+  const newOrder = getActiveOrder();
+  if (newOrder.length === 0) { endGame(); return; }
+
+  if (wasActive) {
+    // Abort current turn cleanly
+    clearTimeout(G._autoNextTimer);
+    clearInterval(G._countdownInterval);
+    timerStop();
+    G.state = STATE.IDLE;
+    G.undoSnapshot = null;
+    document.getElementById('resultFlash').classList.remove('show');
+    document.getElementById('nextArea').style.display = 'none';
+    // Advance turnOrderPos to next slot in the now-smaller order
+    G.turnOrderPos = G.turnOrderPos % newOrder.length;
+    G.activeIndex  = newOrder[G.turnOrderPos];
+    renderPlayerCards(); renderDiceArea(); updateTurnLabel(); timerStart();
+  } else {
+    // Re-anchor turnOrderPos to where the current active player now sits
+    const newPos = newOrder.indexOf(G.activeIndex);
+    G.turnOrderPos = newPos >= 0 ? newPos : G.turnOrderPos % newOrder.length;
+    renderPlayerCards();
+  }
+  G.quitTarget = null;
+}
+
+// ── STOP / END ───────────────────────────────────────────────
+function promptStop() { openModal('stopModal'); sndClick(); }
+
+/** Shows exit-to-home confirmation during an active game. */
+function promptExitHome() { openModal('exitHomeModal'); sndClick(); }
+
+/**
+ * Immediately exits to the main menu, discarding any active game.
+ * Called from the exit modal confirm button AND from leaderboard Home button
+ * (leaderboard exit needs no confirmation since the game is already over).
+ */
+function doExitHome() {
+  closeModal('exitHomeModal');
+  closeModal('stopModal');
+  // Clean up all running timers and audio before leaving
+  timerStop();
+  stopQTimer();
+  clearTimeout(G._autoNextTimer);
+  clearInterval(G._countdownInterval);
+  hideQuestion();
+  resetGame();
+}
+
+function endGame() {
+  clearTimeout(G._autoNextTimer);
+  clearInterval(G._countdownInterval);
+  timerStop();
+  hideQuestion();
+  closeModal('stopModal');
+  saveGameToHistory();
+  buildLeaderboard();
+  showScreen('screen-leaderboard');
+  fireConfetti();
+  sndWin();
+  haptic([50, 30, 100, 30, 200]);
+}
+
+// ── LEADERBOARD ──────────────────────────────────────────────
+function buildLeaderboard() {
+  const active = G.players.filter(p =>  p.active).sort((a,b) => b.score - a.score);
+  const quit   = G.players.filter(p => !p.active).sort((a,b) => b.score - a.score);
+  const sorted = [...active, ...quit];
+
+  // Winner pod
+  const pod = document.getElementById('winnerPod');
+  if (active.length > 0) {
+    const w = active[0], col = PLAYER_COLORS[w.colorIdx].main;
+    pod.innerHTML = `
+      <span class="winner-tag">🏆 WINNER 🏆</span>
+      <span class="winner-ava">${w.avatar}</span>
+      <span class="winner-name" style="color:${col}">${w.name}</span>
+      <span class="winner-score" style="color:${col}">${w.score} points</span>`;
+  } else {
+    pod.innerHTML = `<span class="winner-name">Everyone left 😅</span>`;
+  }
+
+  // Score bar chart
+  buildScoreChart(sorted);
+
+  // Rank rows
+  const rows   = document.getElementById('rankRows');
+  rows.innerHTML = '';
+  const medals = ['🥇','🥈','🥉'], classes = ['gold','silver','bronze'];
+  sorted.forEach(p => {
+    const ar  = active.indexOf(p);
+    const col = PLAYER_COLORS[p.colorIdx].main;
+    const row = document.createElement('div');
+    row.className = `rank-row ${ar >= 0 && ar < 3 ? classes[ar] : ''} ${!p.active ? 'quit-row' : ''}`;
+    const medal = !p.active ? '❌' : ar < 3 ? medals[ar] : `#${ar+1}`;
+    row.innerHTML = `
+      <div class="rank-medal">${medal}</div>
+      <div class="rank-ava">${p.avatar}</div>
+      <div class="rank-name">${p.name}${!p.active?'<span class="rank-quit-tag">left the game</span>':''}</div>
+      <div class="rank-pts" style="color:${col}">${p.score} pts</div>`;
+    rows.appendChild(row);
+  });
+}
+
+/**
+ * Builds an animated horizontal bar chart for the leaderboard.
+ * Bar widths are proportional to the top score.
+ * @param {Array} sorted - Players sorted highest→lowest score.
+ */
+function buildScoreChart(sorted) {
+  const chart  = document.getElementById('scoreChart');
+  const maxPts = Math.max(...sorted.map(p => p.score), 1);
+  chart.innerHTML = `<div class="sc-title">📊 Score Breakdown</div>`;
+  sorted.forEach((p, i) => {
+    const pct = Math.max(Math.round(p.score / maxPts * 100), p.score > 0 ? 3 : 0);
+    const col = PLAYER_COLORS[p.colorIdx].main;
+    const row = document.createElement('div');
+    row.className = 'sc-row';
+    row.innerHTML = `
+      <div class="sc-label">${p.avatar} ${p.name}</div>
+      <div class="sc-bar-wrap">
+        <div class="sc-bar" style="width:${pct}%;background:${col};animation-delay:${i*.1}s"></div>
+      </div>
+      <div class="sc-val" style="color:${col}">${p.score}</div>`;
+    chart.appendChild(row);
+  });
+}
+
+// ── CONFETTI ─────────────────────────────────────────────────
+function fireConfetti() {
+  const cols  = ['#FF4E6A','#FFCE47','#3DD68C','#4A90E2','#9B5DE5','#FF85C8','#FF8C42'];
+  const wrap  = document.getElementById('confettiWrap');
+  for (let i = 0; i < 120; i++) {
+    setTimeout(() => {
+      const b = document.createElement('div');
+      b.className = 'confetti-bit';
+      b.style.left              = Math.random() * 100 + 'vw';
+      b.style.width             = (Math.random() * 10 + 6) + 'px';
+      b.style.height            = (Math.random() * 10 + 6) + 'px';
+      b.style.background        = cols[Math.floor(Math.random() * cols.length)];
+      b.style.borderRadius      = Math.random() > .5 ? '50%' : '2px';
+      b.style.animationDuration = (Math.random() * 2.5 + 2) + 's';
+      wrap.appendChild(b);
+      setTimeout(() => b.remove(), 5500);
+    }, i * 22);
+  }
+}
+
+// ── RESET ────────────────────────────────────────────────────
+function resetGame() {
+  timerStop();
+  hideQuestion();
+  clearTimeout(G._autoNextTimer);
+  clearInterval(G._countdownInterval);
+  G = freshState();
+  document.getElementById('countDisp').textContent = '2';
+  chooseDice('virtual');
+  showScreen('screen-setup');
+  sndClick();
+}
+
+// ── MODAL HELPERS ────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open');    }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── KEYBOARD ─────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  const onGame = document.getElementById('screen-game').classList.contains('active');
+  if (!onGame) return;
+  switch (e.code) {
+    case 'Space':
+    case 'Enter':
+      e.preventDefault();
+      if (G.state === STATE.IDLE && G.diceType === 'virtual') handleDiceTap();
+      else if (G.state === STATE.RESULT) nextTurn();
+      break;
+    case 'Escape':
+      // Close any open modal, sheet, or question overlay
+      document.querySelectorAll('.confirm-modal.open,.modal-overlay.open').forEach(m => m.classList.remove('open'));
+      document.getElementById('scoreboardSheet').classList.remove('open');
+      if (G.state === STATE.QUESTION) { skipQuestion(); break; }
+      if (G.state === STATE.RESULT) nextTurn();
+      break;    case 'KeyZ':
+      if (e.ctrlKey || e.metaKey) { e.preventDefault(); undoRoll(); }
+      break;
+    case 'KeyS':
+      toggleScoreboard();
+      break;
+  }
+});
+
+// ── RESIZE / ORIENTATION ─────────────────────────────────────
+let _resizeTimer = null;
+window.addEventListener('resize', () => {
+  if (!document.getElementById('screen-game').classList.contains('active')) return;
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => { applyDiceSize(); renderPlayerCards(); }, 150);
+});
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    if (document.getElementById('screen-game').classList.contains('active')) {
+      applyDiceSize(); renderPlayerCards();
+    }
+  }, 350);
+});
+</script>
+</body>
+</html>
