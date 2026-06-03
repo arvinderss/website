@@ -1,0 +1,49 @@
+# Purpose: Regenerate the site-wide navigation menu on every push to main,
+#          then commit the result back if any page changed.
+# Assumes: scripts/build_nav.py exists; pages opt in via NAV:START/NAV:END markers.
+name: Build navigation menu
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.html"
+      - "scripts/build_nav.py"
+      - ".github/workflows/build-nav.yml"
+  workflow_dispatch: {}   # allow manual runs from the Actions tab
+
+# Least privilege: the job only needs to write repository contents.
+permissions:
+  contents: write
+
+# Avoid overlapping runs racing on the same branch.
+concurrency:
+  group: build-nav-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-nav:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate navigation
+        run: python scripts/build_nav.py
+
+      - name: Commit changes if any
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "chore: regenerate navigation menu [skip ci]"
+            git push
+          else
+            echo "No navigation changes."
+          fi
