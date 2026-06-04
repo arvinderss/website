@@ -1,0 +1,392 @@
+<!-- NAV:START -->
+<!-- NAV:END -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Velocity Gap — AI's Asymmetric Impact on Threat Vectors and Vulnerability Remediation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0c10;
+    --paper:#e8e4d8;
+    --paper-dim:#b8b3a4;
+    --blood:#d6442f;
+    --blood-dim:#8f2e20;
+    --amber:#e0a93b;
+    --cyan:#4fb0c6;
+    --line:#2a2e36;
+    --line-soft:#1a1d24;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Newsreader',Georgia,serif;
+    font-size:19px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(214,68,47,0.06), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(79,176,198,0.05), transparent 45%);
+    background-attachment:fixed;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;
+    opacity:0.035;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:0 28px}
+
+  /* ---- masthead ---- */
+  header.mast{padding:64px 0 36px;border-bottom:1px solid var(--line)}
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.28em;
+    text-transform:uppercase;color:var(--blood);display:flex;gap:14px;align-items:center;
+    margin-bottom:30px;flex-wrap:wrap;
+  }
+  .kicker .dot{width:7px;height:7px;background:var(--blood);border-radius:50%;
+    animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+  .kicker .sep{color:var(--line);font-size:10px}
+  h1{
+    font-family:'Fraunces',serif;font-weight:900;font-size:clamp(38px,7vw,72px);
+    line-height:0.98;letter-spacing:-0.02em;margin-bottom:24px;
+  }
+  h1 .em{color:var(--blood);font-style:italic;font-weight:400}
+  .standfirst{
+    font-size:clamp(20px,2.6vw,25px);line-height:1.45;color:var(--paper-dim);
+    font-weight:400;max-width:680px;
+  }
+  .byline{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;
+    color:var(--paper-dim);margin-top:34px;display:flex;justify-content:space-between;
+    flex-wrap:wrap;gap:10px;
+  }
+  .byline a{color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--cyan)}
+
+  /* ---- confidence legend ---- */
+  .legend{
+    display:flex;gap:24px;flex-wrap:wrap;margin:38px 0;padding:20px 24px;
+    border:1px solid var(--line);background:rgba(255,255,255,0.015);
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.04em;
+  }
+  .legend span{display:flex;align-items:center;gap:9px;color:var(--paper-dim)}
+  .legend i{width:13px;height:13px;border-radius:2px;display:inline-block}
+  .l-est{background:var(--cyan)}.l-con{background:var(--amber)}.l-jud{background:var(--blood)}
+
+  /* ---- body ---- */
+  article{padding:8px 0 60px}
+  .lede{font-size:22px;line-height:1.55}
+  .lede::first-letter{
+    font-family:'Fraunces',serif;font-weight:900;font-size:84px;line-height:0.7;
+    float:left;margin:8px 14px 0 0;color:var(--blood);
+  }
+  section{margin:56px 0;scroll-margin-top:40px}
+  h2{
+    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(26px,3.6vw,34px);
+    line-height:1.08;letter-spacing:-0.01em;margin-bottom:8px;padding-top:10px;
+    display:flex;align-items:baseline;gap:16px;
+  }
+  h2 .num{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--blood);
+    letter-spacing:0.1em;flex-shrink:0;padding-top:6px;
+  }
+  h2 + .sub{color:var(--paper-dim);font-style:italic;font-size:18px;margin-bottom:22px;
+    padding-left:42px;}
+  p{margin:0 0 20px}
+  p.body, section p{padding-left:0}
+  article > section > p, .lede{}
+  strong{color:#fff;font-weight:500}
+  em.judge{color:var(--blood);font-style:italic;font-weight:500}
+  a.src{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(79,176,198,0.35)}
+  a.src:hover{border-bottom-color:var(--cyan)}
+
+  /* ---- stat callouts ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px;background:var(--line);border:1px solid var(--line);margin:34px 0}
+  .stat{background:var(--ink);padding:22px 20px}
+  .stat .big{font-family:'Fraunces',serif;font-weight:900;font-size:38px;
+    line-height:1;color:var(--blood);letter-spacing:-0.02em}
+  .stat .big.good{color:var(--cyan)}
+  .stat .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.05em;
+    color:var(--paper-dim);margin-top:10px;line-height:1.4;text-transform:uppercase}
+
+  /* ---- chart ---- */
+  .chartcard{border:1px solid var(--line);background:rgba(255,255,255,0.012);
+    padding:30px 26px 24px;margin:40px 0}
+  .chartcard .ctitle{font-family:'IBM Plex Mono',monospace;font-size:12px;
+    letter-spacing:0.16em;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+  .chartcard .csub{color:var(--paper-dim);font-size:15px;font-style:italic;margin-bottom:20px}
+  #gap{width:100%;height:auto;display:block}
+  .clegend{display:flex;gap:22px;margin-top:16px;font-family:'IBM Plex Mono',monospace;
+    font-size:12px;color:var(--paper-dim);flex-wrap:wrap}
+  .clegend b{display:flex;align-items:center;gap:8px;font-weight:400}
+  .clegend b i{width:22px;height:3px;display:inline-block}
+
+  /* ---- pull / mythos block ---- */
+  .pull{border-left:3px solid var(--blood);padding:6px 0 6px 26px;margin:38px 0;
+    font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+    font-size:clamp(22px,3vw,29px);line-height:1.3;color:#fff}
+  .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.06em;
+    padding:3px 8px;border-radius:3px;text-transform:uppercase;vertical-align:middle;
+    margin-right:8px;font-weight:500}
+  .tag.est{background:rgba(79,176,198,0.18);color:var(--cyan);border:1px solid rgba(79,176,198,0.4)}
+  .tag.con{background:rgba(224,169,59,0.16);color:var(--amber);border:1px solid rgba(224,169,59,0.4)}
+  .tag.jud{background:rgba(214,68,47,0.16);color:var(--blood);border:1px solid rgba(214,68,47,0.4)}
+  .epi{display:grid;gap:14px;margin:30px 0}
+  .epi .row{display:grid;grid-template-columns:130px 1fr;gap:18px;align-items:start;
+    padding:16px 18px;border:1px solid var(--line-soft);background:rgba(255,255,255,0.01)}
+  .epi .row .k{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.06em;
+    text-transform:uppercase;padding-top:2px}
+  .epi .row.est .k{color:var(--cyan)} .epi .row.con .k{color:var(--amber)}
+  .epi .row.jud .k{color:var(--blood)}
+  .epi .row .v{font-size:17px;line-height:1.55;color:var(--paper)}
+
+  /* ---- actions ---- */
+  ol.acts{list-style:none;counter-reset:a;margin:26px 0}
+  ol.acts li{counter-increment:a;position:relative;padding:20px 0 20px 64px;
+    border-top:1px solid var(--line-soft)}
+  ol.acts li::before{content:counter(a,decimal-leading-zero);position:absolute;left:0;top:18px;
+    font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--blood);
+    font-weight:600;letter-spacing:0.05em}
+  ol.acts li b{color:#fff;font-weight:500;font-family:'Fraunces',serif;font-size:19px}
+
+  /* ---- close + refs ---- */
+  .close{border:1px solid var(--blood-dim);background:rgba(214,68,47,0.05);
+    padding:30px 30px;margin:50px 0}
+  .close h2{padding-top:0}
+  footer{border-top:1px solid var(--line);padding:40px 0 80px;margin-top:30px}
+  footer h3{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.2em;
+    text-transform:uppercase;color:var(--paper-dim);margin-bottom:20px}
+  .refs{list-style:none;display:grid;gap:11px;font-size:14px;line-height:1.45}
+  .refs li{padding-left:18px;position:relative;color:var(--paper-dim)}
+  .refs li::before{content:"→";position:absolute;left:0;color:var(--blood)}
+  .refs a{color:var(--cyan);text-decoration:none;word-break:break-all}
+  .refs a:hover{text-decoration:underline}
+  .disclaim{font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.7;
+    color:var(--paper-dim);margin-top:34px;padding-top:24px;border-top:1px dashed var(--line)}
+
+  @media(max-width:560px){
+    body{font-size:18px}
+    .epi .row{grid-template-columns:1fr;gap:6px}
+    .lede::first-letter{font-size:64px}
+    h2{flex-direction:column;gap:4px} h2 .num{padding-top:0}
+    h2 + .sub{padding-left:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="kicker">
+      <span class="dot"></span>Threat Intelligence Briefing
+      <span class="sep">///</span> Vulnerability Management
+      <span class="sep">///</span> The Mythos Era
+    </div>
+    <h1>The <span class="em">Velocity</span> Gap</h1>
+    <p class="standfirst">AI accelerated both attack and defense — but not equally. Offensive timelines collapsed faster than remediation could ever compress, and the gap is now structural. Mythos didn't create it. Mythos made it impossible to ignore.</p>
+    <div class="byline">
+      <span>An analytical briefing &nbsp;·&nbsp; Updated June 2026</span>
+      <span>Sources: Mandiant · VulnCheck · Verizon DBIR · OWASP GenAI</span>
+    </div>
+  </header>
+
+  <div class="legend" aria-label="confidence coding">
+    <span><i class="l-est"></i>Established fact</span>
+    <span><i class="l-con"></i>Contested / third-party</span>
+    <span><i class="l-jud"></i>Author's judgment</span>
+  </div>
+
+  <article>
+
+    <p class="lede">The defender's core problem is no longer "patch faster." It is that the entire patch-centric operating model assumes a response window that no longer exists. The well-documented collapse of exploitation timelines, the arrival of agentic offensive capability, and the public alarm crystallized around Anthropic's restricted <strong>Mythos</strong> model together mark a shift from a future risk to a current operating assumption.</p>
+
+    <p>A note on confidence before going further, because it governs how you should read everything below. The macro-trend data on exploitation velocity and remediation is <strong>well-established</strong>, drawn from primary telemetry. The specific Mythos claims — a 32-step autonomous network attack, a Claude Code source leak, downstream weaponization — are <strong>contested third-party reporting</strong>. Anthropic restricts Mythos under Project Glasswing and has not confirmed these incidents. They are treated here as directionally significant signals, not verified events.</p>
+
+    <section id="s1">
+      <h2><span class="num">PART 01</span> The velocity side is measured — and the measurements are brutal</h2>
+      <div class="sub">The collapse of the exploitation window is the single best-documented trend in vulnerability management.</div>
+
+      <p><span class="tag est">Established</span>The Sysdig Zero Day Clock, built on 3,515 CVE-exploit pairs from CISA KEV, VulnCheck KEV, and XDB, tracks median time-to-exploit crossing each threshold. In 2018 the median time from disclosure to first observed exploit was <strong>771 days</strong>; by 2021 it compressed to 84 days, by 2023 to 6 days, by 2024 to roughly 4 hours, and in 2025 the majority of exploited vulnerabilities were weaponized before they were even publicly disclosed. <a class="src" href="https://www.resilientcyber.io/p/the-zero-day-clock-is-ticking-why" target="_blank" rel="noopener">[Resilient Cyber]</a></p>
+
+      <div class="chartcard">
+        <div class="ctitle">Figure 1 — The Diverging Clocks</div>
+        <div class="csub">Time-to-exploit (offense) vs. time-to-remediate criticals (defense). Log scale, days. Lower = faster.</div>
+        <svg id="gap" viewBox="0 0 760 380" role="img" aria-label="Chart showing exploitation time collapsing far below remediation time"></svg>
+        <div class="clegend">
+          <b><i style="background:#d6442f"></i>Time-to-exploit (offense)</b>
+          <b><i style="background:#4fb0c6"></i>Time-to-remediate criticals (defense)</b>
+        </div>
+      </div>
+
+      <p>That last clause breaks the traditional model. Mandiant's M-Trends 2026, built on over 450,000 hours of incident response, reports that the mean time to exploit is approximately <strong>negative seven days</strong> — exploitation now routinely precedes disclosure. CrowdStrike found 42% of exploited vulnerabilities were attacked before public disclosure, and VulnCheck recorded 28.96% of 2025 known-exploited vulnerabilities with exploitation evidence on or before the publication day, up from 23.6% in 2024. <a class="src" href="https://www.stingrai.io/blog/vulnerability-statistics-2026" target="_blank" rel="noopener">[Mandiant via Stingr AI]</a> <a class="src" href="https://www.vulncheck.com/blog/exploitation-trends-q1-2025" target="_blank" rel="noopener">[VulnCheck]</a></p>
+
+      <div class="stats">
+        <div class="stat"><div class="big">48,244</div><div class="lbl">CVEs published 2025 — a record, +20% YoY</div></div>
+        <div class="stat"><div class="big">~29,000</div><div class="lbl">Backlog CVEs NIST reclassified "Not Scheduled," Apr 2026</div></div>
+        <div class="stat"><div class="big">−7 days</div><div class="lbl">Mean time-to-exploit, M-Trends 2026</div></div>
+      </div>
+
+      <p>The pipeline is so saturated the enrichment infrastructure has buckled: NIST formally moved the National Vulnerability Database to a triage model on April 15, 2026, committing to enrich only the 15–20% of incoming CVEs intersecting KEV, federal, or critical-software lists. <em class="judge">My read:</em> defenders face a firehose where most items will never be officially analyzed and the dangerous minority is already exploited before the ticket exists. CVSS — designed for a 30-day world — is now actively misleading as a prioritization signal.</p>
+    </section>
+
+    <section id="s2">
+      <h2><span class="num">PART 02</span> The remediation side moved too — just not enough</h2>
+      <div class="sub">Defense didn't stand still. It just can't run this fast.</div>
+
+      <p><span class="tag est">Established</span>In 2025, mean time to remediation dropped approximately <strong>47% across all severity levels</strong> (Synack 2026 State of Vulnerabilities) — a genuine, large improvement from automated discovery, AI-assisted triage, and continuous validation. <a class="src" href="https://www.helpnetsecurity.com/2026/05/18/synack-2025-ai-driven-vulnerability-trends-report/" target="_blank" rel="noopener">[Synack via Help Net]</a></p>
+
+      <p>But absolute time remains catastrophically out of step. The average time to remediate a known high/critical CVE is now <strong>74 days</strong> (Edgescan 2025), and 45% of vulnerabilities in large-company systems are <strong>never remediated</strong>. For cloud identity it is worse: organizations take nearly eight months to fix weak passwords and excessive third-party permissions, with only 31% ever fully resolving them, and 37% still ran admin cloud accounts without MFA. <a class="src" href="https://thehackernews.com/2026/05/2026-year-of-ai-assisted-attacks.html" target="_blank" rel="noopener">[Edgescan via THN]</a> <a class="src" href="https://www.token.security/blog/the-2026-data-breach-investigations-report-confirms-it-identity-is-the-control-plane-for-agentic-ai" target="_blank" rel="noopener">[2026 DBIR via Token]</a></p>
+
+      <div class="stats">
+        <div class="stat"><div class="big good">47%</div><div class="lbl">Drop in mean time-to-remediate, 2025</div></div>
+        <div class="stat"><div class="big">74 days</div><div class="lbl">Avg remediation, high/critical CVE</div></div>
+        <div class="stat"><div class="big">45%</div><div class="lbl">Large-org vulns never remediated</div></div>
+        <div class="stat"><div class="big">~8 mo</div><div class="lbl">To fix cloud identity hygiene</div></div>
+      </div>
+
+      <div class="pull"><span class="tag jud">Judgment</span>You cannot close a four-order-of-magnitude gap with a 47% efficiency gain. Incremental remediation acceleration is the wrong axis of competition.</div>
+
+      <p>Hold the numbers together. Exploitation: hours, or negative days. Remediation: 74 days for criticals, eight months for identity, "never" for nearly half the estate. A 47% improvement on a 74-day baseline lands you at ~39 days against an adversary on a sub-day clock.</p>
+    </section>
+
+    <section id="s3">
+      <h2><span class="num">PART 03</span> Where AI specifically tips the balance toward offense</h2>
+      <div class="sub">The macro data is mostly pre-agentic. The AI accelerant is now visible in primary reporting.</div>
+
+      <p><span class="tag est">Established</span>On exploit development, the supply-chain signal is the cleanest proxy: malicious packages in public repositories grew from <strong>55,000 in 2022 to 454,600 by 2025</strong> (Sonatype), with notable leaps in 2023 — the year GPT-4 released — and 2025, a marquee year for agentic coding. <span class="tag jud">Judgment</span>Correlation is not proof; I flag the GPT-4/agentic-coding alignment as inference, not an established mechanism — but the timing is hard to wave away.</p>
+
+      <p><span class="tag est">Established</span>On execution, the Verizon 2026 DBIR gives the most concrete metric: the median threat actor used AI assistance across <strong>15 different MITRE ATT&amp;CK techniques</strong>, some across 40 or 50, and attackers are beginning "more agentic approaches" where AI makes autonomous decisions about targets and progression. OWASP frames 2026 as the year AI moved from theoretical risk to a real-world force multiplier. <a class="src" href="https://genai.owasp.org/2026/04/14/owasp-genai-exploit-round-up-report-q1-2026/" target="_blank" rel="noopener">[OWASP GenAI]</a></p>
+
+      <p>The structural problem is that the speed advantage compounds. AI-orchestrated campaigns run recon-to-exploit in hours, adapt to detection in real time, and human-paced SOC workflows are structurally too slow to counter this. Offense can be fully automated end-to-end; remediation still bottlenecks on human decisions — change boards, maintenance windows, regression testing, sign-off. <em class="judge">AI removes the human from the attacker's loop faster than any organization will remove it from the defender's.</em></p>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">PART 04</span> Mythos as the inflection signal — handle with epistemic care</h2>
+      <div class="sub">The temptation toward a dramatic narrative is exactly where rigor usually dies.</div>
+
+      <p>What is reported, <strong>by third parties</strong>: Anthropic's Mythos model demonstrated autonomous, multi-step network exploitation — one account describing a 32-step network attack completed autonomously in hours — alongside a Claude Code source leak and rapid discovery of subsequent vulnerabilities. <a class="src" href="https://adversa.ai/blog/top-agentic-ai-security-resources-may-2026/" target="_blank" rel="noopener">[Adversa AI]</a> <a class="src" href="https://foresiet.com/blog/ai-security-incidents-attack-paths-april-2026/" target="_blank" rel="noopener">[Foresiet]</a></p>
+
+      <div class="epi">
+        <div class="row est"><div class="k">Established</div><div class="v">Frontier models with agentic tool-use can chain multi-step reasoning across system boundaries. Not contested — it is the basis of every coding agent shipping today.</div></div>
+        <div class="row con"><div class="k">Contested</div><div class="v">The specific Mythos incident figures. They come from security vendors with an interest in the narrative, reference a model the public cannot access, and lack Anthropic confirmation. I would not put them in a board deck as fact. The Claude Code leak and downstream weaponization sit in the same bucket — plausible, consequential if true, unverified.</div></div>
+        <div class="row jud"><div class="k">Judgment</div><div class="v">The significance of "Mythos" as a discourse object exceeds whether each detail is accurate. It is the moment the industry stopped treating autonomous offensive AI as future risk and started treating it as a current planning assumption. If the capability is demonstrable in a restricted lab model, the horizon for it appearing in the wild is short — and a leaked frontier model makes that horizon effectively zero. The leak claim, if true, matters more than the demonstration.</div></div>
+      </div>
+    </section>
+
+    <section id="s5">
+      <h2><span class="num">PART 05</span> What actually follows for defenders</h2>
+      <div class="sub">If the gap can't be closed by patching faster, change the shape of the contest — not the speed of the same move.</div>
+
+      <ol class="acts">
+        <li><b>Prioritize on exploitation evidence, not severity.</b> Feed KEV, EPSS, and threat-intel exploitation signals directly into patch ranking and explicitly demote CVSS. With NVD no longer enriching most CVEs, exploitation telemetry is the only scalable signal left.</li>
+        <li><b>Assume compromise of the unpatched window; invest in containment.</b> When time-to-exploit goes negative, the patch can't be the primary control because the exploit predates it. Microsegmentation, least-privilege, and blast-radius limits decide outcomes once initial access is a given.</li>
+        <li><b>Govern non-human and agent identities as a first-class attack surface.</b> An agent that runs code perfectly 10,000 times looks normal to SIEM/EDR built for human anomalies. Layering thousands of agents onto eight-month-old identity sprawl is how a wound becomes fatal. Identity is the control plane.</li>
+        <li><b>Deploy AI on defense where humans are the bottleneck</b> — triage, correlation, automated containment — to remove the latency the attacker has already removed from their loop. The 47% gain proves it works; it isn't sufficient alone.</li>
+        <li><b>Secure your own AI supply chain as production infrastructure.</b> LiteLLM-class RCEs in AI routing layers and MCP/prompt-injection vectors make your defensive AI a high-value, externally reachable target. There is no grace period for an RCE in a production AI integration layer.</li>
+      </ol>
+    </section>
+
+    <div class="close">
+      <h2>Closing assessment</h2>
+      <p>The honest summary is uncomfortable: AI is speeding up both sides, but on 2025–2026 data the arms race is favoring attackers. Velocity is measured, accelerating, and structurally faster than disclosure. Remediation improves in percentage terms while remaining absolutely too slow by orders of magnitude. Mythos — whatever the precise truth of its reported exploits — is best understood as the alarm that made the trajectory undeniable, not its cause.</p>
+      <p style="margin-bottom:0"><span class="tag jud">Judgment</span>Organizations still optimizing primarily for faster patching are optimizing the losing variable. The contest has moved to containment, identity governance, exploitation-driven prioritization, and the security of AI infrastructure itself. The realistic objective in an era of automated offense is to be a <strong>harder target than the next one</strong> — expensive enough that autonomous adversaries route around you. Parity of speed is not on the table.</p>
+    </div>
+
+  </article>
+
+  <footer>
+    <h3>References</h3>
+    <ul class="refs">
+      <li>Sysdig Zero Day Clock / Resilient Cyber — <a href="https://www.resilientcyber.io/p/the-zero-day-clock-is-ticking-why" target="_blank" rel="noopener">The Zero Day Clock Is Ticking</a></li>
+      <li>Mandiant M-Trends 2026 via Stingr AI — <a href="https://www.stingrai.io/blog/vulnerability-statistics-2026" target="_blank" rel="noopener">Vulnerability Statistics 2026</a></li>
+      <li>VulnCheck — <a href="https://www.vulncheck.com/blog/exploitation-trends-q1-2025" target="_blank" rel="noopener">2025 Q1 Trends in Vulnerability Exploitation</a></li>
+      <li>Bright Defense — <a href="https://www.brightdefense.com/resources/zero-day-exploit-statistics/" target="_blank" rel="noopener">80+ Zero-Day Exploit Statistics</a></li>
+      <li>Synack 2026 via Help Net Security — <a href="https://www.helpnetsecurity.com/2026/05/18/synack-2025-ai-driven-vulnerability-trends-report/" target="_blank" rel="noopener">AI shrinks exploitation window to hours</a></li>
+      <li>Verizon 2026 DBIR via Token Security — <a href="https://www.token.security/blog/the-2026-data-breach-investigations-report-confirms-it-identity-is-the-control-plane-for-agentic-ai" target="_blank" rel="noopener">Identity Is the Control Plane for Agentic AI</a></li>
+      <li>The Hacker News — <a href="https://thehackernews.com/2026/05/2026-year-of-ai-assisted-attacks.html" target="_blank" rel="noopener">2026: The Year of AI-Assisted Attacks</a></li>
+      <li>OWASP GenAI — <a href="https://genai.owasp.org/2026/04/14/owasp-genai-exploit-round-up-report-q1-2026/" target="_blank" rel="noopener">Exploit Round-up Q1 2026</a></li>
+      <li>Adversa AI — <a href="https://adversa.ai/blog/top-agentic-ai-security-resources-may-2026/" target="_blank" rel="noopener">Top Agentic AI Security Resources, May 2026</a> (Mythos claims)</li>
+      <li>Foresiet — <a href="https://foresiet.com/blog/ai-security-incidents-attack-paths-april-2026/" target="_blank" rel="noopener">6 AI Security Incidents, April 2026</a></li>
+      <li>Stellar Cyber — <a href="https://stellarcyber.ai/learn/agentic-ai-securiry-threats/" target="_blank" rel="noopener">Top Agentic AI Security Threats in Late 2026</a></li>
+      <li>Hive Security — <a href="https://hivesecurity.gitlab.io/blog/from-cve-to-rce-in-hours-attack-timeline-2026/" target="_blank" rel="noopener">From CVE to RCE in Hours</a></li>
+    </ul>
+    <p class="disclaim">CONFIDENCE NOTE — Macro exploitation/remediation statistics are well-sourced primary telemetry. All Mythos-specific and Claude Code leak claims are unverified third-party reporting and are labeled as such throughout. Not affiliated with the cited vendors; figures should be re-checked against primary reports before use in any formal deliverable.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  // Diverging clocks chart — log scale, days. Drawn natively (no deps).
+  const svg = document.getElementById('gap');
+  const NS='http://www.w3.org/2000/svg';
+  const W=760,H=380, m={t:24,r:20,b:46,l:54};
+  const pw=W-m.l-m.r, ph=H-m.t-m.b;
+
+  const years=[2018,2021,2023,2024,2025,2026];
+  // time-to-exploit in days (negative shown clamped to 0.2 for log); remediate criticals in days
+  const exploit=[771,84,6,0.17,0.04,0.02];   // ~4h=0.17d, sub-day, then "negative"/pre-disclosure ~clamped
+  const remediate=[null,null,null,90,78,74];  // criticals; earlier years sparse
+  const yMin=0.02, yMax=771;
+  const lx=Math.log10(yMin), hx=Math.log10(yMax);
+
+  const xAt=i=> m.l + (i/(years.length-1))*pw;
+  const yAt=v=> m.t + ph - ((Math.log10(v)-lx)/(hx-lx))*ph;
+
+  function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+
+  // gridlines at decades
+  [0.1,1,10,100].forEach(v=>{
+    const y=yAt(v);
+    svg.appendChild(el('line',{x1:m.l,y1:y,x2:W-m.r,y2:y,stroke:'#1a1d24','stroke-width':1}));
+    const lbl=el('text',{x:m.l-10,y:y+4,'text-anchor':'end',fill:'#b8b3a4','font-size':11,'font-family':'IBM Plex Mono,monospace'});
+    lbl.textContent = v>=1? v+'d' : (v*24)+'h';
+    svg.appendChild(lbl);
+  });
+
+  // x labels
+  years.forEach((yr,i)=>{
+    const t=el('text',{x:xAt(i),y:H-18,'text-anchor':'middle',fill:'#b8b3a4','font-size':12,'font-family':'IBM Plex Mono,monospace'});
+    t.textContent=yr; svg.appendChild(t);
+  });
+
+  // danger band (below ~1 day = faster than any human cycle)
+  const bandTop=yAt(1);
+  svg.appendChild(el('rect',{x:m.l,y:bandTop,width:pw,height:(m.t+ph)-bandTop,fill:'rgba(214,68,47,0.07)'}));
+  const bt=el('text',{x:W-m.r-6,y:bandTop+16,'text-anchor':'end',fill:'#d6442f','font-size':10,'font-family':'IBM Plex Mono,monospace','letter-spacing':'0.1em'});
+  bt.textContent='SUB-DAY: FASTER THAN ANY HUMAN PATCH CYCLE'; svg.appendChild(bt);
+
+  function path(data,color,dash){
+    let d='',pts=[];
+    data.forEach((v,i)=>{ if(v==null)return; const x=xAt(i),y=yAt(v); pts.push([x,y,v]); d+=(d?'L':'M')+x+' '+y+' ';});
+    const p=el('path',{d:d,fill:'none',stroke:color,'stroke-width':2.5,'stroke-linecap':'round','stroke-linejoin':'round'});
+    if(dash)p.setAttribute('stroke-dasharray',dash);
+    const len=p.getTotalLength?0:0;
+    svg.appendChild(p);
+    // animate draw
+    try{const L=p.getTotalLength();p.style.strokeDasharray=L;p.style.strokeDashoffset=L;
+      p.animate([{strokeDashoffset:L},{strokeDashoffset:0}],{duration:1400,easing:'ease-out',fill:'forwards'});}catch(e){}
+    pts.forEach(([x,y],idx)=>{
+      const c=el('circle',{cx:x,cy:y,r:4,fill:'#0a0c10',stroke:color,'stroke-width':2});
+      c.style.opacity=0; svg.appendChild(c);
+      c.animate([{opacity:0},{opacity:1}],{duration:300,delay:200+idx*200,fill:'forwards'});
+    });
+  }
+
+  path(remediate,'#4fb0c6');
+  path(exploit,'#d6442f');
+
+  // annotation: negative-days note
+  const note=el('text',{x:xAt(5),y:yAt(0.02)-10,'text-anchor':'end',fill:'#d6442f','font-size':11,'font-family':'IBM Plex Mono,monospace'});
+  note.textContent='2026: exploit precedes disclosure (−7d)'; svg.appendChild(note);
+})();
+</script>
+</body>
+</html>
