@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The ₹15 Lakh Crore Question: Inside the Rajesh Exports Case — arvindersingh.me</title>
+<meta name="description" content="A plain-language breakdown of SEBI's interim order against Rajesh Exports — what is alleged, who is accountable, why the audit chain missed it, what it costs public funds, and what it means for trust in India's numbers. With FAQ and reader poll.">
+<style>
+  :root{
+    --ink:#0c0e12;
+    --panel:#13161d;
+    --panel2:#1a1e27;
+    --line:#2a2f3a;
+    --fog:#8b93a5;
+    --txt:#d7dbe4;
+    --txt-bright:#f2f4f8;
+    --amber:#e6b34a;
+    --amber-dim:#9c7a2e;
+    --red:#e0584f;
+    --green:#5bbf8a;
+    --blue:#5b9bd5;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans:"Helvetica Neue",Helvetica,"Segoe UI",system-ui,sans-serif;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --maxw:760px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--txt);
+    font-family:var(--sans);
+    font-size:18px;
+    line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* ---------- progress bar ---------- */
+  #progress-wrap{
+    position:fixed;top:0;left:0;right:0;height:4px;
+    background:rgba(255,255,255,0.04);z-index:1000;
+  }
+  #progress-bar{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,var(--amber-dim),var(--amber));
+    box-shadow:0 0 12px rgba(230,179,74,0.5);
+    transition:width .1s linear;
+  }
+  #progress-label{
+    position:fixed;top:10px;right:14px;z-index:1000;
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+    color:var(--amber);background:rgba(12,14,18,.7);
+    padding:3px 8px;border:1px solid var(--line);border-radius:3px;
+    backdrop-filter:blur(6px);
+  }
+  /* ---------- background texture ---------- */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(900px 500px at 80% -5%,rgba(230,179,74,0.07),transparent 60%),
+      radial-gradient(700px 600px at -10% 30%,rgba(91,155,213,0.06),transparent 55%);
+  }
+  body::after{
+    content:"";position:fixed;inset:0;z-index:-1;opacity:.025;pointer-events:none;
+    background-image:repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 3px);
+  }
+  /* ---------- hero ---------- */
+  header.hero{
+    max-width:var(--maxw);margin:0 auto;padding:90px 24px 40px;
+  }
+  .kicker{
+    font-family:var(--mono);font-size:12px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:22px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .kicker::before{content:"";width:34px;height:1px;background:var(--amber)}
+  h1{
+    font-family:var(--serif);font-weight:600;
+    font-size:clamp(2.1rem,6vw,3.6rem);line-height:1.08;
+    color:var(--txt-bright);letter-spacing:-.01em;margin-bottom:22px;
+  }
+  h1 em{color:var(--amber);font-style:italic}
+  .standfirst{
+    font-family:var(--serif);font-size:1.28rem;line-height:1.6;
+    color:var(--fog);font-style:italic;border-left:2px solid var(--amber-dim);
+    padding-left:20px;margin-bottom:30px;
+  }
+  .byline{
+    font-family:var(--mono);font-size:12.5px;color:var(--fog);
+    letter-spacing:.04em;display:flex;flex-wrap:wrap;gap:6px 18px;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:16px 0;
+  }
+  .byline b{color:var(--txt)}
+  /* ---------- verdict banner ---------- */
+  .verdict{
+    max-width:var(--maxw);margin:38px auto;padding:0 24px;
+  }
+  .verdict-card{
+    background:linear-gradient(135deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:10px;padding:26px 28px;
+    position:relative;overflow:hidden;
+  }
+  .verdict-card::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+    background:linear-gradient(var(--amber),var(--red));
+  }
+  .verdict-tag{
+    font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--amber);margin-bottom:10px;
+  }
+  .verdict-card p{font-size:1.05rem}
+  .verdict-card p+p{margin-top:12px}
+  .verdict-card strong{color:var(--txt-bright)}
+  /* ---------- body article ---------- */
+  article{max-width:var(--maxw);margin:0 auto;padding:10px 24px 60px}
+  section{margin:54px 0;scroll-margin-top:60px}
+  h2{
+    font-family:var(--serif);font-weight:600;font-size:clamp(1.6rem,4vw,2.1rem);
+    color:var(--txt-bright);line-height:1.16;margin-bottom:6px;letter-spacing:-.01em;
+  }
+  h2 .num{
+    font-family:var(--mono);font-size:.85rem;color:var(--amber);
+    display:block;letter-spacing:.2em;margin-bottom:8px;
+  }
+  h3{
+    font-family:var(--sans);font-weight:700;font-size:1.18rem;
+    color:var(--txt-bright);margin:30px 0 8px;letter-spacing:.01em;
+  }
+  p{margin:16px 0}
+  a{color:var(--amber);text-decoration:none;border-bottom:1px solid var(--amber-dim)}
+  a:hover{color:var(--txt-bright);border-color:var(--amber)}
+  strong{color:var(--txt-bright)}
+  em{color:var(--txt)}
+  .lead{font-size:1.1rem}
+  /* ---------- confidence legend ---------- */
+  .conf-legend{
+    display:flex;flex-wrap:wrap;gap:10px 16px;margin:18px 0 4px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--fog);
+  }
+  .conf-legend span{display:flex;align-items:center;gap:7px}
+  .conf-legend i{width:11px;height:11px;border-radius:2px;display:inline-block}
+  .tag-fact{color:var(--green)}
+  .tag-alleg{color:var(--amber)}
+  .tag-judge{color:var(--blue)}
+  .inl{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:4px;vertical-align:middle;white-space:nowrap}
+  .inl.fact{background:rgba(91,191,138,.14);color:var(--green);border:1px solid rgba(91,191,138,.4)}
+  .inl.alleg{background:rgba(230,179,74,.13);color:var(--amber);border:1px solid rgba(230,179,74,.4)}
+  .inl.judge{background:rgba(91,155,213,.13);color:var(--blue);border:1px solid rgba(91,155,213,.4)}
+  /* ---------- verdict pills ---------- */
+  .claim-row{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;padding:16px 18px;margin:14px 0;
+  }
+  .pill{
+    font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;
+    padding:4px 9px;border-radius:20px;white-space:nowrap;margin-top:2px;flex-shrink:0;
+  }
+  .pill.true{background:rgba(91,191,138,.15);color:var(--green);border:1px solid rgba(91,191,138,.4)}
+  .pill.mixed{background:rgba(230,179,74,.13);color:var(--amber);border:1px solid rgba(230,179,74,.4)}
+  .pill.weak{background:rgba(224,88,79,.13);color:var(--red);border:1px solid rgba(224,88,79,.4)}
+  .claim-row .c-body{font-size:.97rem;line-height:1.6}
+  .claim-row .c-body b{color:var(--txt-bright)}
+  /* ---------- figure / chart ---------- */
+  figure{margin:34px 0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 20px 16px}
+  figure .fig-title{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:4px}
+  figure .fig-sub{font-size:.86rem;color:var(--fog);margin-bottom:18px}
+  figcaption{font-size:.8rem;color:var(--fog);margin-top:14px;font-style:italic;line-height:1.5}
+  canvas{display:block;width:100%}
+  .chart-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--fog)}
+  .chart-legend span{display:flex;align-items:center;gap:6px}
+  .chart-legend i{width:12px;height:12px;border-radius:2px;display:inline-block}
+  /* ---------- callout ---------- */
+  .callout{
+    background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--blue);
+    border-radius:0 8px 8px 0;padding:16px 20px;margin:24px 0;font-size:.98rem;
+  }
+  .callout .ct{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+  .callout.warn{border-left-color:var(--red)}
+  .callout.warn .ct{color:var(--red)}
+  .callout.good{border-left-color:var(--green)}
+  .callout.good .ct{color:var(--green)}
+  /* ---------- structure diagram ---------- */
+  .stack{margin:26px 0;display:flex;flex-direction:column;gap:0}
+  .stack-node{
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:13px 16px;position:relative;
+  }
+  .stack-node .lvl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--fog);text-transform:uppercase}
+  .stack-node .nm{color:var(--txt-bright);font-weight:700;font-size:.98rem}
+  .stack-node .rev{font-family:var(--mono);font-size:.82rem;margin-top:3px}
+  .stack-node .rev.big{color:var(--red)}
+  .stack-node .rev.small{color:var(--green)}
+  .stack-arrow{height:22px;display:flex;align-items:center;justify-content:center;color:var(--amber-dim);font-family:var(--mono);font-size:14px}
+  /* ---------- impact tabs ---------- */
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin:20px 0 0}
+  .tab-btn{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;
+    background:var(--panel);color:var(--fog);border:1px solid var(--line);
+    padding:9px 14px;border-radius:6px 6px 0 0;cursor:pointer;transition:.2s;
+  }
+  .tab-btn:hover{color:var(--txt)}
+  .tab-btn.active{background:var(--panel2);color:var(--amber);border-color:var(--amber-dim);border-bottom-color:var(--panel2)}
+  .tab-panel{
+    display:none;background:var(--panel2);border:1px solid var(--line);
+    border-radius:0 8px 8px 8px;padding:22px 24px;font-size:.98rem;
+  }
+  .tab-panel.active{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .tab-panel h4{font-size:1rem;color:var(--amber);margin-bottom:4px;font-family:var(--sans)}
+  /* ---------- pull stat ---------- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:26px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;text-align:center}
+  .stat .v{font-family:var(--serif);font-size:1.9rem;color:var(--amber);line-height:1}
+  .stat .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--fog);margin-top:8px;text-transform:uppercase}
+  /* ---------- FAQ ---------- */
+  .faq{margin:18px 0}
+  .faq-item{border:1px solid var(--line);border-radius:8px;background:var(--panel);margin:10px 0;overflow:hidden}
+  .faq-q{
+    width:100%;text-align:left;cursor:pointer;background:none;border:none;
+    color:var(--txt-bright);font-family:var(--sans);font-size:1rem;font-weight:700;
+    padding:16px 48px 16px 18px;position:relative;line-height:1.45;
+  }
+  .faq-q::after{
+    content:"+";position:absolute;right:18px;top:50%;transform:translateY(-50%);
+    font-family:var(--mono);font-size:1.3rem;color:var(--amber);transition:.25s;
+  }
+  .faq-item.open .faq-q::after{transform:translateY(-50%) rotate(45deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 18px}
+  .faq-a-inner{padding:0 0 16px;font-size:.96rem;color:var(--txt);line-height:1.66}
+  .faq-a-inner b{color:var(--txt-bright)}
+  /* ---------- poll ---------- */
+  .poll{
+    background:linear-gradient(135deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:10px;padding:24px;margin:22px 0;
+  }
+  .poll-q{font-family:var(--sans);font-weight:700;color:var(--txt-bright);font-size:1.06rem;line-height:1.45;margin-bottom:4px}
+  .poll-sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--fog);text-transform:uppercase;margin-bottom:16px}
+  .poll-opt{
+    display:block;width:100%;text-align:left;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);border-radius:7px;
+    color:var(--txt);font-family:var(--sans);font-size:.95rem;
+    padding:13px 15px;margin:9px 0;position:relative;transition:.18s;overflow:hidden;
+  }
+  .poll-opt:hover{border-color:var(--amber-dim);color:var(--txt-bright)}
+  .poll-opt .fillbar{
+    position:absolute;left:0;top:0;bottom:0;width:0;
+    background:rgba(230,179,74,.14);border-right:2px solid var(--amber-dim);
+    transition:width .7s cubic-bezier(.16,1,.3,1);z-index:0;
+  }
+  .poll-opt .opt-label{position:relative;z-index:1;display:flex;justify-content:space-between;gap:12px;align-items:center}
+  .poll-opt .pct{font-family:var(--mono);font-size:.82rem;color:var(--amber);opacity:0;transition:.3s}
+  .poll.voted .poll-opt{cursor:default}
+  .poll.voted .pct{opacity:1}
+  .poll.voted .poll-opt.chosen{border-color:var(--amber)}
+  .poll-foot{font-family:var(--mono);font-size:10px;color:var(--fog);margin-top:12px;letter-spacing:.04em;line-height:1.5}
+  .poll-reset{background:none;border:none;color:var(--amber-dim);font-family:var(--mono);font-size:10px;cursor:pointer;text-decoration:underline;margin-top:8px;padding:0}
+  /* ---------- sources ---------- */
+  .sources{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin-top:30px}
+  .sources h3{margin-top:0}
+  .sources ol{margin:10px 0 0 18px;font-size:.9rem;color:var(--fog)}
+  .sources li{margin:8px 0}
+  /* ---------- footer ---------- */
+  footer{max-width:var(--maxw);margin:0 auto;padding:30px 24px 70px;border-top:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--fog)}
+  footer a{color:var(--fog);border:none;text-decoration:underline}
+  /* nav dots */
+  #toc{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:900;display:flex;flex-direction:column;gap:12px}
+  #toc a{width:9px;height:9px;border-radius:50%;background:var(--line);border:none;transition:.2s;display:block}
+  #toc a.active{background:var(--amber);box-shadow:0 0 8px var(--amber);transform:scale(1.3)}
+  #toc a:hover{background:var(--fog)}
+  @media(max-width:1080px){#toc{display:none}}
+  @media(max-width:520px){
+    body{font-size:16.5px}
+    header.hero{padding:70px 18px 30px}
+    article{padding:0 18px 40px}
+    .verdict{padding:0 18px}
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+<div id="progress-label">0%</div>
+
+<nav id="toc"></nav>
+
+<header class="hero">
+  <div class="kicker">Markets · Accountability · Explainer</div>
+  <h1>The ₹15 Lakh Crore Question: Inside the <em>Rajesh Exports</em> Case</h1>
+  <p class="standfirst">A regulator called a Fortune Global 500 Indian company's numbers fiction. Stripping the headline down to what is proven, what is alleged, who is accountable, and what it actually costs the public — without the economic-tsunami theatrics.</p>
+  <div class="byline">
+    <span><b>Arvinder Singh</b></span>
+    <span>arvindersingh.me</span>
+    <span>~13 min read</span>
+    <span>Analysis &amp; explainer</span>
+    <span>June 2026</span>
+  </div>
+</header>
+
+<div class="verdict">
+  <div class="verdict-card">
+    <div class="verdict-tag">◆ The Verdict</div>
+    <p><strong>A serious, real regulatory action — and a real test of the system, but not an economic apocalypse.</strong> SEBI's interim order and the trading ban on the promoter are facts. The ₹15.15 lakh crore "fraud" is a prima-facie allegation the company denies and is entitled to contest. The genuine scandal is narrower and sharper than the viral version: it is an <strong>accountability failure across the whole gatekeeping chain</strong> — auditors, exchange surveillance, the regulator's tempo, and a state insurer's judgment.</p>
+    <p>Two myths to drop early: the figure is disputed <strong>revenue</strong>, not "exports," and it does <strong>not</strong> mean India's national trade statistics are wrong — that number lives mostly in a Swiss subsidiary, not in customs data.</p>
+  </div>
+</div>
+
+<article>
+
+  <section id="s1" data-toc="What happened">
+    <h2><span class="num">01 / WHAT HAPPENED</span>The order, in one breath</h2>
+    <p class="lead">On <strong>3 June 2026</strong>, the Securities and Exchange Board of India (SEBI) issued a 109-page ex-parte interim order against Bengaluru-based <strong>Rajesh Exports Ltd (REL)</strong> — the gold and jewellery major that owns Swiss refiner Valcambi.</p>
+    <p>SEBI alleges REL misrepresented roughly <strong>₹15.15 lakh crore (about $158 billion)</strong> of revenue over the five financial years to March 2025 — a sum equal to about 99.8% of the revenue REL credited to its subsidiaries. The regulator barred Chairman &amp; MD <strong>Rajesh Mehta</strong> from the securities market and ordered a fresh forensic audit. <span class="inl fact">FACT</span></p>
+    <p>Mehta denies everything, calling it a misreading of standalone Swiss accounts against consolidated group revenue. He has the right to respond and contest every finding. As of now the <em>order</em> is fact; the <em>fraud</em> is alleged and unproven. <span class="inl alleg">ALLEGED</span></p>
+
+    <div class="conf-legend">
+      <span class="tag-fact"><i style="background:var(--green)"></i>Established fact</span>
+      <span class="tag-alleg"><i style="background:var(--amber)"></i>Alleged / contested</span>
+      <span class="tag-judge"><i style="background:var(--blue)"></i>Author's judgment</span>
+    </div>
+  </section>
+
+  <section id="s2" data-toc="The mechanism">
+    <h2><span class="num">02 / THE MECHANISM</span>Where the missing revenue "lived"</h2>
+    <p>The whole case turns on one mismatch. REL's reported revenue came almost entirely — between <strong>97% and 99%</strong> — from overseas subsidiaries, chiefly Valcambi SA, the Swiss refinery REL bought in 2015 for $400 million. The problem is that Valcambi's <em>own</em> audited books show a tiny fraction of what the group reported at the top. <span class="inl fact">FACT</span></p>
+
+    <div class="stack">
+      <div class="stack-node">
+        <div class="lvl">Top · Indian listed parent</div>
+        <div class="nm">Rajesh Exports Ltd</div>
+        <div class="rev big">Booked ≈ ₹2.81 lakh cr consolidated (CY23)</div>
+      </div>
+      <div class="stack-arrow">▼ owns</div>
+      <div class="stack-node">
+        <div class="lvl">Holding · Singapore</div>
+        <div class="nm">REL Singapore</div>
+      </div>
+      <div class="stack-arrow">▼ owns</div>
+      <div class="stack-node">
+        <div class="lvl">Holding · Switzerland</div>
+        <div class="nm">Global Gold Refineries AG (GGR)</div>
+        <div class="rev big">Reported ≈ ₹2.93 lakh cr consolidated (CY23)</div>
+      </div>
+      <div class="stack-arrow">▼ owns</div>
+      <div class="stack-node">
+        <div class="lvl">Bottom · the actual operating refiner</div>
+        <div class="nm">Valcambi SA</div>
+        <div class="rev small">Standalone revenue ≈ ₹543 cr (CY23) — audited by KPMG SA</div>
+      </div>
+    </div>
+
+    <p>That is the heart of it: the operating company's standalone revenue was <strong>under 0.5%</strong> of what the group booked above it. SEBI's reading is that the difference — about ₹15.15 lakh crore over five years — is non-genuine and cannot be independently verified. <span class="inl alleg">ALLEGED</span></p>
+    <p>REL's defence is that Valcambi's accounts record only processing charges and value-addition, while the holding company books the gross value of the gold passing through. <span class="inl judge">MY READ:</span> a standalone-vs-consolidated gap is a normal accounting feature — but a ~200x gap on your single largest revenue source is not a footnote, and SEBI says the company never produced the customer, vendor, and subsidiary records to substantiate it.</p>
+
+    <figure>
+      <div class="fig-title">Figure 1 — The 200x gap (CY2023, ₹ lakh crore)</div>
+      <div class="fig-sub">What the operating refiner's own audited books showed vs. what the group reported</div>
+      <canvas id="gapChart" height="300"></canvas>
+      <div class="chart-legend">
+        <span><i style="background:#e0584f"></i>Reported at group level</span>
+        <span><i style="background:#5bbf8a"></i>Operating subsidiary standalone (audited)</span>
+      </div>
+      <figcaption>Figures as cited from SEBI's interim order and contemporaneous reporting (Value Research, Outlook Business). The point is the magnitude of the mismatch, not a precise operational number. All figures pertain to the prima-facie stage and are contested by the company.</figcaption>
+    </figure>
+  </section>
+
+  <section id="s3" data-toc="Three questions">
+    <h2><span class="num">03 / THE POLITICS</span>Three questions the order leaves on the desk</h2>
+    <p>Within a day this became a political story. Three questions are doing the damage — but only after one of them is corrected.</p>
+
+    <div class="claim-row">
+      <span class="pill mixed">FAIR — AND POINTED</span>
+      <div class="c-body"><b>Why did LIC stay when others fled?</b> The state-owned insurer holds about <b>10.8%</b> — its largest institutional shareholder — and reportedly held or added even after the March 2024 complaint, while private funds grew wary. The stock has since fallen ~90% from its peak. The caveat: 10.8% can reflect index-linked or legacy positions across LIC's vast book, and a holding is not proof of direction from above. But "why this firm, why this size, why hold through the warnings" is the government's to answer.</div>
+    </div>
+
+    <div class="claim-row">
+      <span class="pill weak">KEEP IT A QUESTION</span>
+      <div class="c-body"><b>Did big investors exit before retail knew?</b> What's clear: institutions were alarmed and the stock bled for months. What's <i>not</i> in the public record: documented evidence of exits timed to non-public knowledge of SEBI's action ahead of retail. That's an insider-trading allegation — write it as a question SEBI's slow timeline invites, not as a fact that happened.</div>
+    </div>
+
+    <div class="claim-row">
+      <span class="pill weak">FACTUAL ERROR — CORRECTED</span>
+      <div class="c-body"><b>"If REL's $158bn exports are fake, are our national export numbers fake?"</b> No — this does not follow. The disputed figure is consolidated <i>revenue</i>, overwhelmingly the throughput of a <i>Swiss</i> refiner, much of it customer-owned gold. India's official export data comes from shipping bills and customs records, not one company's group P&amp;L. The defensible version is narrower and still damning: it questions the reliability of <i>self-reported corporate disclosure and the audit chain</i> — not the trade balance.</div>
+    </div>
+  </section>
+
+  <section id="s4" data-toc="Who is accountable">
+    <h2><span class="num">04 / ACCOUNTABILITY</span>Who is actually answerable — and for what</h2>
+
+    <h3>The company &amp; promoter — primary</h3>
+    <p>SEBI names Rajesh Mehta and bars him from the market. As controlling promoter, he allegedly authored the structure — funds routed through personal accounts, a ₹11,487 crore set of transactions with a broker that told SEBI it was never a client, an undisclosed ₹215.85 crore outflow to a related entity, and ₹1,035 crore of unverified African gold-mining "investments." All prima facie; all denied. <span class="inl alleg">ALLEGED</span></p>
+
+    <h3>The auditors — secondary, now formally under the lens</h3>
+    <p>Two relatively small firms signed off through the period — <strong>P.V. Ramana Reddy &amp; Co</strong> and <strong>BSD &amp; Co</strong> — and allegedly failed to flag related-party dealings, inflated revenue, and misreported payables. SEBI has referred them to the <strong>National Financial Reporting Authority (NFRA)</strong>, and notes they promised audit working papers during depositions and then didn't hand them over. <span class="inl fact">FACT</span></p>
+
+    <h3>The regulator &amp; the state insurer — oversight, not fraud</h3>
+    <p><span class="inl judge">MY READ:</span> SEBI and LIC are not accused of committing fraud. They are answerable for <em>judgment and tempo</em> — SEBI for a 27-month gap between complaint and order, LIC for the holding decision. The government's discomfort is structural: it owns LIC, it appoints SEBI's leadership, and it stakes political capital on the economy's reported strength. None of that makes the allegations true; all of it means the answers are owed by those in power.</p>
+
+    <div class="callout warn">
+      <div class="ct">⚠ The uncomfortable trigger</div>
+      This surfaced from a <b>single shareholder's complaint</b> in March 2024 — not from the auditors, not from exchange surveillance, not from the regulator's own screening. The machinery built to catch exactly this didn't. An outsider did.
+    </div>
+  </section>
+
+  <section id="s5" data-toc="Why not caught">
+    <h2><span class="num">05 / THE GATEKEEPER GAP</span>Why wasn't this audited and caught in time?</h2>
+    <p>Two failures, and only one is genuinely excusable.</p>
+
+    <h3>The hard part (partly excusable)</h3>
+    <p>Unlike Satyam or IL&amp;FS — where the fraud sat in <em>domestic</em> entities that routine checks would have caught — REL's alleged misrepresentation was routed through <em>foreign</em> subsidiaries three layers down, in jurisdictions where the Indian parent's auditor has no direct mandate. Revenue that lives in Switzerland under a different audit regime is genuinely harder to verify from Bengaluru.</p>
+
+    <h3>The inexcusable part</h3>
+    <p>The discrepancy was visible to anyone who compared the layers. The operating subsidiary's audited revenue was under 0.5% of the group figure — a ~200x mismatch on the company's single largest revenue source. <span class="inl judge">MY READ:</span> basic professional skepticism should have asked how a holding company with no independent operations books lakhs of crore that its operating subsidiary's own audited books don't show. The auditors didn't flag it, then wouldn't produce their working papers. That is a gatekeeper failure — which is why NFRA is now involved.</p>
+
+    <div class="callout good">
+      <div class="ct">◆ The honest version</div>
+      The cross-border structure made detection harder — but not impossible. The numbers told the story to anyone who lined them up. This is less "an undetectable fraud" and more "a chain of gatekeepers that didn't look, plus surveillance that didn't trigger, plus a regulator that moved slowly."
+    </div>
+  </section>
+
+  <section id="s6" data-toc="Cost to public funds">
+    <h2><span class="num">06 / THE PUBLIC BILL</span>Is there a real toll on the treasury?</h2>
+    <p>Yes — but be precise, because the honest number is far smaller than the ₹15 lakh crore headline, and overstating it hands critics an easy rebuttal.</p>
+
+    <div class="stats">
+      <div class="stat"><div class="v">~₹15<span style="font-size:1rem"> L cr</span></div><div class="k">Disputed revenue (NOT a public loss)</div></div>
+      <div class="stat"><div class="v">~10.8<span style="font-size:1rem">%</span></div><div class="k">LIC stake — public money</div></div>
+      <div class="stat"><div class="v">~90<span style="font-size:1rem">%</span></div><div class="k">Stock fall from peak</div></div>
+      <div class="stat"><div class="v">~27<span style="font-size:1rem"> mo</span></div><div class="k">Complaint → interim order</div></div>
+    </div>
+
+    <h3>Direct public-fund loss — LIC (real, modest)</h3>
+    <p>LIC is the state-owned insurer; its stake is policyholder and public money. As the stock collapsed, the market value of that holding fell sharply — on the order of a few hundred crore of erosion. That is a real loss of public money. It is <strong>not</strong> ₹15 lakh crore — that figure is disputed revenue, never an amount LIC or the treasury held.</p>
+
+    <h3>Indirect exposure — incentive schemes (potential, capped)</h3>
+    <p>REL has been a beneficiary of government production-linked incentive (PLI) support, and the relevant ministry is reportedly moving to strike it off the beneficiary list. PLI pays against performance, so the exposure is whatever was actually disbursed — not a headline project value. The accountability question is how a firm with these red flags cleared eligibility at all. <span class="inl judge">MY READ:</span> if you put a number on the public toll anywhere, anchor it to <i>LIC erosion + actual incentive disbursed</i>, and explicitly separate both from the revenue figure. That's the framing that survives scrutiny.</p>
+
+    <div class="callout warn">
+      <div class="ct">⚠ Reader's rule of thumb</div>
+      The ₹11,487 crore "Affluence" transactions are intra-corporate flows SEBI calls non-genuine — relevant to the fraud, but <b>not</b> a public-fund line item. Don't add them to "what taxpayers lost."
+    </div>
+  </section>
+
+  <section id="s7" data-toc="Tsunami?">
+    <h2><span class="num">07 / PERSPECTIVE</span>Is this the start of an economic tsunami?</h2>
+    <p>Almost certainly not in the literal sense — and claiming otherwise helps no one. REL's market value has shrunk to a small figure against the financial system; there is no evidence of contagion into banks, sovereign accounts, or the broader index. The real exposure is to <strong>confidence</strong>, not capital.</p>
+    <p>A case of this alleged scale tests three things at once: whether the regulator acts fast enough to protect retail investors, whether a state insurer invests on merit, and whether India's headline corporate numbers mean what they claim. <span class="inl judge">MY READ:</span> the lasting damage isn't a hole in public accounts — it's the reminder that the figures investors, lenders, and the state rely on are only as good as the gatekeepers who certify them. That's the part worth being angry about, and the part worth fixing.</p>
+  </section>
+
+  <section id="s8" data-toc="FAQ">
+    <h2><span class="num">08 / PLAIN ENGLISH</span>Frequently asked questions</h2>
+    <p>Short answers for anyone coming to this cold.</p>
+
+    <div class="faq">
+      <div class="faq-item">
+        <button class="faq-q">What is Rajesh Exports, in one line?</button>
+        <div class="faq-a"><div class="faq-a-inner">A Bengaluru-headquartered gold and jewellery company that became one of India's largest by revenue — largely because it owns <b>Valcambi</b>, one of the world's biggest gold refineries, based in Switzerland.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What exactly is SEBI accusing it of?</button>
+        <div class="faq-a"><div class="faq-a-inner">Of <b>inflating its reported revenue</b> by about ₹15.15 lakh crore over five years — showing huge sales at the group level that the actual operating company's own audited accounts don't support, and routing money in ways SEBI calls non-genuine. This is an interim allegation, not a final court verdict.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Does "₹15 lakh crore" mean that much money was stolen?</button>
+        <div class="faq-a"><div class="faq-a-inner"><b>No.</b> It's the amount of <b>revenue (sales) that SEBI says can't be verified</b> — i.e. possibly fictional bookkeeping, not cash taken out of a vault. The actual money-out-the-door figures alleged are far smaller. Don't read the headline as a ₹15 lakh crore theft.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Are India's national export figures now in doubt?</button>
+        <div class="faq-a"><div class="faq-a-inner"><b>No.</b> This is the most common misunderstanding. The disputed number is company revenue sitting mostly in a <b>Swiss</b> subsidiary refining gold (often gold owned by customers). India's official export numbers come from customs and shipping records, not from this company's profit statement. They are compiled in a completely different way.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Why does LIC keep coming up?</button>
+        <div class="faq-a"><div class="faq-a-inner">Because LIC is <b>government-owned</b> and its money is ultimately the public's. It holds roughly 10.8% of the company — the biggest institutional shareholder — and appears to have held on while private funds grew nervous. As the share price crashed, that public money lost a lot of value.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Where were the auditors?</button>
+        <div class="faq-a"><div class="faq-a-inner">That's the big governance question. Two relatively small audit firms signed off on the accounts and allegedly didn't flag the problems. SEBI has referred them to <b>NFRA</b>, the body that disciplines auditors. A core lesson here is about audit quality, not just one company's conduct.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">How did it stay hidden for five years?</button>
+        <div class="faq-a"><div class="faq-a-inner">The suspect revenue sat in <b>foreign subsidiaries</b>, three corporate layers down, in another country's audit system — genuinely harder to check. But the mismatch was visible to anyone who compared the layers. It finally came to light through a <b>single shareholder's complaint</b>, not through the watchdogs.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Has anything been proven? Is anyone in jail?</button>
+        <div class="faq-a"><div class="faq-a-inner">Not yet. This is an <b>interim order</b> — a preliminary action. The promoter is barred from trading in the securities market and a forensic audit is ordered, but the company denies the allegations and can contest them. Guilt is not established at this stage.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">If I'm an ordinary citizen, why should I care?</button>
+        <div class="faq-a"><div class="faq-a-inner">Two reasons. <b>Public money</b> (through LIC and possibly incentive schemes) is exposed. And it tests whether you can <b>trust the numbers</b> companies report and the watchdogs that certify them — which is what your savings, pension, and the wider market rely on.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Is this going to crash the economy?</button>
+        <div class="faq-a"><div class="faq-a-inner">No credible sign of that. The company is now small relative to the financial system and there's no evidence it's dragging down banks or the broader market. The real cost is to <b>confidence in oversight</b> — serious, but not a systemic financial collapse.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s9" data-toc="Your view">
+    <h2><span class="num">09 / YOUR VIEW</span>Reader poll</h2>
+    <p>Two quick questions. This is an informal reader-sentiment gauge, not a scientific survey — but it's a useful mirror of how people read where the system broke.</p>
+
+    <div class="poll" id="poll1" data-key="rel_poll_failpoint">
+      <div class="poll-q">A flagship Indian company allegedly inflated revenue ~200x for five years — caught only by one shareholder's complaint, not by auditors, the exchange, or the regulator. Where did the system fail most?</div>
+      <div class="poll-sub">Pick one</div>
+      <button class="poll-opt" data-i="0"><span class="fillbar"></span><span class="opt-label"><span>The auditors who signed off</span><span class="pct">0%</span></span></button>
+      <button class="poll-opt" data-i="1"><span class="fillbar"></span><span class="opt-label"><span>SEBI / market surveillance — too slow</span><span class="pct">0%</span></span></button>
+      <button class="poll-opt" data-i="2"><span class="fillbar"></span><span class="opt-label"><span>LIC — investing public money through the red flags</span><span class="pct">0%</span></span></button>
+      <button class="poll-opt" data-i="3"><span class="fillbar"></span><span class="opt-label"><span>All of the above — the whole gatekeeping chain failed</span><span class="pct">0%</span></span></button>
+      <div class="poll-foot" id="foot1">Tap an option to vote and see how readers in this session have answered.</div>
+    </div>
+
+    <div class="poll" id="poll2" data-key="rel_poll_trust">
+      <div class="poll-q">Does this case change how much you trust official numbers — corporate earnings, and the macro data the government cites?</div>
+      <div class="poll-sub">Pick one</div>
+      <button class="poll-opt" data-i="0"><span class="fillbar"></span><span class="opt-label"><span>Yes — if this slipped through, I trust reported figures less</span><span class="pct">0%</span></span></button>
+      <button class="poll-opt" data-i="1"><span class="fillbar"></span><span class="opt-label"><span>No — one fraud doesn't mean the data is systemically wrong</span><span class="pct">0%</span></span></button>
+      <button class="poll-opt" data-i="2"><span class="fillbar"></span><span class="opt-label"><span>I was already skeptical of headline numbers</span><span class="pct">0%</span></span></button>
+      <div class="poll-foot" id="foot2">Tap an option to vote and see how readers in this session have answered.</div>
+    </div>
+    <p style="font-size:.82rem;color:var(--fog);font-style:italic">Note: votes are tallied for this browsing session only and reset on reload — this is a discussion prompt, not a data-collection tool.</p>
+  </section>
+
+  <section id="s10" data-toc="What to watch">
+    <h2><span class="num">10 / WHAT TO WATCH</span>The bar for the next stage</h2>
+    <p>This is an interim order, not a verdict. Watch for: REL's formal response and any rebuttal of the subsidiary-revenue gap; the <strong>forensic audit</strong> findings; whether <strong>NFRA</strong> acts against the auditors; whether SEBI's final order upholds or softens the interim findings; and whether Parliament forces answers on the LIC and incentive-scheme angles.</p>
+    <p>Until then, file this as: <strong>a real and serious regulatory action, a genuine test of India's gatekeeping chain — wrapped in viral framing that runs well ahead of both the evidence and the arithmetic.</strong></p>
+
+    <div class="sources">
+      <h3>Sources consulted</h3>
+      <ol>
+        <li>SEBI forensic audit / revenue order — <a href="https://www.valueresearchonline.com/stories/228727/rajesh-exports-sebi-forensic-audit-revenue-fraud-order/" target="_blank" rel="noopener">Value Research Online</a></li>
+        <li>What the interim order alleges &amp; what happens next — <a href="https://www.outlookbusiness.com/corporate/the-rajesh-exports-case-what-sebis-interim-order-alleges-and-what-happens-next" target="_blank" rel="noopener">Outlook Business</a></li>
+        <li>Auditors under scrutiny (P.V. Ramana Reddy &amp; Co; BSD &amp; Co) — <a href="https://www.freepressjournal.in/business/rajesh-exports-audit-under-scrutiny-over-rs-15-lakh-crore-misreporting" target="_blank" rel="noopener">Free Press Journal</a></li>
+        <li>Auditor / NFRA referral analysis — <a href="https://www.finnovate.in/learn/blog/rajesh-exports-sebi-order-auditor-failure-analysis" target="_blank" rel="noopener">Finnovate</a></li>
+        <li>Auditor scrutiny &amp; standards context — <a href="https://www.casansaar.com/news-Auditing/auditors-of-rajesh-exports-under-scrutiny-over-financial-reporting-exceeding-rs15-lakh-cr/14410.html" target="_blank" rel="noopener">CA Sansaar</a></li>
+      </ol>
+      <p style="font-size:.82rem;margin-top:14px;color:var(--fog)">All allegations are prima-facie findings at the interim stage and are denied by the company; nothing here is a finding of guilt. Revenue, stake, and price figures are as reported by the cited outlets and SEBI's order, and should be re-checked against the primary order before use in any formal deliverable. Independent analysis; not affiliated with SEBI, LIC, Rajesh Exports, or any cited outlet.</p>
+    </div>
+  </section>
+
+</article>
+
+<footer>
+  <p>© <span id="yr"></span> Arvinder Singh · arvindersingh.me — Independent analysis. Explainer and commentary on a public regulatory action; not investment, legal, or accounting advice. All allegations are prima facie and contested.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- progress bar + % label ---- */
+  var bar=document.getElementById("progress-bar");
+  var lbl=document.getElementById("progress-label");
+  function onScroll(){
+    var h=document.documentElement;
+    var max=(h.scrollHeight-h.clientHeight)||1;
+    var pct=Math.min(100,Math.max(0,(h.scrollTop||document.body.scrollTop)/max*100));
+    bar.style.width=pct+"%";
+    lbl.textContent=Math.round(pct)+"%";
+  }
+
+  /* ---- build TOC dots from sections ---- */
+  var secs=Array.prototype.slice.call(document.querySelectorAll("section[data-toc]"));
+  var toc=document.getElementById("toc");
+  secs.forEach(function(s){
+    var a=document.createElement("a");
+    a.href="#"+s.id;
+    a.title=s.getAttribute("data-toc");
+    a.dataset.target=s.id;
+    toc.appendChild(a);
+  });
+  var dots=Array.prototype.slice.call(toc.children);
+  function highlightTOC(){
+    var pos=window.scrollY+window.innerHeight*0.35;
+    var current=secs[0];
+    secs.forEach(function(s){ if(s.offsetTop<=pos) current=s; });
+    dots.forEach(function(d){ d.classList.toggle("active", d.dataset.target===current.id); });
+  }
+
+  window.addEventListener("scroll",function(){onScroll();highlightTOC();},{passive:true});
+  window.addEventListener("resize",onScroll);
+
+  /* ---- year ---- */
+  document.getElementById("yr").textContent=new Date().getFullYear();
+
+  /* ---- FAQ accordion ---- */
+  document.querySelectorAll(".faq-item").forEach(function(item){
+    var q=item.querySelector(".faq-q");
+    var a=item.querySelector(".faq-a");
+    q.addEventListener("click",function(){
+      var isOpen=item.classList.contains("open");
+      if(isOpen){
+        item.classList.remove("open");
+        a.style.maxHeight=null;
+      }else{
+        item.classList.add("open");
+        a.style.maxHeight=a.scrollHeight+"px";
+      }
+    });
+  });
+
+  /* ---- poll (in-memory only; resets on reload) ---- */
+  var pollVotes={};
+  document.querySelectorAll(".poll").forEach(function(poll){
+    var key=poll.dataset.key;
+    var opts=Array.prototype.slice.call(poll.querySelectorAll(".poll-opt"));
+    pollVotes[key]=opts.map(function(){return 0;});
+    var voted=false;
+    var footId=poll.querySelector(".poll-foot").id;
+
+    function render(chosenIdx){
+      var total=pollVotes[key].reduce(function(a,b){return a+b;},0)||1;
+      opts.forEach(function(o,i){
+        var pc=Math.round((pollVotes[key][i]/total)*100);
+        o.querySelector(".fillbar").style.width=pc+"%";
+        o.querySelector(".pct").textContent=pc+"%";
+        o.classList.toggle("chosen",i===chosenIdx);
+      });
+      poll.classList.add("voted");
+      var foot=document.getElementById(footId);
+      var n=pollVotes[key].reduce(function(a,b){return a+b;},0);
+      foot.innerHTML="Thanks for voting. "+n+" response"+(n===1?"":"s")+" in this session. "+
+        "<button class='poll-reset'>Change my answer</button>";
+      foot.querySelector(".poll-reset").addEventListener("click",function(){
+        pollVotes[key]=opts.map(function(){return 0;});
+        voted=false;
+        poll.classList.remove("voted");
+        opts.forEach(function(o){o.querySelector(".fillbar").style.width="0";o.classList.remove("chosen");});
+        document.getElementById(footId).textContent="Tap an option to vote and see how readers in this session have answered.";
+      });
+    }
+
+    opts.forEach(function(o,i){
+      o.addEventListener("click",function(){
+        if(voted) return;
+        voted=true;
+        pollVotes[key][i]+=1;
+        render(i);
+      });
+    });
+  });
+
+  /* ---- IntersectionObserver: draw chart when visible ---- */
+  var gapCanvas=document.getElementById("gapChart");
+  if(gapCanvas){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(!e.isIntersecting) return;
+        if(e.target.id==="gapChart"){ drawGap(); io.unobserve(e.target); }
+      });
+    },{threshold:0.35});
+    io.observe(gapCanvas);
+  }
+
+  /* ---- revenue-gap bar chart (no libraries, log scale) ---- */
+  function drawGap(){
+    var c=gapCanvas;
+    var dpr=window.devicePixelRatio||1;
+    var W=c.clientWidth, H=300;
+    c.width=W*dpr; c.height=H*dpr;
+    var ctx=c.getContext("2d");
+    ctx.scale(dpr,dpr);
+
+    /* values in lakh crore; log scale because of the ~500x gap */
+    var data=[
+      {label:"Group reported (REL)", v:2.81, hl:true},
+      {label:"Holding reported (GGR)", v:2.93, hl:true},
+      {label:"Operating subsidiary (Valcambi, audited)", v:0.0543, hl:false}
+    ];
+    var padL=54,padR=14,padT=20,padB=58;
+    var plotW=W-padL-padR, plotH=H-padT-padB;
+
+    /* log scale from 0.01 to 10 lakh cr */
+    var minE=-2, maxE=1; /* 10^-2=0.01 .. 10^1=10 */
+    function ly(v){
+      var e=Math.log10(v);
+      var t=(e-minE)/(maxE-minE);
+      return padT+plotH-(t*plotH);
+    }
+
+    ctx.clearRect(0,0,W,H);
+    ctx.font="11px monospace";
+    ctx.textBaseline="middle";
+
+    /* gridlines + y labels (log decades) */
+    var ticks=[0.01,0.1,1,10];
+    var tickLabels=["0.01","0.1","1","10"];
+    ctx.strokeStyle="rgba(255,255,255,0.06)";
+    ctx.fillStyle="#8b93a5";
+    ctx.lineWidth=1;
+    ticks.forEach(function(t,i){
+      var y=ly(t);
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);ctx.stroke();
+      ctx.textAlign="right";
+      ctx.fillText(tickLabels[i],padL-8,y);
+    });
+    /* y axis title */
+    ctx.save();
+    ctx.translate(13,padT+plotH/2);ctx.rotate(-Math.PI/2);
+    ctx.textAlign="center";ctx.fillStyle="#8b93a5";
+    ctx.fillText("\u20b9 lakh crore (log scale)",0,0);
+    ctx.restore();
+
+    /* bars */
+    var n=data.length;
+    var gap=26;
+    var bw=(plotW-gap*(n-1))/n;
+    var base=ly(0.01);
+    data.forEach(function(d,i){
+      var x=padL+i*(bw+gap);
+      var y=ly(d.v);
+      var bh=base-y;
+      var grad=ctx.createLinearGradient(0,y,0,y+bh);
+      if(d.hl){grad.addColorStop(0,"#ec7a72");grad.addColorStop(1,"#8f322c");}
+      else{grad.addColorStop(0,"#7fd6a8");grad.addColorStop(1,"#3f8c63");}
+      ctx.fillStyle=grad;
+      roundRect(ctx,x,y,bw,bh,4);ctx.fill();
+      /* value label */
+      ctx.fillStyle=d.hl?"#ec7a72":"#5bbf8a";
+      ctx.textAlign="center";
+      ctx.font="bold 12px monospace";
+      var vtxt=d.v>=1?("\u20b9"+d.v.toFixed(2)+" L cr"):("\u20b9"+Math.round(d.v*100000).toLocaleString("en-IN")+" cr");
+      ctx.fillText(vtxt,x+bw/2,y-12);
+      /* x label (wrapped) */
+      ctx.fillStyle="#8b93a5";
+      ctx.font="10px monospace";
+      wrapText(ctx,d.label,x+bw/2,padT+plotH+16,bw+gap-6,12);
+    });
+  }
+  function wrapText(ctx,text,cx,y,maxW,lh){
+    var words=text.split(" ");var line="";var lines=[];
+    for(var i=0;i<words.length;i++){
+      var test=line+words[i]+" ";
+      if(ctx.measureText(test).width>maxW && line){lines.push(line.trim());line=words[i]+" ";}
+      else line=test;
+    }
+    lines.push(line.trim());
+    lines.slice(0,3).forEach(function(ln,i){ctx.fillText(ln,cx,y+i*lh);});
+  }
+  function roundRect(ctx,x,y,w,h,r){
+    if(h<r)r=Math.max(0,h);
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,0);
+    ctx.arcTo(x,y+h,x,y,0);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  /* redraw chart on resize (debounced) */
+  var rt;
+  window.addEventListener("resize",function(){
+    clearTimeout(rt);
+    rt=setTimeout(function(){ if(gapCanvas && gapCanvas.width) drawGap(); },200);
+  });
+
+  onScroll();highlightTOC();
+})();
+</script>
+</body>
+</html>
