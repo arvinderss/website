@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punjab 2027 — Sitrep &amp; Strategic Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=Noto+Sans+Gurmukhi:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --ink:#0e0f12; --panel:#15171c; --panel2:#1b1e24; --line:#2a2d34;
+  --txt:#e9ebef; --mut:#a6abb5; --amber:#e8a13a; --amber2:#f3c373;
+  --est:#3fae6a; --con:#d9772f; --jud:#7a8cd8; --red:#d05050;
+  --aap:#2bb673; --inc:#29a8e0; --sad:#1c3f94; --bjp:#ff7a18; --ind:#8b8f98; --bsp:#3a5bd0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--txt);font-family:'Inter',system-ui,sans-serif;font-size:16.5px;line-height:1.72;-webkit-font-smoothing:antialiased}
+body[data-lang="pa"] .lp{font-family:'Noto Sans Gurmukhi','Inter',sans-serif;font-size:17px}
+body[data-lang="hi"] .lp{font-family:'Noto Sans Devanagari','Inter',sans-serif;font-size:17px}
+body[data-lang="ur"] .lp{font-family:'Noto Nastaliq Urdu',serif;font-size:17.5px;line-height:2.15}
+.wrap{max-width:880px;margin:0 auto;padding:0 22px}
+/* topbar */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(14,15,18,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;padding:10px 22px;gap:10px;flex-wrap:wrap}
+.brand{font-family:'Fraunces',serif;font-weight:700;color:var(--amber);font-size:1.02rem;letter-spacing:.02em}
+.langs{display:flex;gap:6px}
+.langs button{background:var(--panel);border:1px solid var(--line);color:var(--mut);padding:6px 13px;border-radius:999px;cursor:pointer;font-size:.85rem;font-family:'Inter',sans-serif;transition:all .15s}
+.langs button:hover{border-color:var(--amber);color:var(--txt)}
+.langs button.on{background:var(--amber);color:#1a1408;border-color:var(--amber);font-weight:600}
+.langs button:focus-visible{outline:2px solid var(--amber2);outline-offset:2px}
+/* hero */
+.hero{padding:64px 0 36px;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:14px;font-family:'Inter',sans-serif}
+h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(1.9rem,4.6vw,3.1rem);line-height:1.14;letter-spacing:-.01em}
+body[data-lang="ur"] h1,body[data-lang="ur"] h2{font-family:'Noto Nastaliq Urdu',serif;line-height:1.9}
+body[data-lang="pa"] h1,body[data-lang="pa"] h2{font-family:'Noto Sans Gurmukhi',sans-serif}
+body[data-lang="hi"] h1,body[data-lang="hi"] h2{font-family:'Noto Sans Devanagari',sans-serif}
+.dek{color:var(--mut);margin-top:16px;font-size:1.06rem;max-width:62ch}
+.meta{margin-top:18px;color:var(--mut);font-size:.84rem;display:flex;gap:14px;flex-wrap:wrap}
+/* legend */
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.pill{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.06em;padding:2px 10px;border-radius:999px;border:1px solid;vertical-align:2px;font-family:'Inter',sans-serif;white-space:nowrap}
+.pill.est{color:var(--est);border-color:var(--est)}
+.pill.con{color:var(--con);border-color:var(--con)}
+.pill.jud{color:var(--jud);border-color:var(--jud)}
+/* sections */
+.sec{padding:46px 0;border-bottom:1px solid var(--line)}
+h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(1.35rem,3vw,1.85rem);margin-bottom:18px;line-height:1.25}
+h3{font-size:1.02rem;font-weight:600;color:var(--amber2);margin:22px 0 8px}
+p{margin-bottom:14px;color:#d4d7dd}
+p strong{color:var(--txt)}
+ul{margin:0 0 14px 1.2em;color:#d4d7dd}
+body[dir="rtl"] ul{margin:0 1.2em 14px 0}
+li{margin-bottom:8px}
+.note{background:var(--panel);border:1px solid var(--line);border-inline-start:3px solid var(--amber);padding:14px 18px;border-radius:8px;margin:18px 0;color:#cfd3da;font-size:.95rem}
+.warn{border-inline-start-color:var(--red)}
+.chartwrap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 18px 12px;margin:26px 0}
+.chartwrap h4{font-size:.9rem;color:var(--txt);font-weight:600;margin-bottom:4px;font-family:'Inter',sans-serif}
+.chartwrap .src{font-size:.72rem;color:var(--mut);margin-top:8px}
+.chartbox{position:relative;height:300px}
+@media(max-width:560px){.chartbox{height:260px}}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:9px 11px;text-align:start;vertical-align:top}
+th{background:var(--panel2);color:var(--amber2);font-weight:600;font-size:.8rem;letter-spacing:.04em}
+td{color:#d4d7dd}
+a{color:var(--amber2);text-decoration:none;border-bottom:1px dotted var(--amber)}
+a:hover{color:var(--amber)}
+/* infographic */
+.infogrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+@media(max-width:640px){.infogrid{grid-template-columns:1fr}}
+.infocard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.infocard.now{border-top:3px solid var(--red)}
+.infocard.future{border-top:3px solid var(--est)}
+.infocard h4{font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:10px}
+.infocard ul{font-size:.9rem;margin-bottom:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.kpi .n{font-family:'Fraunces',serif;font-size:1.5rem;color:var(--amber);font-weight:700}
+.kpi .l{font-size:.74rem;color:var(--mut);margin-top:2px;line-height:1.4}
+.gurbani{font-family:'Noto Sans Gurmukhi',sans-serif;font-size:1.15rem;color:var(--amber2);text-align:center;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;margin:18px 0;line-height:2}
+.gurbani .tr{font-family:'Inter',sans-serif;font-size:.85rem;color:var(--mut);display:block;margin-top:6px;line-height:1.6}
+footer{padding:40px 0 70px;color:var(--mut);font-size:.84rem}
+.lp{display:none}
+.lp.show{display:block}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body data-lang="en">
+<div class="topbar"><div class="wrap">
+  <div class="brand">PUNJAB · 2027</div>
+  <div class="langs" role="group" aria-label="Language">
+    <button class="on" data-lang="en" onclick="setLang('en')">English</button>
+    <button data-lang="pa" onclick="setLang('pa')">ਪੰਜਾਬੀ</button>
+    <button data-lang="hi" onclick="setLang('hi')">हिंदी</button>
+    <button data-lang="ur" onclick="setLang('ur')">اردو</button>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+<!-- HERO -->
+<header class="hero">
+  <div class="lp" data-l="en">
+    <div class="eyebrow">Situation Report · 10 June 2026 · Assembly election due early 2027</div>
+    <h1>Punjab 2027: the battle for the last border state</h1>
+    <p class="dek">A citizen's strategic briefing — BJP's full-scale entry plan, the agency question, the Panth, the diaspora, the debt, and how Punjab can keep public interest at the centre. Every claim is confidence-labelled.</p>
+  </div>
+  <div class="lp" data-l="pa">
+    <div class="eyebrow">ਹਾਲਾਤ ਰਿਪੋਰਟ · 10 ਜੂਨ 2026 · ਵਿਧਾਨ ਸਭਾ ਚੋਣਾਂ 2027 ਦੇ ਸ਼ੁਰੂ ਵਿੱਚ</div>
+    <h1>ਪੰਜਾਬ 2027: ਆਖ਼ਰੀ ਸਰਹੱਦੀ ਸੂਬੇ ਦੀ ਜੰਗ</h1>
+    <p class="dek">ਨਾਗਰਿਕ ਲਈ ਰਣਨੀਤਕ ਬ੍ਰੀਫ਼ਿੰਗ — ਭਾਜਪਾ ਦੀ ਪੂਰੀ-ਤਾਕਤ ਯੋਜਨਾ, ਏਜੰਸੀਆਂ ਦਾ ਸਵਾਲ, ਪੰਥ, ਪਰਵਾਸੀ ਸਿੱਖ, ਕਰਜ਼ਾ, ਅਤੇ ਲੋਕ-ਹਿੱਤ ਨੂੰ ਕੇਂਦਰ ਵਿੱਚ ਰੱਖਣ ਦਾ ਰਾਹ। ਹਰ ਦਾਅਵੇ ਉੱਤੇ ਭਰੋਸੇ ਦਾ ਲੇਬਲ ਲੱਗਾ ਹੈ।</p>
+  </div>
+  <div class="lp" data-l="hi">
+    <div class="eyebrow">स्थिति रिपोर्ट · 10 जून 2026 · विधानसभा चुनाव 2027 की शुरुआत में</div>
+    <h1>पंजाब 2027: आख़िरी सीमावर्ती राज्य की लड़ाई</h1>
+    <p class="dek">नागरिक के लिए रणनीतिक ब्रीफ़िंग — भाजपा की पूर्ण-शक्ति योजना, एजेंसियों का सवाल, पंथ, प्रवासी सिख, क़र्ज़, और जनहित को केंद्र में रखने का रास्ता। हर दावे पर विश्वसनीयता का लेबल है।</p>
+  </div>
+  <div class="lp" data-l="ur">
+    <div class="eyebrow">صورتِ حال رپورٹ · 10 جون 2026 · اسمبلی انتخابات 2027 کے اوائل میں</div>
+    <h1>پنجاب 2027: آخری سرحدی ریاست کی جنگ</h1>
+    <p class="dek">شہری کے لیے حکمتِ عملی بریفنگ — بی جے پی کا مکمل قوت منصوبہ، ایجنسیوں کا سوال، پنتھ، بیرونِ ملک سکھ، قرضہ، اور عوامی مفاد کو مرکز میں رکھنے کا راستہ۔ ہر دعوے پر اعتماد کا لیبل لگا ہے۔</p>
+  </div>
+  <div class="legend">
+    <span class="pill est">ESTABLISHED</span>
+    <span class="pill con">CONTESTED</span>
+    <span class="pill jud">AUTHOR'S JUDGMENT</span>
+  </div>
+  <div class="meta"><span>arvindersingh.me framework</span><span>Sources linked in §18</span></div>
+</header>
+
+<!-- S1 SITREP -->
+<section class="sec" id="s1">
+<div class="lp" data-l="en">
+<div class="eyebrow">§1 · Sitrep</div>
+<h2>Where Punjab stands, June 2026</h2>
+<p><span class="pill est">ESTABLISHED</span> AAP remains the dominant force. In the May 2026 municipal elections it won 958 of 1,977 wards; Congress took 397, Independents 251, SAD 192, BJP 172, BSP 7. Polling (~64%) was marred by violence, stone-pelting and booth-capture allegations in several towns.</p>
+<p><span class="pill est">ESTABLISHED</span> BJP has decided to contest all 117 seats alone, with Amit Shah personally commanding strategy. Its case rests on 2024 Lok Sabha arithmetic: 18.56% vote share, first place in 23 assembly segments, competitive in ~38 — i.e., 21 short of the 59-seat majority line in a four-cornered field where winning margins shrink.</p>
+<p><span class="pill est">ESTABLISHED</span> In April 2026, seven of AAP's ten Rajya Sabha MPs crossed to the BJP using the two-thirds merger provision — a parliamentary blow that did not, however, dent AAP's municipal sweep weeks later. ED action has intensified: minister Sanjeev Arora arrested, raids on RS MP Ashok Mittal, with roughly 16 Punjab political figures under the agency's scanner per The Tribune.</p>
+<p><span class="pill est">ESTABLISHED</span> SAD is in institutional crisis: Sukhbir Badal was declared tankhaiya by the Akal Takht (2 Dec 2024), resigned, was re-elected president (April 2025), and is now again under pressure for calling the punishment a "conspiracy". Amritpal Singh's Akali Dal (Waris Punjab De), launched at Maghi Mela 2025, competes for the panthic vote while he remains in NSA detention in Dibrugarh.</p>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> Net assessment: AAP enters as favourite on organisation and welfare delivery; its vulnerabilities are debt, law-and-order perception, farmer alienation after the March 2025 Shambhu–Khanauri crackdown, and the agency squeeze. BJP's path is not victory by majority but relevance by fragmentation — and kingmaker leverage in a hung house.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§1 · ਹਾਲਾਤ</div>
+<h2>ਜੂਨ 2026 ਵਿੱਚ ਪੰਜਾਬ ਕਿੱਥੇ ਖੜ੍ਹਾ ਹੈ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਮਈ 2026 ਦੀਆਂ ਨਗਰ ਨਿਗਮ ਚੋਣਾਂ ਵਿੱਚ ਆਪ ਨੇ 1,977 ਵਿੱਚੋਂ 958 ਵਾਰਡ ਜਿੱਤੇ; ਕਾਂਗਰਸ 397, ਆਜ਼ਾਦ 251, ਅਕਾਲੀ ਦਲ 192, ਭਾਜਪਾ 172, ਬਸਪਾ 7। ਕਈ ਥਾਈਂ ਹਿੰਸਾ ਤੇ ਬੂਥ ਕਬਜ਼ੇ ਦੇ ਦੋਸ਼ ਲੱਗੇ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਭਾਜਪਾ ਸਾਰੀਆਂ 117 ਸੀਟਾਂ ਉੱਤੇ ਇਕੱਲੀ ਲੜੇਗੀ; ਕਮਾਨ ਅਮਿਤ ਸ਼ਾਹ ਕੋਲ। ਆਧਾਰ: 2024 ਲੋਕ ਸਭਾ ਵਿੱਚ 18.56% ਵੋਟ, 23 ਹਲਕਿਆਂ ਵਿੱਚ ਪਹਿਲਾ ਸਥਾਨ, ~38 ਵਿੱਚ ਮਜ਼ਬੂਤ ਮੌਜੂਦਗੀ — ਚੌਕੋਣੇ ਮੁਕਾਬਲੇ ਵਿੱਚ ਜਿੱਤ ਦਾ ਫ਼ਰਕ ਘਟ ਜਾਂਦਾ ਹੈ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਅਪ੍ਰੈਲ 2026 ਵਿੱਚ ਆਪ ਦੇ 10 ਵਿੱਚੋਂ 7 ਰਾਜ ਸਭਾ ਮੈਂਬਰ ਭਾਜਪਾ ਵਿੱਚ ਚਲੇ ਗਏ। ਈ.ਡੀ. ਦੀ ਕਾਰਵਾਈ ਤੇਜ਼ ਹੋਈ — ਮੰਤਰੀ ਸੰਜੀਵ ਅਰੋੜਾ ਗ੍ਰਿਫ਼ਤਾਰ, ਐਮ.ਪੀ. ਅਸ਼ੋਕ ਮਿੱਤਲ ਉੱਤੇ ਛਾਪੇ, ~16 ਆਗੂ ਜਾਂਚ ਹੇਠ (ਟ੍ਰਿਬਿਊਨ)।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਅਕਾਲੀ ਦਲ ਸੰਕਟ ਵਿੱਚ: ਸੁਖਬੀਰ ਬਾਦਲ 2 ਦਸੰਬਰ 2024 ਨੂੰ ਤਨਖ਼ਾਹੀਆ ਕਰਾਰ, ਫਿਰ ਅਪ੍ਰੈਲ 2025 ਵਿੱਚ ਮੁੜ ਪ੍ਰਧਾਨ; ਹੁਣ "ਸਾਜ਼ਿਸ਼" ਵਾਲੇ ਬਿਆਨ ਉੱਤੇ ਮੁੜ ਘਿਰੇ। ਅੰਮ੍ਰਿਤਪਾਲ ਸਿੰਘ ਦਾ ਅਕਾਲੀ ਦਲ (ਵਾਰਿਸ ਪੰਜਾਬ ਦੇ) ਪੰਥਕ ਵੋਟ ਲਈ ਮੈਦਾਨ ਵਿੱਚ ਹੈ।</p>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਆਪ ਜਥੇਬੰਦੀ ਤੇ ਭਲਾਈ ਸਕੀਮਾਂ ਕਰਕੇ ਅੱਗੇ ਹੈ; ਕਮਜ਼ੋਰੀਆਂ — ਕਰਜ਼ਾ, ਅਮਨ-ਕਾਨੂੰਨ ਦੀ ਧਾਰਨਾ, ਮਾਰਚ 2025 ਦੀ ਕਿਸਾਨ-ਕਾਰਵਾਈ ਪਿੱਛੋਂ ਕਿਸਾਨੀ ਨਾਰਾਜ਼ਗੀ, ਤੇ ਏਜੰਸੀਆਂ ਦਾ ਦਬਾਅ। ਭਾਜਪਾ ਦਾ ਰਾਹ ਬਹੁਮਤ ਨਹੀਂ, ਵੰਡ ਰਾਹੀਂ ਪ੍ਰਸੰਗਿਕਤਾ — ਤੇ ਲਟਕਵੀਂ ਵਿਧਾਨ ਸਭਾ ਵਿੱਚ ਸੌਦੇਬਾਜ਼ੀ ਦੀ ਤਾਕਤ ਹੈ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§1 · स्थिति</div>
+<h2>जून 2026 में पंजाब कहाँ खड़ा है</h2>
+<p><span class="pill est">स्थापित</span> मई 2026 के निकाय चुनावों में आप ने 1,977 में से 958 वार्ड जीते; कांग्रेस 397, निर्दलीय 251, अकाली दल 192, भाजपा 172, बसपा 7। कई जगह हिंसा और बूथ-कब्ज़े के आरोप लगे।</p>
+<p><span class="pill est">स्थापित</span> भाजपा सभी 117 सीटों पर अकेले लड़ेगी; कमान अमित शाह के पास। आधार: 2024 लोकसभा में 18.56% वोट, 23 विधानसभा क्षेत्रों में पहला स्थान, ~38 में मज़बूत उपस्थिति — चतुष्कोणीय मुक़ाबले में जीत का अंतर घट जाता है।</p>
+<p><span class="pill est">स्थापित</span> अप्रैल 2026 में आप के 10 में से 7 राज्यसभा सांसद भाजपा में चले गए। ईडी की कार्रवाई तेज़ — मंत्री संजीव अरोड़ा गिरफ़्तार, सांसद अशोक मित्तल पर छापे, ~16 नेता जाँच के घेरे में (ट्रिब्यून)।</p>
+<p><span class="pill est">स्थापित</span> अकाली दल संकट में: सुखबीर बादल 2 दिसंबर 2024 को तनख़ैया घोषित, अप्रैल 2025 में पुनः अध्यक्ष; अब "साज़िश" वाले बयान पर फिर घिरे। अमृतपाल सिंह का अकाली दल (वारिस पंजाब दे) पंथक वोट के लिए मैदान में है।</p>
+<p><span class="pill jud">लेखकीय राय</span> आप संगठन व कल्याण-योजनाओं के बल पर आगे; कमज़ोरियाँ — क़र्ज़, क़ानून-व्यवस्था की धारणा, मार्च 2025 की किसान-कार्रवाई के बाद किसान नाराज़गी, एजेंसियों का दबाव। भाजपा का रास्ता बहुमत नहीं, विभाजन से प्रासंगिकता — और त्रिशंकु सदन में सौदेबाज़ी की ताक़त।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§1 · صورتِ حال</div>
+<h2>جون 2026 میں پنجاب کہاں کھڑا ہے</h2>
+<p><span class="pill est">مستند</span> مئی 2026 کے بلدیاتی انتخابات میں عام آدمی پارٹی نے 1,977 میں سے 958 وارڈ جیتے؛ کانگریس 397، آزاد 251، اکالی دل 192، بی جے پی 172، بی ایس پی 7۔ کئی مقامات پر تشدد اور بوتھ قبضے کے الزامات لگے۔</p>
+<p><span class="pill est">مستند</span> بی جے پی تمام 117 نشستوں پر تنہا لڑے گی؛ کمان امت شاہ کے پاس۔ بنیاد: 2024 لوک سبھا میں 18.56٪ ووٹ، 23 حلقوں میں پہلی پوزیشن، تقریباً 38 میں مضبوط موجودگی — چار رخی مقابلے میں جیت کا فرق کم ہو جاتا ہے۔</p>
+<p><span class="pill est">مستند</span> اپریل 2026 میں عام آدمی پارٹی کے 10 میں سے 7 راجیہ سبھا ارکان بی جے پی میں شامل ہو گئے۔ ای ڈی کی کارروائی تیز — وزیر سنجیو اروڑا گرفتار، رکن پارلیمنٹ اشوک متل پر چھاپے، تقریباً 16 رہنما تفتیش کے دائرے میں (ٹریبیون)۔</p>
+<p><span class="pill est">مستند</span> اکالی دل بحران میں: سکھبیر بادل 2 دسمبر 2024 کو تنخواہیا قرار پائے، اپریل 2025 میں دوبارہ صدر؛ اب "سازش" والے بیان پر پھر گھرے۔ امرت پال سنگھ کا اکالی دل (وارث پنجاب دے) پنتھک ووٹ کے لیے میدان میں ہے۔</p>
+<p><span class="pill jud">مصنف کی رائے</span> عام آدمی پارٹی تنظیم اور فلاحی اسکیموں کی بنا پر آگے؛ کمزوریاں — قرضہ، امن و امان کا تاثر، مارچ 2025 کے کسان کریک ڈاؤن کے بعد کسان ناراضگی، اور ایجنسیوں کا دباؤ۔ بی جے پی کا راستہ اکثریت نہیں بلکہ تقسیم سے اہمیت — اور معلق اسمبلی میں سودے بازی کی طاقت ہے۔</p>
+</div>
+
+<div class="chartwrap">
+  <h4>Vote share: 2022 Assembly vs 2024 Lok Sabha (%)</h4>
+  <div class="chartbox"><canvas id="c1"></canvas></div>
+  <div class="src">ECI results. BJP fought 2022 with PLC/SAD(S); 2024 alone.</div>
+</div>
+<div class="chartwrap">
+  <h4>Assembly seats won, 2012 → 2017 → 2022 (of 117)</h4>
+  <div class="chartbox"><canvas id="c2"></canvas></div>
+  <div class="src">ECI. SAD figure includes BJP alliance seats separately shown.</div>
+</div>
+<div class="chartwrap">
+  <h4>Municipal wards won, May 2026 (1,977 total)</h4>
+  <div class="chartbox"><canvas id="c3"></canvas></div>
+  <div class="src">ThePrint / India TV, 29–30 May 2026.</div>
+</div>
+</section>
+
+<!-- S2 BJP PLAN -->
+<section class="sec" id="s2">
+<div class="lp" data-l="en">
+<div class="eyebrow">§2 · The plan</div>
+<h2>BJP's machinery: what is actually being built</h2>
+<p><span class="pill est">ESTABLISHED</span> Per the Aaj Tak report (9 June 2026) and allied coverage: Shah is convening Punjab BJP leaders this month to finalise a state-wide <strong>anti-drugs jansampark abhiyan</strong> — the chosen emotional wedge issue. Village-level door-to-door contact, booth committees and the <strong>panna pramukh</strong> system (one worker per voter-list page) are being installed — the same micro-machinery used in UP, Gujarat and Haryana.</p>
+<p><span class="pill est">ESTABLISHED</span> Personnel moves: Ravneet Bittu's RS term ends 21 June; he is expected to resign from the Union council and be deployed in Punjab — but not projected as CM face. Internal friction is real: general secretary Jagmohan Raju resigned; Capt. Amarinder Singh met Shah amid reported unhappiness over the state-president appointment. Strategists who worked AAP's Punjab campaigns have been recruited for "Mission 2027".</p>
+<p><span class="pill est">ESTABLISHED</span> Sikh-outreach optics are deliberate and sustained: Kartarpur corridor, Veer Bal Diwas, FCRA/citizenship gestures to Afghan Sikhs, leaders appearing in dastaar at Punjab events, and SAD-adjacent recruitment of jat-Sikh faces (Kewal Dhillon and others). <span class="pill con">CONTESTED</span> Whether this converts rural jat-Sikh votes — BJP's structural weakness — is the central open question; its 2024 vote was concentrated in urban Hindu belts.</p>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> Expect a three-layer campaign: (1) air war — drugs, debt, "AAP = Delhi remote control", law-and-order; (2) ground war — booth machinery plus beneficiary (labharthi) lists from central schemes; (3) lawfare/defection war — agencies, Operation-Lotus-style absorption of winnable faces from Congress, SAD and AAP. Layer 3 is where Punjab's democratic hygiene will be tested.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§2 · ਯੋਜਨਾ</div>
+<h2>ਭਾਜਪਾ ਦੀ ਮਸ਼ੀਨਰੀ: ਅਸਲ ਵਿੱਚ ਕੀ ਬਣ ਰਿਹਾ ਹੈ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਆਜ ਤਕ (9 ਜੂਨ 2026): ਸ਼ਾਹ ਇਸ ਮਹੀਨੇ ਨਸ਼ਾ-ਵਿਰੋਧੀ ਜਨ-ਸੰਪਰਕ ਅਭਿਆਨ ਨੂੰ ਅੰਤਿਮ ਰੂਪ ਦੇਣਗੇ — ਇਹੀ ਭਾਵੁਕ ਮੁੱਦਾ ਚੁਣਿਆ ਗਿਆ ਹੈ। ਪਿੰਡ-ਪਿੰਡ ਘਰ-ਘਰ ਸੰਪਰਕ, ਬੂਥ ਕਮੇਟੀਆਂ ਤੇ ਪੰਨਾ ਪ੍ਰਮੁੱਖ ਪ੍ਰਣਾਲੀ — ਯੂ.ਪੀ., ਗੁਜਰਾਤ, ਹਰਿਆਣਾ ਵਾਲੀ ਮਾਈਕ੍ਰੋ-ਮਸ਼ੀਨਰੀ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਰਵਨੀਤ ਬਿੱਟੂ ਦੀ ਰਾਜ ਸਭਾ ਮਿਆਦ 21 ਜੂਨ ਨੂੰ ਖ਼ਤਮ; ਉਨ੍ਹਾਂ ਨੂੰ ਪੰਜਾਬ ਵਿੱਚ ਉਤਾਰਨ ਦੀ ਯੋਜਨਾ, ਪਰ ਸੀ.ਐਮ. ਚਿਹਰਾ ਨਹੀਂ। ਅੰਦਰੂਨੀ ਖਿੱਚੋਤਾਣ ਅਸਲੀ ਹੈ — ਜਗਮੋਹਨ ਰਾਜੂ ਦਾ ਅਸਤੀਫ਼ਾ, ਕੈਪਟਨ ਦੀ ਨਾਰਾਜ਼ਗੀ। ਆਪ ਦੇ ਸਾਬਕਾ ਰਣਨੀਤੀਕਾਰ "ਮਿਸ਼ਨ 2027" ਲਈ ਭਰਤੀ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਸਿੱਖ-ਪਹੁੰਚ ਸੋਚੀ-ਸਮਝੀ ਹੈ: ਕਰਤਾਰਪੁਰ ਲਾਂਘਾ, ਵੀਰ ਬਾਲ ਦਿਵਸ, ਦਸਤਾਰ ਵਾਲੇ ਪ੍ਰਤੀਕ, ਜੱਟ-ਸਿੱਖ ਚਿਹਰਿਆਂ ਦੀ ਭਰਤੀ। <span class="pill con">ਵਿਵਾਦਿਤ</span> ਕੀ ਇਹ ਪੇਂਡੂ ਜੱਟ-ਸਿੱਖ ਵੋਟ ਵਿੱਚ ਬਦਲੇਗੀ — ਇਹੀ ਕੇਂਦਰੀ ਸਵਾਲ ਹੈ; 2024 ਦੀ ਵੋਟ ਸ਼ਹਿਰੀ ਹਿੰਦੂ ਪੱਟੀ ਵਿੱਚ ਕੇਂਦਰਿਤ ਸੀ।</p>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਤਿੰਨ-ਪਰਤੀ ਮੁਹਿੰਮ ਦੀ ਉਮੀਦ: (1) ਹਵਾਈ ਜੰਗ — ਨਸ਼ਾ, ਕਰਜ਼ਾ, "ਦਿੱਲੀ ਦਾ ਰਿਮੋਟ"; (2) ਜ਼ਮੀਨੀ ਜੰਗ — ਬੂਥ ਮਸ਼ੀਨਰੀ + ਲਾਭਾਰਥੀ ਸੂਚੀਆਂ; (3) ਕਾਨੂੰਨੀ/ਦਲ-ਬਦਲੀ ਜੰਗ — ਏਜੰਸੀਆਂ ਤੇ ਜਿੱਤਣਯੋਗ ਚਿਹਰਿਆਂ ਦੀ ਖਿੱਚ। ਤੀਜੀ ਪਰਤ ਉੱਤੇ ਹੀ ਲੋਕਤੰਤਰੀ ਸਫ਼ਾਈ ਦੀ ਪਰਖ ਹੋਵੇਗੀ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§2 · योजना</div>
+<h2>भाजपा की मशीनरी: वास्तव में क्या बन रहा है</h2>
+<p><span class="pill est">स्थापित</span> आज तक (9 जून 2026): शाह इसी महीने नशा-विरोधी जनसंपर्क अभियान को अंतिम रूप देंगे — यही भावनात्मक मुद्दा चुना गया है। गाँव-गाँव घर-घर संपर्क, बूथ समितियाँ और पन्ना प्रमुख प्रणाली — यूपी, गुजरात, हरियाणा वाली माइक्रो-मशीनरी।</p>
+<p><span class="pill est">स्थापित</span> रवनीत बिट्टू का राज्यसभा कार्यकाल 21 जून को समाप्त; उन्हें पंजाब में उतारने की योजना, पर सीएम चेहरा नहीं। आंतरिक खींचतान वास्तविक — जगमोहन राजू का इस्तीफ़ा, कैप्टन की नाराज़गी। आप के पूर्व रणनीतिकार "मिशन 2027" के लिए भर्ती।</p>
+<p><span class="pill est">स्थापित</span> सिख-आउटरीच सोची-समझी है: करतारपुर गलियारा, वीर बाल दिवस, दस्तार-प्रतीक, जाट-सिख चेहरों की भर्ती। <span class="pill con">विवादित</span> क्या यह ग्रामीण जाट-सिख वोट में बदलेगी — यही केंद्रीय प्रश्न; 2024 का वोट शहरी हिंदू पट्टी में केंद्रित था।</p>
+<p><span class="pill jud">लेखकीय राय</span> तीन-परत अभियान: (1) हवाई युद्ध — नशा, क़र्ज़, "दिल्ली का रिमोट"; (2) ज़मीनी युद्ध — बूथ मशीनरी + लाभार्थी सूचियाँ; (3) क़ानूनी/दल-बदल युद्ध — एजेंसियाँ और जिताऊ चेहरों का अवशोषण। तीसरी परत पर ही लोकतांत्रिक स्वच्छता की परीक्षा होगी।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§2 · منصوبہ</div>
+<h2>بی جے پی کی مشینری: اصل میں کیا بن رہا ہے</h2>
+<p><span class="pill est">مستند</span> آج تک (9 جون 2026): شاہ اسی مہینے منشیات مخالف عوامی رابطہ مہم کو حتمی شکل دیں گے — یہی جذباتی مسئلہ چنا گیا ہے۔ گاؤں گاؤں گھر گھر رابطہ، بوتھ کمیٹیاں اور پنّا پرمکھ نظام — یوپی، گجرات، ہریانہ والی مائیکرو مشینری۔</p>
+<p><span class="pill est">مستند</span> رونیت بٹو کی راجیہ سبھا مدت 21 جون کو ختم؛ انہیں پنجاب میں اتارنے کا منصوبہ، مگر وزیر اعلیٰ کا چہرہ نہیں۔ اندرونی کھینچا تانی حقیقی — جگموہن راجو کا استعفیٰ، کیپٹن کی ناراضگی۔ عام آدمی پارٹی کے سابق حکمت کار "مشن 2027" کے لیے بھرتی۔</p>
+<p><span class="pill est">مستند</span> سکھ رسائی سوچی سمجھی ہے: کرتارپور راہداری، ویر بال دوس، دستار کی علامتیں، جاٹ سکھ چہروں کی بھرتی۔ <span class="pill con">متنازع</span> کیا یہ دیہی جاٹ سکھ ووٹ میں بدلے گی — یہی مرکزی سوال ہے؛ 2024 کا ووٹ شہری ہندو پٹی میں مرکوز تھا۔</p>
+<p><span class="pill jud">مصنف کی رائے</span> تین پرتوں والی مہم: (1) فضائی جنگ — منشیات، قرضہ، "دہلی کا ریموٹ"؛ (2) زمینی جنگ — بوتھ مشینری اور مستفید فہرستیں؛ (3) قانونی/انحراف جنگ — ایجنسیاں اور جیتنے والے چہروں کا انجذاب۔ تیسری پرت پر ہی جمہوری صفائی کا امتحان ہوگا۔</p>
+</div>
+</section>
+
+<!-- S3 MANIFESTO & TRACK RECORD -->
+<section class="sec" id="s3">
+<div class="lp" data-l="en">
+<div class="eyebrow">§3 · Promises vs delivery</div>
+<h2>The likely BJP manifesto — and the truthfulness audit</h2>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> Expected manifesto pillars, extrapolated from the campaign build-out and BJP's pattern in agrarian states: nasha-mukt Punjab with a time-bound drug war; "double-engine" investment and industrial corridors; direct-benefit welfare (Ujjwala, Kisan Samman top-ups, housing); MSP "assurance" language short of a statutory guarantee; border-security and anti-gangster plank; possibly a Sikh-heritage package (circuit tourism, 1984-justice rhetoric, Bandi Singh releases as a dangled concession).</p>
+<h3>Track record on the commitments that matter to Punjab</h3>
+<table>
+<tr><th>Commitment</th><th>What happened</th><th>Status</th></tr>
+<tr><td>Doubling farmers' income by 2022 (2016 pledge)</td><td>Not achieved by official income data; target quietly retired</td><td><span class="pill est">ESTABLISHED</span></td></tr>
+<tr><td>Three farm laws (2020)</td><td>Pushed without state consultation; repealed Nov 2021 after year-long morcha and ~700+ protester deaths claimed by SKM</td><td><span class="pill est">ESTABLISHED</span></td></tr>
+<tr><td>Legal MSP guarantee (promised in writing at repeal)</td><td>Committee formed; no law as of June 2026; Dallewal fast and NPFAM dispute continue the standoff</td><td><span class="pill est">ESTABLISHED</span></td></tr>
+<tr><td>"Will not misuse agencies"</td><td>Opposition states report concentrated ED/CBI action; conviction rate in PMLA political cases is very low; SC has repeatedly flagged ED conduct. BJP denies political direction</td><td><span class="pill con">CONTESTED</span></td></tr>
+<tr><td>Sikh outreach (Kartarpur, citizenship for Afghan Sikhs, 1984 SIT cases)</td><td>Delivered in substantial part — Kartarpur corridor opened 2019; Sajjan Kumar convicted 2018 under reopened cases</td><td><span class="pill est">ESTABLISHED</span></td></tr>
+</table>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> On the user's core question — public interest vs concentrated industrialisation: BJP's national model has measurably favoured scale capital (PLI winners, port/airport/power concentration in two or three conglomerates is documented in market-share data), while its welfare delivery to the poor (gas, toilets, DBT) is also real. Punjab's specific risk is agrarian: any procurement "reform" that dilutes assured MSP purchase of wheat-paddy would transfer price risk from the state to the small farmer. Read every mandi/procurement clause in the manifesto with that lens.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§3 · ਵਾਅਦੇ ਬਨਾਮ ਅਮਲ</div>
+<h2>ਭਾਜਪਾ ਦਾ ਸੰਭਾਵੀ ਮੈਨੀਫੈਸਟੋ — ਤੇ ਸੱਚਾਈ ਦੀ ਪੜਤਾਲ</h2>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਸੰਭਾਵੀ ਥੰਮ੍ਹ: ਨਸ਼ਾ-ਮੁਕਤ ਪੰਜਾਬ, "ਡਬਲ-ਇੰਜਣ" ਨਿਵੇਸ਼, ਸਿੱਧੀ-ਲਾਭ ਭਲਾਈ, ਕਾਨੂੰਨੀ ਗਰੰਟੀ ਤੋਂ ਘੱਟ ਵਾਲੀ ਐਮ.ਐਸ.ਪੀ. "ਭਰੋਸਾ" ਭਾਸ਼ਾ, ਸਰਹੱਦੀ-ਸੁਰੱਖਿਆ ਤੇ ਗੈਂਗਸਟਰ-ਵਿਰੋਧੀ ਮੁੱਦਾ, ਸਿੱਖ-ਵਿਰਾਸਤ ਪੈਕੇਜ (ਬੰਦੀ ਸਿੰਘਾਂ ਦੀ ਰਿਹਾਈ ਲਟਕਦੀ ਰਿਆਇਤ ਵਜੋਂ)।</p>
+<ul>
+<li><span class="pill est">ਸਥਾਪਿਤ</span> 2022 ਤੱਕ ਕਿਸਾਨ ਆਮਦਨ ਦੁੱਗਣੀ — ਪੂਰਾ ਨਹੀਂ ਹੋਇਆ।</li>
+<li><span class="pill est">ਸਥਾਪਿਤ</span> ਤਿੰਨ ਖੇਤੀ ਕਾਨੂੰਨ — ਸਾਲ ਭਰ ਦੇ ਮੋਰਚੇ ਪਿੱਛੋਂ ਨਵੰਬਰ 2021 ਵਿੱਚ ਰੱਦ; ਲਿਖਤੀ ਵਾਅਦੇ ਦੇ ਬਾਵਜੂਦ ਐਮ.ਐਸ.ਪੀ. ਕਾਨੂੰਨ ਅੱਜ ਤੱਕ ਨਹੀਂ।</li>
+<li><span class="pill con">ਵਿਵਾਦਿਤ</span> ਏਜੰਸੀਆਂ ਦੀ ਦੁਰਵਰਤੋਂ ਨਾ ਕਰਨ ਦਾ ਦਾਅਵਾ — ਵਿਰੋਧੀ ਸੂਬਿਆਂ ਵਿੱਚ ਕੇਂਦਰਿਤ ਕਾਰਵਾਈ ਦਰਜ; ਸਿਆਸੀ ਕੇਸਾਂ ਵਿੱਚ ਸਜ਼ਾ-ਦਰ ਬਹੁਤ ਘੱਟ; ਭਾਜਪਾ ਇਨਕਾਰ ਕਰਦੀ ਹੈ।</li>
+<li><span class="pill est">ਸਥਾਪਿਤ</span> ਸਿੱਖ ਪਹੁੰਚ — ਕਰਤਾਰਪੁਰ ਲਾਂਘਾ 2019 ਵਿੱਚ ਖੁੱਲ੍ਹਿਆ; ਸੱਜਣ ਕੁਮਾਰ ਨੂੰ 2018 ਵਿੱਚ ਸਜ਼ਾ।</li>
+</ul>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਅਸਲ ਖ਼ਤਰਾ ਖੇਤੀ ਵਿੱਚ ਹੈ: ਜੇ ਕਣਕ-ਝੋਨੇ ਦੀ ਯਕੀਨੀ ਸਰਕਾਰੀ ਖ਼ਰੀਦ ਨੂੰ ਕਿਸੇ "ਸੁਧਾਰ" ਨਾਲ ਪਤਲਾ ਕੀਤਾ ਗਿਆ ਤਾਂ ਭਾਅ ਦਾ ਜੋਖ਼ਮ ਛੋਟੇ ਕਿਸਾਨ ਉੱਤੇ ਆ ਜਾਵੇਗਾ। ਮੰਡੀ/ਖ਼ਰੀਦ ਵਾਲੀ ਹਰ ਧਾਰਾ ਇਸੇ ਨਜ਼ਰ ਨਾਲ ਪੜ੍ਹੋ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§3 · वादे बनाम अमल</div>
+<h2>भाजपा का संभावित घोषणापत्र — और सच्चाई की पड़ताल</h2>
+<p><span class="pill jud">लेखकीय राय</span> संभावित स्तंभ: नशा-मुक्त पंजाब, "डबल-इंजन" निवेश, प्रत्यक्ष-लाभ कल्याण, क़ानूनी गारंटी से कम वाली एमएसपी "आश्वासन" भाषा, सीमा-सुरक्षा व गैंगस्टर-विरोधी मुद्दा, सिख-विरासत पैकेज (बंदी सिंहों की रिहाई लटकती रियायत के रूप में)।</p>
+<ul>
+<li><span class="pill est">स्थापित</span> 2022 तक किसान आय दोगुनी — पूरा नहीं हुआ।</li>
+<li><span class="pill est">स्थापित</span> तीन कृषि क़ानून — साल भर के मोर्चे के बाद नवंबर 2021 में रद्द; लिखित वादे के बावजूद एमएसपी क़ानून आज तक नहीं।</li>
+<li><span class="pill con">विवादित</span> एजेंसियों के दुरुपयोग से इनकार — विपक्षी राज्यों में केंद्रित कार्रवाई दर्ज; राजनीतिक मामलों में सज़ा-दर बहुत कम; भाजपा राजनीतिक निर्देश से इनकार करती है।</li>
+<li><span class="pill est">स्थापित</span> सिख आउटरीच — करतारपुर गलियारा 2019; सज्जन कुमार को 2018 में सज़ा।</li>
+</ul>
+<p><span class="pill jud">लेखकीय राय</span> असली जोखिम कृषि में: यदि गेहूँ-धान की सुनिश्चित सरकारी ख़रीद किसी "सुधार" से कमज़ोर हुई तो मूल्य-जोखिम छोटे किसान पर आ जाएगा। मंडी/ख़रीद की हर धारा इसी दृष्टि से पढ़ें।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§3 · وعدے بمقابلہ عمل</div>
+<h2>بی جے پی کا ممکنہ منشور — اور سچائی کا جائزہ</h2>
+<p><span class="pill jud">مصنف کی رائے</span> ممکنہ ستون: نشہ سے پاک پنجاب، "ڈبل انجن" سرمایہ کاری، براہِ راست فلاح، قانونی ضمانت سے کم والی ایم ایس پی "یقین دہانی" کی زبان، سرحدی سلامتی اور گینگسٹر مخالف نکتہ، سکھ ورثہ پیکیج (بندی سنگھوں کی رہائی لٹکتی رعایت کے طور پر)۔</p>
+<ul>
+<li><span class="pill est">مستند</span> 2022 تک کسان آمدنی دوگنی — پورا نہیں ہوا۔</li>
+<li><span class="pill est">مستند</span> تین زرعی قوانین — سال بھر کے مورچے کے بعد نومبر 2021 میں منسوخ؛ تحریری وعدے کے باوجود ایم ایس پی قانون آج تک نہیں۔</li>
+<li><span class="pill con">متنازع</span> ایجنسیوں کے غلط استعمال سے انکار — اپوزیشن ریاستوں میں مرکوز کارروائی درج؛ سیاسی مقدمات میں سزا کی شرح بہت کم؛ بی جے پی سیاسی ہدایت سے انکار کرتی ہے۔</li>
+<li><span class="pill est">مستند</span> سکھ رسائی — کرتارپور راہداری 2019؛ سجن کمار کو 2018 میں سزا۔</li>
+</ul>
+<p><span class="pill jud">مصنف کی رائے</span> اصل خطرہ زراعت میں ہے: اگر گندم-دھان کی یقینی سرکاری خرید کسی "اصلاح" سے کمزور ہوئی تو قیمت کا خطرہ چھوٹے کسان پر آ جائے گا۔ منڈی/خرید کی ہر شق اسی نظر سے پڑھیں۔</p>
+</div>
+</section>
+
+<!-- S4 ENTRY PLAYBOOK -->
+<section class="sec" id="s4">
+<div class="lp" data-l="en">
+<div class="eyebrow">§4 · The playbook</div>
+<h2>How the BJP enters states: soft power, hard power</h2>
+<p><span class="pill est">ESTABLISHED</span> The historical sequence is consistent across states. <strong>Phase 1, alliance piggyback:</strong> junior partner to a regional party (SAD in Punjab 1996–2020, JD(U) in Bihar, Shiv Sena in Maharashtra) to acquire cadre and respectability. <strong>Phase 2, identity expansion:</strong> RSS-network social work, religious-cultural events, beneficiary welfare, micro-caste engineering (in Punjab: urban Hindus + ~32% Dalit population + OBC/Rai Sikh pockets + deras). <strong>Phase 3, decapitation of the partner:</strong> contest alone once the regional ally weakens (Punjab post-2020 farm-law split mirrors Maharashtra post-2019 and the Haryana INLD collapse).</p>
+<p><span class="pill con">CONTESTED</span> <strong>The "force" instruments</strong> alleged by opponents and documented unevenly: agency cases that pause when targets defect (multiple reported instances nationally — e.g., closure or dormancy of cases against leaders after joining NDA, the "washing machine" charge); resort politics and engineered defections (Madhya Pradesh 2020, Maharashtra 2022); gubernatorial discretion in inviting governments; income-tax action on hostile media. BJP's position: agencies act on evidence, defectors come for "development". Both narratives are on the record; the pattern data leans toward selectivity, the legal proof of direction does not exist in public.</p>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> In Punjab specifically, "peace" options dominate the plan — drugs campaign, Sikh symbolism, investment promises — because hard polarisation is uniquely dangerous in a Sikh-majority border state and BJP strategists know 2020–21 taught Punjab to mobilise. The hard instruments most likely here: agency attrition of AAP/Congress finances and candidates, post-poll absorption of independents and small parties, and Governor–Vidhan Sabha friction (already a Punjab pattern since 2022, twice reaching the Supreme Court).</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§4 · ਤਰੀਕਾ</div>
+<h2>ਭਾਜਪਾ ਸੂਬਿਆਂ ਵਿੱਚ ਕਿਵੇਂ ਦਾਖ਼ਲ ਹੁੰਦੀ ਹੈ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਤਰਤੀਬ ਹਰ ਥਾਂ ਇੱਕੋ ਜਿਹੀ: (1) ਖੇਤਰੀ ਪਾਰਟੀ ਦੇ ਮੋਢੇ ਚੜ੍ਹਨਾ (ਪੰਜਾਬ ਵਿੱਚ ਅਕਾਲੀ ਦਲ 1996–2020); (2) ਪਛਾਣ-ਵਿਸਤਾਰ — ਆਰ.ਐਸ.ਐਸ. ਨੈੱਟਵਰਕ, ਧਾਰਮਿਕ ਸਮਾਗਮ, ਲਾਭਾਰਥੀ ਭਲਾਈ, ਜਾਤੀ-ਇੰਜੀਨੀਅਰਿੰਗ (ਸ਼ਹਿਰੀ ਹਿੰਦੂ + ~32% ਦਲਿਤ + ਡੇਰੇ); (3) ਸਾਥੀ ਦੇ ਕਮਜ਼ੋਰ ਹੋਣ ਉੱਤੇ ਇਕੱਲੇ ਲੜਨਾ।</p>
+<p><span class="pill con">ਵਿਵਾਦਿਤ</span> "ਤਾਕਤ" ਵਾਲੇ ਸੰਦ ਜੋ ਵਿਰੋਧੀ ਦੋਸ਼ ਲਾਉਂਦੇ ਹਨ: ਦਲ-ਬਦਲੀ ਪਿੱਛੋਂ ਠੰਢੇ ਪੈਂਦੇ ਏਜੰਸੀ ਕੇਸ ("ਵਾਸ਼ਿੰਗ ਮਸ਼ੀਨ" ਦੋਸ਼), ਰਿਜ਼ੋਰਟ ਰਾਜਨੀਤੀ (ਮ.ਪ੍ਰ. 2020, ਮਹਾਰਾਸ਼ਟਰ 2022), ਰਾਜਪਾਲ ਦੀ ਵਰਤੋਂ। ਭਾਜਪਾ ਦਾ ਪੱਖ: ਏਜੰਸੀਆਂ ਸਬੂਤਾਂ ਉੱਤੇ ਚੱਲਦੀਆਂ ਹਨ। ਪੈਟਰਨ ਚੋਣਵੇਂਪਣ ਵੱਲ ਝੁਕਦਾ ਹੈ; ਹਦਾਇਤ ਦਾ ਕਾਨੂੰਨੀ ਸਬੂਤ ਜਨਤਕ ਨਹੀਂ।</p>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਪੰਜਾਬ ਵਿੱਚ "ਸ਼ਾਂਤ" ਸੰਦ ਹੀ ਮੁੱਖ ਰਹਿਣਗੇ — ਸਿੱਖ-ਬਹੁਗਿਣਤੀ ਸਰਹੱਦੀ ਸੂਬੇ ਵਿੱਚ ਤਿੱਖਾ ਧਰੁਵੀਕਰਨ ਖ਼ਤਰਨਾਕ ਹੈ ਤੇ 2020–21 ਨੇ ਪੰਜਾਬ ਨੂੰ ਲਾਮਬੰਦੀ ਸਿਖਾਈ ਹੈ। ਸਖ਼ਤ ਸੰਦ: ਏਜੰਸੀਆਂ ਰਾਹੀਂ ਵਿਰੋਧੀ ਮਾਲੀਏ/ਉਮੀਦਵਾਰਾਂ ਦੀ ਘਸਾਈ, ਚੋਣਾਂ ਪਿੱਛੋਂ ਆਜ਼ਾਦਾਂ ਦੀ ਖਿੱਚ, ਰਾਜਪਾਲ-ਵਿਧਾਨ ਸਭਾ ਟਕਰਾਅ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§4 · तरीक़ा</div>
+<h2>भाजपा राज्यों में कैसे प्रवेश करती है</h2>
+<p><span class="pill est">स्थापित</span> क्रम हर जगह एक-सा: (1) क्षेत्रीय दल के कंधे पर सवारी (पंजाब में अकाली दल 1996–2020); (2) पहचान-विस्तार — आरएसएस नेटवर्क, धार्मिक आयोजन, लाभार्थी कल्याण, जाति-इंजीनियरिंग (शहरी हिंदू + ~32% दलित + डेरे); (3) सहयोगी कमज़ोर होते ही अकेले लड़ना।</p>
+<p><span class="pill con">विवादित</span> "बल" वाले उपकरण जिनके आरोप विपक्ष लगाता है: दल-बदल के बाद ठंडे पड़ते एजेंसी केस ("वॉशिंग मशीन"), रिज़ॉर्ट राजनीति (म.प्र. 2020, महाराष्ट्र 2022), राज्यपाल का उपयोग। भाजपा का पक्ष: एजेंसियाँ सबूतों पर चलती हैं। पैटर्न चयनात्मकता की ओर झुकता है; निर्देश का क़ानूनी प्रमाण सार्वजनिक नहीं।</p>
+<p><span class="pill jud">लेखकीय राय</span> पंजाब में "शांत" उपकरण ही प्रमुख रहेंगे — सिख-बहुल सीमावर्ती राज्य में तीखा ध्रुवीकरण जोखिमभरा है और 2020–21 ने पंजाब को लामबंदी सिखाई है। कठोर उपकरण: एजेंसियों से विपक्षी वित्त/उम्मीदवारों का क्षरण, चुनाव-बाद निर्दलीयों का अवशोषण, राज्यपाल-विधानसभा टकराव।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§4 · طریقہ</div>
+<h2>بی جے پی ریاستوں میں کیسے داخل ہوتی ہے</h2>
+<p><span class="pill est">مستند</span> ترتیب ہر جگہ ایک سی: (1) علاقائی جماعت کے کندھے پر سواری (پنجاب میں اکالی دل 1996–2020)؛ (2) شناختی توسیع — آر ایس ایس نیٹ ورک، مذہبی تقریبات، مستفید فلاح، ذات انجینئرنگ (شہری ہندو + تقریباً 32٪ دلت + ڈیرے)؛ (3) اتحادی کمزور ہوتے ہی تنہا لڑنا۔</p>
+<p><span class="pill con">متنازع</span> "طاقت" والے اوزار جن کے الزامات اپوزیشن لگاتی ہے: انحراف کے بعد ٹھنڈے پڑتے ایجنسی مقدمات ("واشنگ مشین")، ریزورٹ سیاست (ایم پی 2020، مہاراشٹر 2022)، گورنر کا استعمال۔ بی جے پی کا موقف: ایجنسیاں شواہد پر چلتی ہیں۔ پیٹرن انتخابی پن کی طرف جھکتا ہے؛ ہدایت کا قانونی ثبوت عوامی نہیں۔</p>
+<p><span class="pill jud">مصنف کی رائے</span> پنجاب میں "پرامن" اوزار ہی غالب رہیں گے — سکھ اکثریتی سرحدی ریاست میں شدید پولرائزیشن خطرناک ہے اور 2020–21 نے پنجاب کو متحرک ہونا سکھایا ہے۔ سخت اوزار: ایجنسیوں سے حریف مالیات/امیدواروں کی گھسائی، انتخابات کے بعد آزادوں کا انجذاب، گورنر-اسمبلی ٹکراؤ۔</p>
+</div>
+</section>
+
+<!-- S5 AGENCIES -->
+<section class="sec" id="s5">
+<div class="lp" data-l="en">
+<div class="eyebrow">§5 · The agency question</div>
+<h2>Central machinery in Punjab: what is documented</h2>
+<p><span class="pill est">ESTABLISHED</span> Documented in Punjab, 2025–26: ED arrest of industries minister Sanjeev Arora (FEMA/remittance allegations via HSRL); raids on AAP RS MP Ashok Mittal 48 hours earlier; The Tribune counts ~16 Punjab political figures across parties under ED scanner. CM Mann calls it "murder of democracy"; AAP ministers allege an Operation-Lotus pressure campaign. Earlier: Kejriwal and Sisodia jailed in the excise case (both bailed; trial pending), Congress MLA Sukhpal Khaira arrested in a 2015 drugs case he calls vendetta.</p>
+<p><span class="pill est">ESTABLISHED</span> Context that cuts both ways: PMLA gives ED attachment and arrest powers with reversed bail burden; conviction rates in cases against politicians remain very low; the Supreme Court has repeatedly criticised ED's conduct and bail resistance. None of this proves innocence of any accused — corruption in Punjab politics is real across parties — but it does mean an arrest is not a verdict.</p>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> Expect agency tempo to rise as candidate lists firm up (Sept 2026–Jan 2027): summons timed to news cycles, attachment of campaign-relevant assets, and IT surveys on financiers. The democratic harm is less the individual case than the chilling of opposition fundraising and the conversion of investigations into defection leverage. Watch one tell above all: <strong>does a case go quiet after its subject switches sides?</strong></p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§5 · ਏਜੰਸੀਆਂ ਦਾ ਸਵਾਲ</div>
+<h2>ਪੰਜਾਬ ਵਿੱਚ ਕੇਂਦਰੀ ਮਸ਼ੀਨਰੀ: ਦਰਜ ਤੱਥ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> 2025–26: ਮੰਤਰੀ ਸੰਜੀਵ ਅਰੋੜਾ ਦੀ ਈ.ਡੀ. ਗ੍ਰਿਫ਼ਤਾਰੀ, ਐਮ.ਪੀ. ਅਸ਼ੋਕ ਮਿੱਤਲ ਉੱਤੇ ਛਾਪੇ, ~16 ਆਗੂ ਜਾਂਚ ਹੇਠ। ਮਾਨ ਇਸਨੂੰ "ਲੋਕਤੰਤਰ ਦਾ ਕਤਲ" ਕਹਿੰਦੇ ਹਨ; ਆਪ "ਆਪ੍ਰੇਸ਼ਨ ਲੋਟਸ" ਦਾ ਦੋਸ਼ ਲਾਉਂਦੀ ਹੈ। ਪਹਿਲਾਂ ਕੇਜਰੀਵਾਲ-ਸਿਸੋਦੀਆ ਆਬਕਾਰੀ ਕੇਸ ਵਿੱਚ ਜੇਲ੍ਹ ਗਏ (ਜ਼ਮਾਨਤ ਮਿਲੀ; ਮੁਕੱਦਮਾ ਜਾਰੀ); ਖਹਿਰਾ ਦੀ ਗ੍ਰਿਫ਼ਤਾਰੀ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਦੋਵੇਂ ਪਾਸੇ ਕੱਟਦਾ ਪ੍ਰਸੰਗ: ਪੀ.ਐਮ.ਐਲ.ਏ. ਵਿੱਚ ਜ਼ਮਾਨਤ ਦਾ ਉਲਟਾ ਬੋਝ; ਸਿਆਸੀ ਕੇਸਾਂ ਵਿੱਚ ਸਜ਼ਾ-ਦਰ ਬਹੁਤ ਘੱਟ; ਸੁਪਰੀਮ ਕੋਰਟ ਨੇ ਈ.ਡੀ. ਦੇ ਰਵੱਈਏ ਉੱਤੇ ਵਾਰ-ਵਾਰ ਟਿੱਪਣੀ ਕੀਤੀ। ਪਰ ਭ੍ਰਿਸ਼ਟਾਚਾਰ ਵੀ ਹਰ ਪਾਰਟੀ ਵਿੱਚ ਅਸਲੀ ਹੈ — ਗ੍ਰਿਫ਼ਤਾਰੀ ਫ਼ੈਸਲਾ ਨਹੀਂ ਹੁੰਦੀ।</p>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਉਮੀਦਵਾਰ ਸੂਚੀਆਂ ਪੱਕੀਆਂ ਹੁੰਦਿਆਂ (ਸਤੰ. 2026–ਜਨ. 2027) ਏਜੰਸੀ ਰਫ਼ਤਾਰ ਵਧੇਗੀ। ਸਭ ਤੋਂ ਵੱਡੀ ਨਿਸ਼ਾਨੀ ਇਹ ਵੇਖੋ: <strong>ਕੀ ਪਾਲਾ ਬਦਲਣ ਪਿੱਛੋਂ ਕੇਸ ਠੰਢਾ ਪੈ ਜਾਂਦਾ ਹੈ?</strong></p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§5 · एजेंसियों का सवाल</div>
+<h2>पंजाब में केंद्रीय मशीनरी: दर्ज तथ्य</h2>
+<p><span class="pill est">स्थापित</span> 2025–26: मंत्री संजीव अरोड़ा की ईडी गिरफ़्तारी, सांसद अशोक मित्तल पर छापे, ~16 नेता जाँच के घेरे में। मान इसे "लोकतंत्र की हत्या" कहते हैं; आप "ऑपरेशन लोटस" का आरोप लगाती है। पहले केजरीवाल-सिसोदिया आबकारी मामले में जेल गए (ज़मानत पर; मुक़दमा जारी); खैरा की गिरफ़्तारी।</p>
+<p><span class="pill est">स्थापित</span> दोनों ओर कटता संदर्भ: पीएमएलए में ज़मानत का उलटा बोझ; राजनीतिक मामलों में सज़ा-दर बहुत कम; सुप्रीम कोर्ट ने ईडी के आचरण पर बार-बार टिप्पणी की। पर भ्रष्टाचार भी हर दल में वास्तविक है — गिरफ़्तारी फ़ैसला नहीं होती।</p>
+<p><span class="pill jud">लेखकीय राय</span> उम्मीदवार सूचियाँ पक्की होते ही (सितं. 2026–जन. 2027) एजेंसी-गति बढ़ेगी। सबसे बड़ा संकेत: <strong>क्या पाला बदलने के बाद केस ठंडा पड़ जाता है?</strong></p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§5 · ایجنسیوں کا سوال</div>
+<h2>پنجاب میں مرکزی مشینری: درج حقائق</h2>
+<p><span class="pill est">مستند</span> 2025–26: وزیر سنجیو اروڑا کی ای ڈی گرفتاری، رکن پارلیمنٹ اشوک متل پر چھاپے، تقریباً 16 رہنما تفتیش کے دائرے میں۔ مان اسے "جمہوریت کا قتل" کہتے ہیں؛ عام آدمی پارٹی "آپریشن لوٹس" کا الزام لگاتی ہے۔ پہلے کیجریوال-سسودیا ایکسائز کیس میں جیل گئے (ضمانت پر؛ مقدمہ جاری)؛ کھیرا کی گرفتاری۔</p>
+<p><span class="pill est">مستند</span> دونوں طرف کٹتا سیاق: پی ایم ایل اے میں ضمانت کا الٹا بوجھ؛ سیاسی مقدمات میں سزا کی شرح بہت کم؛ سپریم کورٹ نے ای ڈی کے طرزِ عمل پر بار بار تنقید کی۔ مگر بدعنوانی بھی ہر جماعت میں حقیقی ہے — گرفتاری فیصلہ نہیں ہوتی۔</p>
+<p><span class="pill jud">مصنف کی رائے</span> امیدوار فہرستیں پکی ہوتے ہی (ستمبر 2026–جنوری 2027) ایجنسی رفتار بڑھے گی۔ سب سے بڑی علامت: <strong>کیا پالا بدلنے کے بعد مقدمہ ٹھنڈا پڑ جاتا ہے؟</strong></p>
+</div>
+</section>
+
+<!-- S6 WATCHLIST & DISRUPTORS -->
+<section class="sec" id="s6">
+<div class="lp" data-l="en">
+<div class="eyebrow">§6 · Watchlist</div>
+<h2>What the Punjab public should be watchful of</h2>
+<div class="note warn"><strong>The disruptor catalogue</strong> — vectors with Punjab precedent, all <span class="pill jud">AUTHOR'S JUDGMENT</span> as forward risks, with established history noted:</div>
+<ul>
+<li><strong>Sacrilege (beadbi) incidents.</strong> Punjab's most combustible trigger — Bargari 2015 still unresolved in public memory. Any beadbi wave near polling deserves cold forensic scrutiny before emotional response: ask who benefits from a panth-vs-state flare-up.</li>
+<li><strong>Communal micro-incidents</strong> amplified to split the Hindu (~38%) and Sikh (~58%) vote, and Dalit-vs-Jat framing aimed at the 32% SC electorate (India's highest share).</li>
+<li><strong>Drug-bust theatre vs drug policy.</strong> Seizure headlines spike before polls in every cycle; the supply chain (border heroin + pharma diversion) rarely shrinks. Judge by Punjab's own health-department de-addiction data, not press conferences.</li>
+<li><strong>Deepfakes &amp; WhatsApp-forward ops</strong> in Punjabi/Hindi, including fabricated Gurbani-context clips, fake jathedar statements, and diaspora-funded ad blitzes from abroad on Meta/Google (check ad libraries).</li>
+<li><strong>Booth-level games:</strong> the May 2026 civic polls already saw violence, stone-pelting and booth-capture allegations — under an AAP state government, which is a reminder that machinery abuse is a ruling-party temptation everywhere, not one party's monopoly.</li>
+<li><strong>Voter-roll churn:</strong> mass deletions/additions in tight urban seats. Verify your family's entries early at voters.eci.gov.in and after every revision.</li>
+<li><strong>Khalistan-bogey vs Khalistan-bait:</strong> both exist — exaggerated security framing to polarise Hindus, and genuine foreign-based actors (and possibly ISI-linked networks) who profit from unrest. Refuse both scripts.</li>
+<li><strong>Cash, liquor, and "MCC blindness":</strong> watch whether the Election Commission applies the Model Code symmetrically; document violations on video with timestamps and file on the cVIGIL app — it creates a public record.</li>
+</ul>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§6 · ਚੌਕਸੀ ਸੂਚੀ</div>
+<h2>ਪੰਜਾਬ ਦੇ ਲੋਕ ਕਿਸ ਤੋਂ ਚੌਕਸ ਰਹਿਣ</h2>
+<ul>
+<li><strong>ਬੇਅਦਬੀ ਦੀਆਂ ਘਟਨਾਵਾਂ</strong> — ਪੰਜਾਬ ਦਾ ਸਭ ਤੋਂ ਭੜਕਾਊ ਟ੍ਰਿਗਰ (ਬਰਗਾੜੀ 2015 ਅਜੇ ਵੀ ਅਣਸੁਲਝਿਆ ਜ਼ਖ਼ਮ)। ਚੋਣਾਂ ਨੇੜੇ ਕੋਈ ਵੀ ਲਹਿਰ ਆਵੇ — ਪਹਿਲਾਂ ਠੰਢੀ ਜਾਂਚ, ਫਿਰ ਪ੍ਰਤੀਕਿਰਿਆ; ਪੁੱਛੋ ਫ਼ਾਇਦਾ ਕਿਸਨੂੰ?</li>
+<li><strong>ਫ਼ਿਰਕੂ ਛੋਟੀਆਂ ਘਟਨਾਵਾਂ</strong> ਨੂੰ ਵਧਾ ਕੇ ਹਿੰਦੂ (~38%) ਤੇ ਸਿੱਖ (~58%) ਵੋਟ ਵੰਡਣਾ; ਦਲਿਤ-ਜੱਟ ਫ੍ਰੇਮਿੰਗ (32% ਅਨੁਸੂਚਿਤ ਜਾਤੀ — ਦੇਸ਼ ਵਿੱਚ ਸਭ ਤੋਂ ਵੱਧ)।</li>
+<li><strong>ਨਸ਼ਾ-ਫੜੋ ਨਾਟਕ ਬਨਾਮ ਨੀਤੀ</strong> — ਚੋਣਾਂ ਤੋਂ ਪਹਿਲਾਂ ਬਰਾਮਦਗੀਆਂ ਦੀਆਂ ਸੁਰਖ਼ੀਆਂ ਵਧਦੀਆਂ ਹਨ; ਸਪਲਾਈ ਚੇਨ ਘੱਟ ਹੀ ਟੁੱਟਦੀ ਹੈ।</li>
+<li><strong>ਡੀਪਫ਼ੇਕ ਤੇ ਵਟਸਐਪ ਫ਼ਾਰਵਰਡ</strong> — ਜਥੇਦਾਰਾਂ ਦੇ ਝੂਠੇ ਬਿਆਨ, ਗੁਰਬਾਣੀ ਦੇ ਤੋੜੇ-ਮਰੋੜੇ ਕਲਿੱਪ, ਵਿਦੇਸ਼ੋਂ ਫੰਡ ਹੋਈਆਂ ਇਸ਼ਤਿਹਾਰ ਮੁਹਿੰਮਾਂ।</li>
+<li><strong>ਬੂਥ ਪੱਧਰ ਦੀਆਂ ਖੇਡਾਂ</strong> — ਮਈ 2026 ਵਿੱਚ ਹੀ ਹਿੰਸਾ ਤੇ ਬੂਥ-ਕਬਜ਼ੇ ਦੇ ਦੋਸ਼ ਲੱਗੇ — ਆਪ ਸਰਕਾਰ ਹੇਠ; ਮਸ਼ੀਨਰੀ ਦੀ ਦੁਰਵਰਤੋਂ ਕਿਸੇ ਇੱਕ ਪਾਰਟੀ ਦੀ ਜਾਗੀਰ ਨਹੀਂ।</li>
+<li><strong>ਵੋਟਰ ਸੂਚੀ ਦੀ ਛਾਣਬੀਣ</strong> — voters.eci.gov.in ਉੱਤੇ ਆਪਣੇ ਪਰਿਵਾਰ ਦੀਆਂ ਐਂਟਰੀਆਂ ਪਹਿਲਾਂ ਹੀ ਜਾਂਚੋ।</li>
+<li><strong>ਖ਼ਾਲਿਸਤਾਨ-ਡਰਾਵਾ ਬਨਾਮ ਖ਼ਾਲਿਸਤਾਨ-ਚਾਰਾ</strong> — ਦੋਵੇਂ ਮੌਜੂਦ ਹਨ; ਦੋਵੇਂ ਸਕ੍ਰਿਪਟਾਂ ਠੁਕਰਾਓ।</li>
+<li><strong>ਨਕਦੀ-ਸ਼ਰਾਬ ਤੇ ਚੋਣ ਜ਼ਾਬਤੇ ਦੀ ਇੱਕਪਾਸੜ ਵਰਤੋਂ</strong> — ਉਲੰਘਣਾ ਵੇਖੋ ਤਾਂ cVIGIL ਐਪ ਉੱਤੇ ਟਾਈਮਸਟੈਂਪ ਵੀਡੀਓ ਨਾਲ ਦਰਜ ਕਰੋ।</li>
+</ul>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§6 · निगरानी सूची</div>
+<h2>पंजाब की जनता किससे सतर्क रहे</h2>
+<ul>
+<li><strong>बेअदबी की घटनाएँ</strong> — सबसे ज्वलनशील ट्रिगर (बरगाड़ी 2015 अब भी अनसुलझा घाव)। चुनाव के निकट कोई लहर आए — पहले ठंडी जाँच, फिर प्रतिक्रिया; पूछिए लाभ किसे?</li>
+<li><strong>सांप्रदायिक सूक्ष्म-घटनाओं</strong> को बढ़ाकर हिंदू (~38%) व सिख (~58%) वोट बाँटना; दलित-जाट फ़्रेमिंग (32% अनुसूचित जाति — देश में सर्वाधिक)।</li>
+<li><strong>ड्रग-बरामदगी का नाट्य बनाम नीति</strong> — चुनाव पूर्व सुर्ख़ियाँ बढ़ती हैं; आपूर्ति-शृंखला कम ही टूटती है।</li>
+<li><strong>डीपफ़ेक व व्हाट्सऐप फ़ॉरवर्ड</strong> — जत्थेदारों के झूठे बयान, संदर्भ से कटे क्लिप, विदेश से वित्तपोषित विज्ञापन अभियान।</li>
+<li><strong>बूथ-स्तरीय खेल</strong> — मई 2026 में ही हिंसा व बूथ-कब्ज़े के आरोप — आप सरकार के अधीन; मशीनरी-दुरुपयोग किसी एक दल की बपौती नहीं।</li>
+<li><strong>मतदाता सूची की जाँच</strong> — voters.eci.gov.in पर परिवार की प्रविष्टियाँ पहले से सत्यापित करें।</li>
+<li><strong>ख़ालिस्तान-हौवा बनाम ख़ालिस्तान-चारा</strong> — दोनों मौजूद; दोनों स्क्रिप्ट ठुकराएँ।</li>
+<li><strong>नक़दी-शराब व आचार संहिता की एकतरफ़ा सख़्ती</strong> — उल्लंघन दिखे तो cVIGIL ऐप पर टाइमस्टैम्प वीडियो सहित दर्ज करें।</li>
+</ul>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§6 · نگرانی فہرست</div>
+<h2>پنجاب کے عوام کس سے چوکس رہیں</h2>
+<ul>
+<li><strong>بے ادبی کے واقعات</strong> — سب سے بھڑکاؤ ٹرگر (برگاڑی 2015 اب بھی ان سلجھا زخم)۔ انتخابات کے قریب کوئی لہر آئے — پہلے ٹھنڈی تحقیق، پھر ردِعمل؛ پوچھیے فائدہ کسے؟</li>
+<li><strong>فرقہ وارانہ چھوٹے واقعات</strong> کو بڑھا کر ہندو (~38٪) اور سکھ (~58٪) ووٹ تقسیم کرنا؛ دلت-جاٹ فریمنگ (32٪ شیڈولڈ کاسٹ — ملک میں سب سے زیادہ)۔</li>
+<li><strong>منشیات برآمدگی کا ڈرامہ بمقابلہ پالیسی</strong> — انتخابات سے پہلے سرخیاں بڑھتی ہیں؛ سپلائی چین کم ہی ٹوٹتی ہے۔</li>
+<li><strong>ڈیپ فیک اور واٹس ایپ فارورڈ</strong> — جتھیداروں کے جھوٹے بیانات، سیاق سے کٹے کلپ، بیرونِ ملک سے مالی اعانت یافتہ اشتہاری مہمات۔</li>
+<li><strong>بوتھ سطح کے کھیل</strong> — مئی 2026 میں ہی تشدد اور بوتھ قبضے کے الزامات — عام آدمی پارٹی حکومت کے تحت؛ مشینری کا غلط استعمال کسی ایک جماعت کی جاگیر نہیں۔</li>
+<li><strong>ووٹر فہرست کی جانچ</strong> — voters.eci.gov.in پر خاندان کے اندراجات پہلے سے تصدیق کریں۔</li>
+<li><strong>خالصتان کا ہوّا بمقابلہ خالصتان کا چارہ</strong> — دونوں موجود؛ دونوں اسکرپٹ مسترد کریں۔</li>
+<li><strong>نقدی-شراب اور ضابطۂ اخلاق کی یکطرفہ سختی</strong> — خلاف ورزی دیکھیں تو cVIGIL ایپ پر ٹائم اسٹیمپ ویڈیو کے ساتھ درج کریں۔</li>
+</ul>
+</div>
+</section>
+
+<!-- S7 AAP/CONG -->
+<section class="sec" id="s7">
+<div class="lp" data-l="en">
+<div class="eyebrow">§7 · The opposition's counter</div>
+<h2>AAP and Congress vs the agency squeeze — and the alliance question</h2>
+<p><span class="pill est">ESTABLISHED</span> Their existing counter-strategies: AAP litigates aggressively (its leaders have won bail at the Supreme Court repeatedly, with judgments critical of ED practice), turns every arrest into a victimhood-mobilisation event ("ED party" is now standard AAP vocabulary in Punjab), and front-loads delivery — free power for ~90% households, Aam Aadmi Clinics, teacher recruitment — to make welfare the ballot question. Congress relies on its 2024 base (7 of 13 LS seats, 26%+ vote), strong urban second place in the civic polls, and Warring–Bajwa's anti-AAP positioning.</p>
+<p><span class="pill est">ESTABLISHED</span> Alliance probability: in Punjab, AAP and Congress have refused alliance at every opportunity — 2024 LS (fought separately despite both being INDIA members), and the state units' open hostility (Khaira's arrest by the AAP government, Overseas Congress opposition). They are each other's principal opponent: AAP's 2022 sweep came largely from ex-Congress voters.</p>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> Probability of a pre-poll AAP–Congress alliance: very low (&lt;10%). A post-poll arrangement in a hung assembly to block the BJP: plausible, with national INDIA-bloc logic doing the persuading. Paradoxically, a strong Congress helps the BJP's first-place-in-fragmentation math; a collapsed Congress helps AAP consolidate the anti-BJP vote. Voters who prioritise keeping any one bloc out should think in those terms seat-by-seat, not statewide.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§7 · ਵਿਰੋਧੀ ਧਿਰ ਦਾ ਜਵਾਬ</div>
+<h2>ਏਜੰਸੀ ਦਬਾਅ ਅੱਗੇ ਆਪ ਤੇ ਕਾਂਗਰਸ — ਅਤੇ ਗੱਠਜੋੜ ਦਾ ਸਵਾਲ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਆਪ ਦਾ ਤਰੀਕਾ: ਅਦਾਲਤੀ ਲੜਾਈ (ਸੁਪਰੀਮ ਕੋਰਟ ਤੋਂ ਵਾਰ-ਵਾਰ ਜ਼ਮਾਨਤਾਂ), ਹਰ ਗ੍ਰਿਫ਼ਤਾਰੀ ਨੂੰ ਪੀੜਤ-ਲਾਮਬੰਦੀ ਵਿੱਚ ਬਦਲਣਾ ("ED ਪਾਰਟੀ" ਹੁਣ ਆਮ ਸ਼ਬਦਾਵਲੀ), ਤੇ ਡਿਲੀਵਰੀ ਅੱਗੇ ਰੱਖਣਾ — ~90% ਘਰਾਂ ਦੇ ਜ਼ੀਰੋ ਬਿਜਲੀ ਬਿੱਲ, ਮੁਹੱਲਾ ਕਲੀਨਿਕ। ਕਾਂਗਰਸ ਕੋਲ 2024 ਦਾ ਆਧਾਰ (13 ਵਿੱਚੋਂ 7 ਸੀਟਾਂ) ਤੇ ਸ਼ਹਿਰੀ ਦੂਜਾ ਸਥਾਨ ਹੈ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਪੰਜਾਬ ਵਿੱਚ ਆਪ-ਕਾਂਗਰਸ ਨੇ ਹਰ ਮੌਕੇ ਗੱਠਜੋੜ ਠੁਕਰਾਇਆ ਹੈ — 2024 ਵਿੱਚ ਵੀ ਵੱਖ-ਵੱਖ ਲੜੇ; ਸੂਬਾਈ ਇਕਾਈਆਂ ਦੀ ਖੁੱਲ੍ਹੀ ਦੁਸ਼ਮਣੀ ਹੈ।</p>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਚੋਣਾਂ ਤੋਂ ਪਹਿਲਾਂ ਗੱਠਜੋੜ ਦੀ ਸੰਭਾਵਨਾ ਬਹੁਤ ਘੱਟ (&lt;10%); ਲਟਕਵੀਂ ਵਿਧਾਨ ਸਭਾ ਵਿੱਚ ਭਾਜਪਾ ਰੋਕਣ ਲਈ ਚੋਣਾਂ ਪਿੱਛੋਂ ਸਮਝੌਤਾ ਸੰਭਵ। ਵਿਰੋਧਾਭਾਸ: ਮਜ਼ਬੂਤ ਕਾਂਗਰਸ ਭਾਜਪਾ ਦੇ ਵੰਡ-ਗਣਿਤ ਨੂੰ ਫ਼ਾਇਦਾ ਦਿੰਦੀ ਹੈ। ਵੋਟਰ ਸੂਬਾ-ਪੱਧਰ ਨਹੀਂ, ਸੀਟ-ਦਰ-ਸੀਟ ਸੋਚਣ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§7 · विपक्ष का जवाब</div>
+<h2>एजेंसी दबाव के सामने आप व कांग्रेस — और गठबंधन का प्रश्न</h2>
+<p><span class="pill est">स्थापित</span> आप का तरीक़ा: आक्रामक मुक़दमेबाज़ी (सुप्रीम कोर्ट से बार-बार ज़मानतें), हर गिरफ़्तारी को पीड़ित-लामबंदी में बदलना ("ED पार्टी" अब सामान्य शब्दावली), और डिलीवरी आगे रखना — ~90% घरों के शून्य बिजली बिल, मोहल्ला क्लीनिक। कांग्रेस के पास 2024 का आधार (13 में से 7 सीटें) व शहरी दूसरा स्थान।</p>
+<p><span class="pill est">स्थापित</span> पंजाब में आप-कांग्रेस ने हर अवसर पर गठबंधन ठुकराया — 2024 में भी अलग-अलग लड़े; राज्य इकाइयों की खुली शत्रुता।</p>
+<p><span class="pill jud">लेखकीय राय</span> चुनाव-पूर्व गठबंधन की संभावना बहुत कम (&lt;10%); त्रिशंकु सदन में भाजपा रोकने हेतु चुनाव-बाद समझौता संभव। विरोधाभास: मज़बूत कांग्रेस भाजपा के विभाजन-गणित को लाभ देती है। मतदाता सीट-दर-सीट सोचें।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§7 · حزبِ اختلاف کا جواب</div>
+<h2>ایجنسی دباؤ کے سامنے عام آدمی پارٹی اور کانگریس — اور اتحاد کا سوال</h2>
+<p><span class="pill est">مستند</span> عام آدمی پارٹی کا طریقہ: جارحانہ مقدمہ بازی (سپریم کورٹ سے بار بار ضمانتیں)، ہر گرفتاری کو مظلومیت کی تحریک میں بدلنا ("ED پارٹی" اب عام اصطلاح)، اور کارکردگی آگے رکھنا — تقریباً 90٪ گھروں کے صفر بجلی بل، محلہ کلینک۔ کانگریس کے پاس 2024 کی بنیاد (13 میں سے 7 نشستیں) اور شہری دوسرا مقام۔</p>
+<p><span class="pill est">مستند</span> پنجاب میں دونوں نے ہر موقع پر اتحاد مسترد کیا — 2024 میں بھی الگ الگ لڑے؛ ریاستی اکائیوں کی کھلی دشمنی۔</p>
+<p><span class="pill jud">مصنف کی رائے</span> انتخابات سے پہلے اتحاد کا امکان بہت کم (&lt;10٪)؛ معلق اسمبلی میں بی جے پی روکنے کے لیے بعد از انتخابات بندوبست ممکن۔ تضاد: مضبوط کانگریس بی جے پی کے تقسیم-حساب کو فائدہ دیتی ہے۔ ووٹر نشست بہ نشست سوچیں۔</p>
+</div>
+</section>
+
+<!-- S8 OTHER FORCES -->
+<section class="sec" id="s8">
+<div class="lp" data-l="en">
+<div class="eyebrow">§8 · The rest of the board</div>
+<h2>Other powers in play</h2>
+<p><span class="pill est">ESTABLISHED</span> <strong>SAD:</strong> reduced to 3 seats (2022), 1 LS seat (2024), 192 civic wards — but its rural sangat network and SGPC control remain assets no rival has replicated. The Sukhbir-vs-Takht confrontation is existential: a party built on panthic legitimacy is in open friction with the institution that confers it. <strong>Akali Dal (Waris Punjab De):</strong> Amritpal Singh (Khadoor Sahib MP, in NSA detention) and Sarabjit Singh Khalsa (Faridkot MP) proved in 2024 that the radical-panthic vote is real and seat-winning in the Majha–Malwa belt; their assembly play will fragment the panthic vote further — which arithmetically can help BJP or AAP depending on the seat. <strong>Giani Harpreet Singh's faction</strong> adds another Akali splinter with an SC-community leadership first.</p>
+<p><span class="pill est">ESTABLISHED</span> <strong>Farm unions:</strong> SKM, SKM (Non-Political) and KMM are not electoral parties (the 2022 SSM experiment failed badly) but they are Punjab's most powerful veto force — capable of shutting highways and rail. After the March 2025 Punjab Police clearance of Shambhu/Khanauri (350+ arrests, Dallewal among detainees), unions are estranged from AAP and the Centre simultaneously; their pre-poll posture (boycott BJP villages? punish AAP?) will move rural margins. <strong>BSP</strong> retains pockets in Doaba; the <strong>Left</strong> survives in union form; <strong>deras</strong> (Sacha Sauda's political wing history, Ballan, Nirankari, Radha Soami's apolitical mass) quietly broker bloc votes — every party courts them.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§8 · ਬਾਕੀ ਮੋਹਰੇ</div>
+<h2>ਮੈਦਾਨ ਵਿਚਲੀਆਂ ਹੋਰ ਤਾਕਤਾਂ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਅਕਾਲੀ ਦਲ:</strong> 2022 ਵਿੱਚ 3 ਸੀਟਾਂ, 2024 ਵਿੱਚ 1, ਪਰ ਪੇਂਡੂ ਸੰਗਤ-ਨੈੱਟਵਰਕ ਤੇ ਸ਼੍ਰੋਮਣੀ ਕਮੇਟੀ ਉੱਤੇ ਕੰਟਰੋਲ ਅਜੇ ਵੀ ਪੂੰਜੀ ਹੈ। ਸੁਖਬੀਰ-ਤਖ਼ਤ ਟਕਰਾਅ ਹੋਂਦ ਦਾ ਸਵਾਲ ਹੈ। <strong>ਅਕਾਲੀ ਦਲ (ਵਾਰਿਸ ਪੰਜਾਬ ਦੇ):</strong> ਅੰਮ੍ਰਿਤਪਾਲ ਸਿੰਘ ਤੇ ਸਰਬਜੀਤ ਸਿੰਘ ਖ਼ਾਲਸਾ ਨੇ 2024 ਵਿੱਚ ਸਾਬਤ ਕੀਤਾ ਕਿ ਪੰਥਕ-ਰੈਡੀਕਲ ਵੋਟ ਸੀਟਾਂ ਜਿੱਤ ਸਕਦੀ ਹੈ; ਵਿਧਾਨ ਸਭਾ ਵਿੱਚ ਇਹ ਪੰਥਕ ਵੋਟ ਨੂੰ ਹੋਰ ਵੰਡੇਗੀ। ਗਿਆਨੀ ਹਰਪ੍ਰੀਤ ਸਿੰਘ ਦਾ ਧੜਾ ਵੀ ਮੈਦਾਨ ਵਿੱਚ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਕਿਸਾਨ ਜਥੇਬੰਦੀਆਂ:</strong> ਚੋਣ ਪਾਰਟੀਆਂ ਨਹੀਂ (2022 ਦਾ ਤਜਰਬਾ ਫੇਲ੍ਹ) ਪਰ ਪੰਜਾਬ ਦੀ ਸਭ ਤੋਂ ਤਾਕਤਵਰ ਵੀਟੋ-ਸ਼ਕਤੀ। ਮਾਰਚ 2025 ਦੀ ਸ਼ੰਭੂ-ਖਨੌਰੀ ਕਾਰਵਾਈ (350+ ਗ੍ਰਿਫ਼ਤਾਰੀਆਂ) ਪਿੱਛੋਂ ਉਹ ਆਪ ਤੇ ਕੇਂਦਰ ਦੋਹਾਂ ਤੋਂ ਦੂਰ ਹਨ; ਉਨ੍ਹਾਂ ਦਾ ਰੁਖ਼ ਪੇਂਡੂ ਨਤੀਜੇ ਹਿਲਾਏਗਾ। <strong>ਬਸਪਾ</strong> ਦੁਆਬੇ ਵਿੱਚ, <strong>ਡੇਰੇ</strong> ਚੁੱਪ-ਚਾਪ ਬਲਾਕ-ਵੋਟ ਦੇ ਦਲਾਲ — ਹਰ ਪਾਰਟੀ ਇਨ੍ਹਾਂ ਦੇ ਦਰ ਜਾਂਦੀ ਹੈ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§8 · शेष मोहरे</div>
+<h2>मैदान की अन्य शक्तियाँ</h2>
+<p><span class="pill est">स्थापित</span> <strong>अकाली दल:</strong> 2022 में 3 सीटें, 2024 में 1, पर ग्रामीण संगत-नेटवर्क व एसजीपीसी नियंत्रण अब भी पूँजी। सुखबीर-तख़्त टकराव अस्तित्व का प्रश्न। <strong>अकाली दल (वारिस पंजाब दे):</strong> अमृतपाल व सरबजीत खालसा ने 2024 में सिद्ध किया कि पंथक-रैडिकल वोट सीटें जीत सकता है; विधानसभा में यह पंथक वोट को और बाँटेगा। ज्ञानी हरप्रीत सिंह का धड़ा भी मैदान में।</p>
+<p><span class="pill est">स्थापित</span> <strong>किसान संगठन:</strong> चुनावी दल नहीं, पर पंजाब की सबसे शक्तिशाली वीटो-शक्ति। मार्च 2025 की शंभू-खनौरी कार्रवाई (350+ गिरफ़्तारियाँ) के बाद वे आप व केंद्र दोनों से विमुख; उनका रुख़ ग्रामीण नतीजे हिलाएगा। <strong>बसपा</strong> दोआबा में, <strong>डेरे</strong> चुपचाप ब्लॉक-वोट के मध्यस्थ — हर दल इनके द्वार जाता है।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§8 · باقی مہرے</div>
+<h2>میدان کی دیگر قوتیں</h2>
+<p><span class="pill est">مستند</span> <strong>اکالی دل:</strong> 2022 میں 3 نشستیں، 2024 میں 1، مگر دیہی سنگت نیٹ ورک اور ایس جی پی سی پر کنٹرول اب بھی سرمایہ۔ سکھبیر-تخت ٹکراؤ وجودی سوال۔ <strong>اکالی دل (وارث پنجاب دے):</strong> امرت پال اور سربجیت خالصہ نے 2024 میں ثابت کیا کہ پنتھک-ریڈیکل ووٹ نشستیں جیت سکتا ہے؛ اسمبلی میں یہ پنتھک ووٹ کو مزید تقسیم کرے گا۔ گیانی ہرپریت سنگھ کا دھڑا بھی میدان میں۔</p>
+<p><span class="pill est">مستند</span> <strong>کسان تنظیمیں:</strong> انتخابی جماعتیں نہیں، مگر پنجاب کی سب سے طاقتور ویٹو قوت۔ مارچ 2025 کے شمبھو-کھنوری آپریشن (350+ گرفتاریاں) کے بعد وہ عام آدمی پارٹی اور مرکز دونوں سے بیزار؛ ان کا رویہ دیہی نتائج ہلائے گا۔ <strong>بی ایس پی</strong> دوآبہ میں، <strong>ڈیرے</strong> خاموشی سے بلاک ووٹ کے ثالث — ہر جماعت ان کے در جاتی ہے۔</p>
+</div>
+</section>
+
+<!-- S9 PANTH -->
+<section class="sec" id="s9">
+<div class="lp" data-l="en">
+<div class="eyebrow">§9 · The Panth's institutions</div>
+<h2>Akal Takht, SGPC, jathedars, Nihang dals</h2>
+<p><span class="pill est">ESTABLISHED</span> The Akal Takht is itself in a legitimacy dispute: Giani Kuldeep Singh Gargaj has been officiating jathedar since March 2025 (also Jathedar, Takht Kesgarh Sahib), appointed by the SAD-controlled SGPC after Giani Raghbir Singh's removal — while Bhai Dhian Singh Mand still claims the office from the 2015 Sarbat Khalsa line. Gargaj has signalled independence: attending SAD (Amritsar)'s foundation day with a message of Akali unity, and public friction with the Punjab government has been reported. The deeper structural issue: <strong>jathedars are appointed and removable by the SGPC executive</strong>, which the Badal-led SAD controls — so the Takht's moral authority and a party's institutional control sit in permanent tension. SGPC general elections (long overdue, last held 2011) would be the real reset; an all-India Sikh body and Haryana's separate committee add further contestation.</p>
+<p><span class="pill est">ESTABLISHED</span> <strong>Nihang Singh jathebandian / Dal Panth:</strong> Budha Dal (96 Crori traditions, Jathedar Baba Balbir Singh's succession itself contested after Baba Surjit Singh), Tarna Dal (Harian Velan and Baba Bakala wings) and smaller dals carry deep rural reverence and guard maryada at key asthans. They are not electoral machines, but their stance on beadbi, Bandi Singh and maryada disputes shapes the panthic mood, and parties court their fateh. <span class="pill jud">AUTHOR'S JUDGMENT</span> Watch three things between now and the polls: who the SGPC house elects as its president in November; whether a permanent (not officiating) Akal Takht jathedar is installed and by what process; and whether any government — Centre or state — is seen to touch gurdwara affairs. Each is a potential detonator or unifier.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§9 · ਪੰਥਕ ਸੰਸਥਾਵਾਂ</div>
+<h2>ਅਕਾਲ ਤਖ਼ਤ, ਸ਼੍ਰੋਮਣੀ ਕਮੇਟੀ, ਜਥੇਦਾਰ, ਨਿਹੰਗ ਦਲ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> ਅਕਾਲ ਤਖ਼ਤ ਖ਼ੁਦ ਵੈਧਤਾ-ਵਿਵਾਦ ਵਿੱਚ ਹੈ: ਗਿਆਨੀ ਕੁਲਦੀਪ ਸਿੰਘ ਗੜਗੱਜ ਮਾਰਚ 2025 ਤੋਂ ਕਾਰਜਕਾਰੀ ਜਥੇਦਾਰ ਹਨ (ਨਾਲੇ ਤਖ਼ਤ ਕੇਸਗੜ੍ਹ ਸਾਹਿਬ ਦੇ ਜਥੇਦਾਰ); ਗਿਆਨੀ ਰਘਬੀਰ ਸਿੰਘ ਨੂੰ ਹਟਾ ਕੇ ਨਿਯੁਕਤੀ ਅਕਾਲੀ-ਕੰਟਰੋਲ ਵਾਲੀ ਸ਼੍ਰੋਮਣੀ ਕਮੇਟੀ ਨੇ ਕੀਤੀ; ਉਧਰ ਭਾਈ ਧਿਆਨ ਸਿੰਘ ਮੰਡ 2015 ਸਰਬੱਤ ਖ਼ਾਲਸਾ ਵੱਲੋਂ ਦਾਅਵੇਦਾਰ ਹਨ। ਗੜਗੱਜ ਨੇ ਆਜ਼ਾਦ ਰੁਖ਼ ਵਿਖਾਇਆ ਹੈ — ਅਕਾਲੀ ਏਕਤਾ ਦਾ ਸੁਨੇਹਾ ਲੈ ਕੇ ਮਾਨ ਦਲ ਦੇ ਸਮਾਗਮ ਵਿੱਚ ਸ਼ਮੂਲੀਅਤ। ਮੂਲ ਢਾਂਚਾਗਤ ਮਸਲਾ: <strong>ਜਥੇਦਾਰ ਸ਼੍ਰੋਮਣੀ ਕਮੇਟੀ ਦੀ ਕਾਰਜਕਾਰਨੀ ਵੱਲੋਂ ਲਾਏ-ਹਟਾਏ ਜਾਂਦੇ ਹਨ</strong> — ਤਖ਼ਤ ਦੀ ਆਤਮਿਕ ਪ੍ਰਭੁਤਾ ਤੇ ਪਾਰਟੀ-ਕੰਟਰੋਲ ਵਿੱਚ ਪੱਕਾ ਤਣਾਅ। ਅਸਲ ਹੱਲ ਸ਼੍ਰੋਮਣੀ ਕਮੇਟੀ ਦੀਆਂ ਆਮ ਚੋਣਾਂ ਹਨ (ਆਖ਼ਰੀ ਵਾਰ 2011)।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਨਿਹੰਗ ਜਥੇਬੰਦੀਆਂ/ਦਲ ਪੰਥ:</strong> ਬੁੱਢਾ ਦਲ (96 ਕਰੋੜੀ ਰਵਾਇਤ; ਗੱਦੀ ਦਾ ਵਿਵਾਦ ਵੀ ਰਿਹਾ), ਤਰਨਾ ਦਲ (ਹਰੀਆਂ ਵੇਲਾਂ, ਬਾਬਾ ਬਕਾਲਾ) — ਪੇਂਡੂ ਸ਼ਰਧਾ ਡੂੰਘੀ; ਚੋਣ-ਮਸ਼ੀਨ ਨਹੀਂ ਪਰ ਬੇਅਦਬੀ, ਬੰਦੀ ਸਿੰਘ ਤੇ ਮਰਿਆਦਾ ਮਸਲਿਆਂ ਉੱਤੇ ਇਨ੍ਹਾਂ ਦਾ ਰੁਖ਼ ਪੰਥਕ ਮਾਹੌਲ ਘੜਦਾ ਹੈ। <span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਤਿੰਨ ਗੱਲਾਂ ਵੇਖੋ: ਨਵੰਬਰ ਵਿੱਚ ਸ਼੍ਰੋਮਣੀ ਕਮੇਟੀ ਪ੍ਰਧਾਨ ਕੌਣ; ਪੱਕਾ ਜਥੇਦਾਰ ਕਿਵੇਂ ਥਾਪਿਆ ਜਾਂਦਾ ਹੈ; ਤੇ ਕੀ ਕੋਈ ਸਰਕਾਰ ਗੁਰਦੁਆਰਾ ਮਾਮਲਿਆਂ ਨੂੰ ਛੇੜਦੀ ਦਿਸਦੀ ਹੈ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§9 · पंथक संस्थाएँ</div>
+<h2>अकाल तख़्त, एसजीपीसी, जत्थेदार, निहंग दल</h2>
+<p><span class="pill est">स्थापित</span> अकाल तख़्त स्वयं वैधता-विवाद में: ज्ञानी कुलदीप सिंह गड़गज मार्च 2025 से कार्यवाहक जत्थेदार (तख़्त केसगढ़ साहिब के जत्थेदार भी); नियुक्ति अकाली-नियंत्रित एसजीपीसी ने की; उधर भाई धियान सिंह मंड 2015 सरबत ख़ालसा से दावेदार। गड़गज ने स्वतंत्र रुख़ दिखाया है। मूल संरचनात्मक समस्या: <strong>जत्थेदार एसजीपीसी कार्यकारिणी द्वारा नियुक्त-पदच्युत होते हैं</strong> — तख़्त की नैतिक सत्ता और दलीय नियंत्रण में स्थायी तनाव। वास्तविक समाधान एसजीपीसी आम चुनाव (अंतिम बार 2011)।</p>
+<p><span class="pill est">स्थापित</span> <strong>निहंग जत्थेबंदियाँ/दल पंथ:</strong> बुड्ढा दल, तरना दल (हरियाँ वेलाँ, बाबा बकाला) — गहरी ग्रामीण श्रद्धा; चुनावी मशीन नहीं पर बेअदबी, बंदी सिंह व मर्यादा मुद्दों पर इनका रुख़ पंथक माहौल गढ़ता है। <span class="pill jud">लेखकीय राय</span> तीन बातें देखें: नवंबर में एसजीपीसी अध्यक्ष कौन; स्थायी जत्थेदार किस प्रक्रिया से; और क्या कोई सरकार गुरुद्वारा मामलों को छेड़ती दिखती है।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§9 · پنتھک ادارے</div>
+<h2>اکال تخت، ایس جی پی سی، جتھیدار، نہنگ دل</h2>
+<p><span class="pill est">مستند</span> اکال تخت خود جواز کے تنازع میں: گیانی کلدیپ سنگھ گڑگج مارچ 2025 سے قائم مقام جتھیدار (تخت کیس گڑھ صاحب کے جتھیدار بھی)؛ تقرری اکالی کنٹرول والی ایس جی پی سی نے کی؛ ادھر بھائی دھیان سنگھ منڈ 2015 سربت خالصہ سے دعویدار۔ بنیادی ساختی مسئلہ: <strong>جتھیدار ایس جی پی سی ایگزیکٹو کے ذریعے مقرر اور معزول ہوتے ہیں</strong> — تخت کی اخلاقی حاکمیت اور جماعتی کنٹرول میں مستقل تناؤ۔ اصل حل ایس جی پی سی کے عام انتخابات (آخری بار 2011)۔</p>
+<p><span class="pill est">مستند</span> <strong>نہنگ جتھے بندیاں/دل پنتھ:</strong> بڈھا دل، ترنا دل (ہریاں ویلاں، بابا بکالا) — گہری دیہی عقیدت؛ انتخابی مشین نہیں مگر بے ادبی، بندی سنگھ اور مریادا کے مسائل پر ان کا رویہ پنتھک ماحول بناتا ہے۔ <span class="pill jud">مصنف کی رائے</span> تین باتیں دیکھیں: نومبر میں ایس جی پی سی صدر کون؛ مستقل جتھیدار کس عمل سے؛ اور کیا کوئی حکومت گردوارہ امور کو چھیڑتی نظر آتی ہے۔</p>
+</div>
+</section>
+
+<!-- S10 INTERNATIONAL -->
+<section class="sec" id="s10">
+<div class="lp" data-l="en">
+<div class="eyebrow">§10 · The world in Punjab</div>
+<h2>Pakistan, the diaspora, and foreign hands</h2>
+<p><span class="pill est">ESTABLISHED</span> <strong>Pakistan:</strong> the 553-km border is the heroin and weapons artery; drone drops of narcotics and arms are routine BSF reportage. Indian agencies attribute gangster–terror networks (Rinda-type modules) to ISI patronage; Pakistan denies. Kartarpur remains the one open channel of devotional contact. Any India–Pakistan escalation instantly militarises Punjab's politics and economy (border farming, Attari trade — suspended since 2019/2025 tensions).</p>
+<p><span class="pill est">ESTABLISHED</span> <strong>Canada:</strong> the Nijjar killing (18 June 2023) triggered the worst rupture in relations — RCMP allegations of Indian official involvement in violence networks, mutual expulsion of High Commissioners (Oct 2024) — followed by a thaw under PM Carney: Modi–Carney at the G7 in Kananaskis (June 2025), High Commissioners restored 29 August 2025, staffing normalisation continuing into 2026, trade talks revived. The Nijjar murder trial and the US case over the alleged Pannun plot remain live landmines. <strong>US/UK/Australia/NZ/Europe:</strong> host the gurdwara-centred political economy of the diaspora — roughly 2–3 million strong — which shapes Punjab through remittances (Punjab is a top remittance state), NRI sabhas adopting villages, hawala-and-legal campaign money (every party fundraises in Surrey, Brampton, Southall, Yuba City, Melbourne), referendum politics (SFJ's symbolic votes), and media ecosystems whose YouTube channels often out-rate Punjab's TV news inside Punjab. <strong>Gulf/Saudi:</strong> labour remittances and, for Malerkotla and Muslim Punjabis, religious links; minimal political leverage.</p>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> Net effect of the diaspora: economically stabilising, politically amplifying, ideologically polarising — it funds hospitals and it funds maximalism, sometimes from the same postal code. For 2027, expect diaspora money and content on all sides; FCRA and ECI ad-transparency rules will be tested far more than enforced.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§10 · ਪੰਜਾਬ ਵਿੱਚ ਦੁਨੀਆ</div>
+<h2>ਪਾਕਿਸਤਾਨ, ਪਰਵਾਸੀ ਸਿੱਖ ਤੇ ਬਾਹਰੀ ਹੱਥ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਪਾਕਿਸਤਾਨ:</strong> 553 ਕਿ.ਮੀ. ਸਰਹੱਦ ਹੈਰੋਇਨ ਤੇ ਹਥਿਆਰਾਂ ਦੀ ਨਾੜੀ; ਡਰੋਨ ਡ੍ਰਾਪ ਰੋਜ਼ਮੱਰਾ। ਏਜੰਸੀਆਂ ਗੈਂਗਸਟਰ-ਦਹਿਸ਼ਤ ਨੈੱਟਵਰਕ ISI ਨਾਲ ਜੋੜਦੀਆਂ ਹਨ; ਪਾਕਿਸਤਾਨ ਇਨਕਾਰੀ। ਕਰਤਾਰਪੁਰ ਲਾਂਘਾ ਇੱਕੋ-ਇੱਕ ਖੁੱਲ੍ਹਾ ਸ਼ਰਧਾ-ਰਾਹ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਕੈਨੇਡਾ:</strong> ਨਿੱਝਰ ਕਤਲ (18 ਜੂਨ 2023) ਨੇ ਰਿਸ਼ਤੇ ਤੋੜੇ — ਹਾਈ ਕਮਿਸ਼ਨਰ ਕੱਢੇ ਗਏ (ਅਕਤੂਬਰ 2024); ਫਿਰ ਕਾਰਨੀ ਰਾਜ ਵਿੱਚ ਸੁਲ੍ਹਾ: G7 ਕਨਾਨਾਸਕਿਸ ਜੂਨ 2025, ਹਾਈ ਕਮਿਸ਼ਨਰ 29 ਅਗਸਤ 2025 ਨੂੰ ਬਹਾਲ। ਨਿੱਝਰ ਮੁਕੱਦਮਾ ਤੇ ਪੰਨੂ-ਸਾਜ਼ਿਸ਼ ਕੇਸ ਜ਼ਿੰਦਾ ਬਾਰੂਦ ਹਨ। <strong>ਅਮਰੀਕਾ/ਯੂ.ਕੇ./ਆਸਟ੍ਰੇਲੀਆ/ਨਿਊਜ਼ੀਲੈਂਡ/ਯੂਰਪ:</strong> ~20-30 ਲੱਖ ਦੀ ਡਾਇਸਪੋਰਾ ਪੰਜਾਬ ਨੂੰ ਘੜਦੀ ਹੈ — ਰੈਮਿਟੈਂਸ, ਪਿੰਡ ਗੋਦ ਲੈਣ ਵਾਲੀਆਂ ਸਭਾਵਾਂ, ਚੋਣ-ਫੰਡ (ਹਰ ਪਾਰਟੀ ਸਰੀ-ਬਰੈਂਪਟਨ-ਸਾਊਥਹਾਲ ਵਿੱਚ ਫੰਡ ਇਕੱਠਾ ਕਰਦੀ ਹੈ), ਰੈਫਰੰਡਮ ਰਾਜਨੀਤੀ, ਤੇ ਯੂਟਿਊਬ ਮੀਡੀਆ ਜੋ ਪੰਜਾਬ ਅੰਦਰ ਟੀ.ਵੀ. ਤੋਂ ਵੱਧ ਵੇਖਿਆ ਜਾਂਦਾ ਹੈ। <strong>ਖਾੜੀ/ਸਾਊਦੀ:</strong> ਕਿਰਤ-ਰੈਮਿਟੈਂਸ; ਸਿਆਸੀ ਅਸਰ ਘੱਟ।</p>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਡਾਇਸਪੋਰਾ ਆਰਥਿਕ ਤੌਰ ਉੱਤੇ ਸਹਾਰਾ, ਸਿਆਸੀ ਤੌਰ ਉੱਤੇ ਲਾਊਡਸਪੀਕਰ, ਵਿਚਾਰਧਾਰਕ ਤੌਰ ਉੱਤੇ ਧਰੁਵੀਕਰਨ ਕਰਨ ਵਾਲੀ — ਉਹੀ ਮੁਹੱਲਾ ਹਸਪਤਾਲ ਵੀ ਫੰਡ ਕਰਦਾ ਹੈ ਤੇ ਅਤਿਵਾਦ ਵੀ। 2027 ਵਿੱਚ ਹਰ ਧਿਰ ਲਈ ਵਿਦੇਸ਼ੀ ਪੈਸਾ ਤੇ ਕੰਟੈਂਟ ਆਵੇਗਾ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§10 · पंजाब में दुनिया</div>
+<h2>पाकिस्तान, प्रवासी सिख और बाहरी हाथ</h2>
+<p><span class="pill est">स्थापित</span> <strong>पाकिस्तान:</strong> 553 किमी सीमा हेरोइन-हथियारों की धमनी; ड्रोन ड्रॉप नियमित। एजेंसियाँ गैंगस्टर-आतंक नेटवर्क को आईएसआई से जोड़ती हैं; पाकिस्तान इनकार करता है। करतारपुर एकमात्र खुला श्रद्धा-मार्ग।</p>
+<p><span class="pill est">स्थापित</span> <strong>कनाडा:</strong> निज्जर हत्या (18 जून 2023) से संबंध टूटे — उच्चायुक्त निष्कासित (अक्टू. 2024); फिर कार्नी-काल में सुलह: G7 कनानास्किस जून 2025, उच्चायुक्त 29 अगस्त 2025 को बहाल। निज्जर मुक़दमा व पन्नू-षड्यंत्र केस जीवित बारूद। <strong>यूएस/यूके/ऑस्ट्रेलिया/एनज़ी/यूरोप:</strong> ~20–30 लाख की डायस्पोरा पंजाब को गढ़ती है — रेमिटेंस, गाँव गोद लेने वाली सभाएँ, चुनावी चंदा (हर दल सरे-ब्रैम्पटन-साउथहॉल में जुटाता है), रेफ़रेंडम राजनीति, और यूट्यूब मीडिया जो पंजाब के भीतर टीवी से अधिक देखा जाता है। <strong>खाड़ी/सऊदी:</strong> श्रम-रेमिटेंस; राजनीतिक प्रभाव न्यून।</p>
+<p><span class="pill jud">लेखकीय राय</span> डायस्पोरा आर्थिक रूप से सहारा, राजनीतिक रूप से लाउडस्पीकर, वैचारिक रूप से ध्रुवीकारक — वही मोहल्ला अस्पताल भी फंड करता है और अतिवाद भी। 2027 में हर पक्ष के लिए विदेशी धन व कंटेंट आएगा।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§10 · پنجاب میں دنیا</div>
+<h2>پاکستان، بیرونِ ملک سکھ اور بیرونی ہاتھ</h2>
+<p><span class="pill est">مستند</span> <strong>پاکستان:</strong> 553 کلومیٹر سرحد ہیروئن اور ہتھیاروں کی شریان؛ ڈرون ڈراپ معمول۔ بھارتی ایجنسیاں گینگسٹر-دہشت نیٹ ورک کو آئی ایس آئی سے جوڑتی ہیں؛ پاکستان انکار کرتا ہے۔ کرتارپور واحد کھلا عقیدت کا راستہ۔</p>
+<p><span class="pill est">مستند</span> <strong>کینیڈا:</strong> نجر قتل (18 جون 2023) سے تعلقات ٹوٹے — ہائی کمشنر نکالے گئے (اکتوبر 2024)؛ پھر کارنی دور میں صلح: G7 کناناسکس جون 2025، ہائی کمشنر 29 اگست 2025 کو بحال۔ نجر مقدمہ اور پنوں سازش کیس زندہ بارود۔ <strong>امریکہ/برطانیہ/آسٹریلیا/نیوزی لینڈ/یورپ:</strong> تقریباً 20–30 لاکھ کی ڈائاسپورا پنجاب کو تشکیل دیتی ہے — ترسیلات، گاؤں گود لینے والی سبھائیں، انتخابی چندہ، ریفرنڈم سیاست، اور یوٹیوب میڈیا جو پنجاب کے اندر ٹی وی سے زیادہ دیکھا جاتا ہے۔ <strong>خلیج/سعودی:</strong> محنت کی ترسیلات؛ سیاسی اثر کم۔</p>
+<p><span class="pill jud">مصنف کی رائے</span> ڈائاسپورا معاشی طور پر سہارا، سیاسی طور پر لاؤڈ اسپیکر، نظریاتی طور پر پولرائز کرنے والی — وہی محلہ ہسپتال بھی فنڈ کرتا ہے اور انتہا پسندی بھی۔ 2027 میں ہر فریق کے لیے بیرونی پیسہ اور مواد آئے گا۔</p>
+</div>
+</section>
+
+<!-- S11 CORE ISSUES -->
+<section class="sec" id="s11">
+<div class="lp" data-l="en">
+<div class="eyebrow">§11 · The real ballot questions</div>
+<h2>Punjab's structural crises — the issues under the noise</h2>
+<p><span class="pill est">ESTABLISHED</span> <strong>Debt.</strong> Outstanding liabilities: ~₹2.1 lakh crore (2017) → ~₹2.7 lakh crore (2022) → projected ~₹4.48 lakh crore by 2027 — roughly 45% of GSDP against Haryana's 26–28%. Interest alone in 2026-27: ₹28,755 crore, ~23% of revenue receipts; total debt servicing exceeds ₹42,000 crore. The power subsidy (₹15,550 crore budgeted, ~90% households on zero bills) plus old-pension and procurement liabilities crowd out capital spending. Every party's freebie promise must be read against this arithmetic.</p>
+<p><span class="pill est">ESTABLISHED</span> <strong>Agriculture &amp; water.</strong> The wheat–paddy MSP cycle has mined the aquifer — most development blocks are over-exploited, water tables falling ~0.5m/year in central Punjab. Diversification fails without an MSP-equivalent assurance on alternatives (maize, pulses, kinnow, dairy). The MSP legal-guarantee standoff (Dallewal's fast since 26 Nov 2024; NPFAM rejection) is therefore not a protest story — it is THE structural economic question.</p>
+<p><span class="pill est">ESTABLISHED</span> <strong>Drugs.</strong> Border heroin plus pharmaceutical diversion; seizures rise, addiction persists; de-addiction infrastructure (OOAT clinics) understaffed. <strong>Employment &amp; exodus.</strong> Punjab's youth vote with their feet — IELTS-and-visa economy, study permits to Canada/Australia (now tightening, which boomerangs frustrated youth home by 2027). In-migration of labour from UP, Bihar, MP, Odisha fills farm and industrial work — economically essential, politically weaponisable in both directions (resentment narratives vs. their growing vote share in urban seats).</p>
+<p><span class="pill est">ESTABLISHED</span> <strong>Energy &amp; rivers.</strong> The BBMB composition changes and Dam Safety Act disputes pit Punjab against the Centre; SYL remains the eternal third rail with Haryana. <strong>Education/health:</strong> government-school improvement is real but uneven; AIIMS-Bathinda and clinics coexist with collapsing district hospitals. <strong>Roads/infra:</strong> NH expansion (Delhi–Katra, Amritsar–Jamnagar corridors) is Centre-funded and will be claimed by BJP; land-acquisition friction with farmers is the counter-story.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§11 · ਅਸਲ ਮੁੱਦੇ</div>
+<h2>ਪੰਜਾਬ ਦੇ ਢਾਂਚਾਗਤ ਸੰਕਟ — ਰੌਲ਼ੇ ਹੇਠਲੇ ਮਸਲੇ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਕਰਜ਼ਾ:</strong> ~₹2.1 ਲੱਖ ਕਰੋੜ (2017) → ~₹2.7 ਲੱਖ ਕਰੋੜ (2022) → 2027 ਤੱਕ ਅਨੁਮਾਨਿਤ ~₹4.48 ਲੱਖ ਕਰੋੜ — GSDP ਦਾ ~45% (ਹਰਿਆਣਾ 26–28%)। ਸਿਰਫ਼ ਵਿਆਜ 2026-27 ਵਿੱਚ ₹28,755 ਕਰੋੜ — ਮਾਲੀ ਆਮਦਨ ਦਾ ~23%। ਬਿਜਲੀ ਸਬਸਿਡੀ ₹15,550 ਕਰੋੜ। ਹਰ ਪਾਰਟੀ ਦਾ ਮੁਫ਼ਤ-ਵਾਅਦਾ ਇਸੇ ਹਿਸਾਬ ਨਾਲ ਪੜ੍ਹੋ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਖੇਤੀ ਤੇ ਪਾਣੀ:</strong> ਕਣਕ-ਝੋਨੇ ਦੇ ਚੱਕਰ ਨੇ ਧਰਤੀ ਹੇਠਲਾ ਪਾਣੀ ਖਾ ਲਿਆ — ਕੇਂਦਰੀ ਪੰਜਾਬ ਵਿੱਚ ਪੱਧਰ ~0.5 ਮੀਟਰ/ਸਾਲ ਡਿੱਗ ਰਿਹਾ। ਬਦਲਵੀਂ ਫ਼ਸਲ ਉੱਤੇ MSP-ਵਰਗਾ ਭਰੋਸਾ ਬਿਨਾਂ ਵਿਭਿੰਨਤਾ ਨਹੀਂ ਹੋਣੀ। ਡੱਲੇਵਾਲ ਦਾ ਮਰਨ ਵਰਤ (26 ਨਵੰਬਰ 2024 ਤੋਂ) ਤੇ MSP ਕਾਨੂੰਨ ਦਾ ਸਵਾਲ ਹੀ ਅਸਲ ਆਰਥਿਕ ਸਵਾਲ ਹੈ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਨਸ਼ਾ:</strong> ਸਰਹੱਦੀ ਹੈਰੋਇਨ + ਦਵਾਈ-ਡਾਇਵਰਸ਼ਨ; ਬਰਾਮਦਗੀਆਂ ਵਧਦੀਆਂ, ਅਮਲ ਕਾਇਮ। <strong>ਰੁਜ਼ਗਾਰ ਤੇ ਪਰਵਾਸ:</strong> ਜਵਾਨੀ IELTS-ਵੀਜ਼ਾ ਰਾਹ ਪੈ ਗਈ; ਹੁਣ ਕੈਨੇਡਾ-ਆਸਟ੍ਰੇਲੀਆ ਦੇ ਦਰ ਤੰਗ ਹੋਣ ਨਾਲ ਨਿਰਾਸ਼ ਜਵਾਨੀ ਘਰ ਮੁੜੇਗੀ। ਯੂ.ਪੀ.-ਬਿਹਾਰ-ਮ.ਪ੍ਰ.-ਓਡੀਸ਼ਾ ਤੋਂ ਆਈ ਕਿਰਤ ਆਰਥਿਕ ਤੌਰ ਉੱਤੇ ਜ਼ਰੂਰੀ, ਸਿਆਸੀ ਤੌਰ ਉੱਤੇ ਦੋਵੇਂ ਪਾਸਿਓਂ ਹਥਿਆਰ ਬਣਾਈ ਜਾ ਸਕਦੀ ਹੈ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਊਰਜਾ ਤੇ ਦਰਿਆ:</strong> BBMB ਬਣਤਰ ਤੇ ਡੈਮ ਸੇਫਟੀ ਐਕਟ ਉੱਤੇ ਕੇਂਦਰ ਨਾਲ ਟਕਰਾਅ; SYL ਸਦੀਵੀ ਮਸਲਾ। <strong>ਸਿੱਖਿਆ/ਸਿਹਤ:</strong> ਸਰਕਾਰੀ ਸਕੂਲ ਸੁਧਾਰ ਅਸਲੀ ਪਰ ਅਧੂਰਾ। <strong>ਸੜਕਾਂ:</strong> ਦਿੱਲੀ-ਕਟੜਾ, ਅੰਮ੍ਰਿਤਸਰ-ਜਾਮਨਗਰ ਕੌਰੀਡੋਰ ਕੇਂਦਰ-ਫੰਡਿਡ — ਭਾਜਪਾ ਦਾਅਵਾ ਕਰੇਗੀ; ਜ਼ਮੀਨ-ਐਕੁਆਇਰ ਟਕਰਾਅ ਉਲਟ-ਕਹਾਣੀ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§11 · असली मुद्दे</div>
+<h2>पंजाब के संरचनात्मक संकट — शोर के नीचे के मसले</h2>
+<p><span class="pill est">स्थापित</span> <strong>क़र्ज़:</strong> ~₹2.1 लाख करोड़ (2017) → ~₹2.7 लाख करोड़ (2022) → 2027 तक अनुमानित ~₹4.48 लाख करोड़ — GSDP का ~45% (हरियाणा 26–28%)। केवल ब्याज 2026-27 में ₹28,755 करोड़ — राजस्व प्राप्तियों का ~23%। बिजली सब्सिडी ₹15,550 करोड़। हर दल का मुफ़्त-वादा इसी गणित से पढ़ें।</p>
+<p><span class="pill est">स्थापित</span> <strong>कृषि व जल:</strong> गेहूँ-धान चक्र ने भूजल खा लिया — केंद्रीय पंजाब में स्तर ~0.5 मी/वर्ष गिर रहा। वैकल्पिक फ़सलों पर MSP-तुल्य आश्वासन बिना विविधीकरण असंभव। डल्लेवाल का अनशन (26 नवंबर 2024 से) व MSP क़ानून ही असली आर्थिक प्रश्न।</p>
+<p><span class="pill est">स्थापित</span> <strong>नशा:</strong> सीमा-हेरोइन + दवा-डायवर्ज़न; बरामदगी बढ़ती, लत क़ायम। <strong>रोज़गार व पलायन:</strong> युवा IELTS-वीज़ा मार्ग पर; अब कनाडा-ऑस्ट्रेलिया के द्वार संकरे होने से निराश युवा लौटेंगे। यूपी-बिहार-मप्र-ओडिशा की श्रमिक-आमद आर्थिक रूप से आवश्यक, राजनीतिक रूप से दोनों ओर से हथियार बनाई जा सकती है।</p>
+<p><span class="pill est">स्थापित</span> <strong>ऊर्जा व नदियाँ:</strong> BBMB संरचना व डैम सेफ़्टी एक्ट पर केंद्र से टकराव; SYL चिरस्थायी मुद्दा। <strong>शिक्षा/स्वास्थ्य:</strong> सरकारी स्कूल सुधार वास्तविक पर असमान। <strong>सड़कें:</strong> दिल्ली-कटरा, अमृतसर-जामनगर कॉरिडोर केंद्र-वित्तपोषित — भाजपा दावा करेगी; भूमि-अधिग्रहण टकराव प्रति-कथा।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§11 · اصل مسائل</div>
+<h2>پنجاب کے ساختی بحران — شور کے نیچے کے مسئلے</h2>
+<p><span class="pill est">مستند</span> <strong>قرضہ:</strong> تقریباً ₹2.1 لاکھ کروڑ (2017) → ₹2.7 لاکھ کروڑ (2022) → 2027 تک متوقع ₹4.48 لاکھ کروڑ — GSDP کا تقریباً 45٪ (ہریانہ 26–28٪)۔ صرف سود 2026-27 میں ₹28,755 کروڑ — محصولات کا ~23٪۔ بجلی سبسڈی ₹15,550 کروڑ۔ ہر جماعت کا مفت وعدہ اسی حساب سے پڑھیں۔</p>
+<p><span class="pill est">مستند</span> <strong>زراعت اور پانی:</strong> گندم-دھان کے چکر نے زیرِ زمین پانی کھا لیا — وسطی پنجاب میں سطح تقریباً 0.5 میٹر/سال گر رہی ہے۔ متبادل فصلوں پر MSP جیسی ضمانت کے بغیر تنوع ممکن نہیں۔ ڈلیوال کی بھوک ہڑتال (26 نومبر 2024 سے) اور MSP قانون ہی اصل معاشی سوال ہے۔</p>
+<p><span class="pill est">مستند</span> <strong>منشیات:</strong> سرحدی ہیروئن + دوا ڈائیورژن؛ برآمدگیاں بڑھتی ہیں، لت قائم۔ <strong>روزگار اور نقل مکانی:</strong> نوجوان IELTS-ویزا راہ پر؛ اب کینیڈا-آسٹریلیا کے دروازے تنگ ہونے سے مایوس نوجوان واپس آئیں گے۔ یوپی-بہار-ایم پی-اڈیشہ سے آنے والی محنت معاشی طور پر ضروری، سیاسی طور پر دونوں طرف سے ہتھیار بنائی جا سکتی ہے۔</p>
+<p><span class="pill est">مستند</span> <strong>توانائی اور دریا:</strong> BBMB ساخت اور ڈیم سیفٹی ایکٹ پر مرکز سے ٹکراؤ؛ SYL دائمی مسئلہ۔ <strong>تعلیم/صحت:</strong> سرکاری اسکول اصلاح حقیقی مگر ناہموار۔ <strong>سڑکیں:</strong> دہلی-کٹرہ، امرتسر-جام نگر کوریڈور مرکز کے فنڈ سے — بی جے پی دعویٰ کرے گی؛ زمین کے حصول کا ٹکراؤ جوابی کہانی۔</p>
+</div>
+
+<div class="chartwrap">
+  <h4>Punjab's debt curve (₹ lakh crore) with annual interest burden (₹ '000 crore)</h4>
+  <div class="chartbox"><canvas id="c4"></canvas></div>
+  <div class="src">Punjab budget documents / CAG-based reporting; 2027 projected.</div>
+</div>
+<div class="chartwrap">
+  <h4>Where the 2026-27 budget rupee goes (₹ crore, selected heads)</h4>
+  <div class="chartbox"><canvas id="c5"></canvas></div>
+  <div class="src">Punjab Budget 2026-27 allocations as reported.</div>
+</div>
+</section>
+
+<!-- S12 POLICIES -->
+<section class="sec" id="s12">
+<div class="lp" data-l="en">
+<div class="eyebrow">§12 · The fix list</div>
+<h2>Policies Punjab actually needs — whoever wins</h2>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> A non-partisan minimum programme: (1) <strong>Crop-shift contract:</strong> a Punjab-Centre jointly funded price-deficiency/assured-procurement scheme for maize, pulses, oilseeds, basmati — paying farmers the paddy-equivalent margin for five years, tied to metered groundwater zones. (2) <strong>Debt restructuring compact</strong> with the 16th Finance Commission window: swap high-cost debt, cap fresh subsidies (means-test the power subsidy above a consumption threshold), publish a citizens' debt dashboard quarterly. (3) <strong>Drug policy as health policy:</strong> triple OOAT/de-addiction staffing, naloxone access, and judicial fast-tracking that targets financiers rather than addict-peddlers; publish supply-side conviction data monthly. (4) <strong>Jobs:</strong> agro-processing clusters (the only industry with Punjab comparative advantage), restoring Attari land-trade when geopolitics allows, and an honest skilling-to-GCC/IT-services bridge in Mohali's orbit. (5) <strong>Institutional hygiene:</strong> time-bound beadbi-case prosecution, SGPC general elections, DGP and chief secretary appointments insulated from poll cycles, and a state law mandating disclosure of all government advertising spend.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§12 · ਮੁਰੰਮਤ ਸੂਚੀ</div>
+<h2>ਪੰਜਾਬ ਨੂੰ ਅਸਲ ਵਿੱਚ ਲੋੜੀਂਦੀਆਂ ਨੀਤੀਆਂ — ਜਿੱਤੇ ਕੋਈ ਵੀ</h2>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਗ਼ੈਰ-ਪੱਖੀ ਘੱਟੋ-ਘੱਟ ਪ੍ਰੋਗਰਾਮ: (1) <strong>ਫ਼ਸਲ-ਬਦਲੀ ਠੇਕਾ:</strong> ਮੱਕੀ-ਦਾਲਾਂ-ਤੇਲਬੀਜਾਂ ਲਈ ਪੰਜ ਸਾਲ ਝੋਨੇ-ਬਰਾਬਰ ਮਾਰਜਨ ਦੀ ਯਕੀਨੀ ਖ਼ਰੀਦ, ਪਾਣੀ-ਮੀਟਰਿੰਗ ਨਾਲ ਜੁੜੀ। (2) <strong>ਕਰਜ਼ਾ-ਪੁਨਰਗਠਨ ਸਮਝੌਤਾ:</strong> ਮਹਿੰਗਾ ਕਰਜ਼ਾ ਬਦਲੋ, ਬਿਜਲੀ ਸਬਸਿਡੀ ਨੂੰ ਖਪਤ-ਹੱਦ ਤੋਂ ਉੱਤੇ ਮੀਨਜ਼-ਟੈਸਟ ਕਰੋ, ਤਿਮਾਹੀ ਨਾਗਰਿਕ ਕਰਜ਼ਾ-ਡੈਸ਼ਬੋਰਡ ਛਾਪੋ। (3) <strong>ਨਸ਼ਾ-ਨੀਤੀ = ਸਿਹਤ-ਨੀਤੀ:</strong> OOAT ਸਟਾਫ਼ ਤਿੰਨ ਗੁਣਾ, ਫਾਇਨਾਂਸਰਾਂ ਉੱਤੇ ਤੇਜ਼ ਮੁਕੱਦਮੇ, ਮਹੀਨਾਵਾਰ ਸਜ਼ਾ-ਅੰਕੜੇ। (4) <strong>ਰੁਜ਼ਗਾਰ:</strong> ਐਗਰੋ-ਪ੍ਰੋਸੈਸਿੰਗ ਕਲੱਸਟਰ, ਅਟਾਰੀ ਵਪਾਰ ਦੀ ਬਹਾਲੀ, ਮੋਹਾਲੀ ਦੁਆਲੇ IT/GCC ਸਕਿਲਿੰਗ ਪੁਲ। (5) <strong>ਸੰਸਥਾਈ ਸਫ਼ਾਈ:</strong> ਬੇਅਦਬੀ ਕੇਸਾਂ ਦੀ ਸਮਾਂ-ਬੱਧ ਪੈਰਵੀ, ਸ਼੍ਰੋਮਣੀ ਕਮੇਟੀ ਚੋਣਾਂ, ਚੋਣ-ਚੱਕਰ ਤੋਂ ਮੁਕਤ ਡੀ.ਜੀ.ਪੀ. ਨਿਯੁਕਤੀਆਂ, ਸਰਕਾਰੀ ਇਸ਼ਤਿਹਾਰ-ਖ਼ਰਚ ਦਾ ਖੁਲਾਸਾ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§12 · मरम्मत सूची</div>
+<h2>पंजाब को वास्तव में चाहिए ये नीतियाँ — जीते कोई भी</h2>
+<p><span class="pill jud">लेखकीय राय</span> ग़ैर-दलीय न्यूनतम कार्यक्रम: (1) <strong>फ़सल-परिवर्तन अनुबंध:</strong> मक्का-दालें-तिलहन पर पाँच वर्ष धान-तुल्य मार्जिन की सुनिश्चित ख़रीद, भूजल-मीटरिंग से जुड़ी। (2) <strong>ऋण-पुनर्गठन समझौता:</strong> महँगा क़र्ज़ बदलें, बिजली सब्सिडी को खपत-सीमा से ऊपर मीन्स-टेस्ट करें, त्रैमासिक नागरिक ऋण-डैशबोर्ड। (3) <strong>नशा-नीति = स्वास्थ्य-नीति:</strong> OOAT स्टाफ़ तिगुना, फ़ाइनेंसरों पर त्वरित मुक़दमे, मासिक सज़ा-आँकड़े। (4) <strong>रोज़गार:</strong> एग्रो-प्रोसेसिंग क्लस्टर, अटारी व्यापार बहाली, मोहाली के इर्द-गिर्द IT/GCC स्किलिंग सेतु। (5) <strong>संस्थागत स्वच्छता:</strong> बेअदबी मामलों की समयबद्ध पैरवी, एसजीपीसी चुनाव, चुनाव-चक्र से मुक्त डीजीपी नियुक्तियाँ, सरकारी विज्ञापन-व्यय का खुलासा।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§12 · مرمت فہرست</div>
+<h2>پنجاب کو واقعی درکار پالیسیاں — جیتے کوئی بھی</h2>
+<p><span class="pill jud">مصنف کی رائے</span> غیر جماعتی کم از کم پروگرام: (1) <strong>فصل تبدیلی معاہدہ:</strong> مکئی-دالوں-تلہن پر پانچ سال دھان کے برابر مارجن کی یقینی خرید، پانی میٹرنگ سے منسلک۔ (2) <strong>قرض تنظیمِ نو معاہدہ:</strong> مہنگا قرض بدلیں، بجلی سبسڈی کو کھپت کی حد سے اوپر مینز ٹیسٹ کریں، سہ ماہی شہری قرض ڈیش بورڈ۔ (3) <strong>منشیات پالیسی = صحت پالیسی:</strong> OOAT عملہ تین گنا، فنانسرز پر تیز مقدمے، ماہانہ سزا کے اعداد۔ (4) <strong>روزگار:</strong> ایگرو پروسیسنگ کلسٹر، اٹاری تجارت کی بحالی، موہالی کے گرد IT/GCC اسکلنگ پل۔ (5) <strong>ادارہ جاتی صفائی:</strong> بے ادبی مقدمات کی پابندِ وقت پیروی، ایس جی پی سی انتخابات، انتخابی چکر سے آزاد ڈی جی پی تقرریاں، سرکاری اشتہاری خرچ کا انکشاف۔</p>
+</div>
+</section>
+
+<!-- S13 SECTOR MATRIX -->
+<section class="sec" id="s13">
+<div class="lp" data-l="en">
+<div class="eyebrow">§13 · Sector matrix</div>
+<h2>Who gains, who loses — scenario by sector</h2>
+<table>
+<tr><th>Sector</th><th>AAP retained</th><th>BJP-led / kingmaker</th><th>Congress-led</th></tr>
+<tr><td><strong>Farming</strong></td><td>Status-quo MSP defence; union friction persists; diversification slow</td><td>Central funds flow, but procurement "reform" risk to assured MSP purchase is highest; union confrontation likely</td><td>MSP-protective rhetoric; implementation capacity untested since 2022 wipeout</td></tr>
+<tr><td><strong>Small business / MSME</strong></td><td>Zero-bill relief continues; inspector-raj complaints persist</td><td>Likely best credit/PLI access and GST facilitation; chain-retail and big-capital entry pressures kirana margins</td><td>Urban trader base served; fiscal room minimal</td></tr>
+<tr><td><strong>Industry</strong></td><td>Power subsidy burden limits industrial tariff relief</td><td>"Double-engine" corridor investment most plausible here — with concentration risk toward large groups</td><td>Legacy Ludhiana/Jalandhar networks; no new model visible</td></tr>
+<tr><td><strong>Transport</strong></td><td>Cartel cleanup claimed, partial</td><td>Highway build-out accelerates; tolls multiply</td><td>Historic cartel proximity is its own baggage</td></tr>
+<tr><td><strong>Real estate (your Zirakpur belt)</strong></td><td>Regularisation-led churn</td><td>Infrastructure premium on corridor land; speculative spikes</td><td>Status quo</td></tr>
+</table>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> The table is my assessment, not prophecy; treat each cell as a hypothesis to test against manifestos when they land.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§13 · ਖੇਤਰ ਮੈਟ੍ਰਿਕਸ</div>
+<h2>ਕਿਸਨੂੰ ਲਾਭ, ਕਿਸਨੂੰ ਘਾਟਾ</h2>
+<ul>
+<li><strong>ਖੇਤੀ:</strong> ਆਪ — ਮੌਜੂਦਾ MSP ਬਚਾਅ; ਭਾਜਪਾ — ਕੇਂਦਰੀ ਫੰਡ ਪਰ ਯਕੀਨੀ ਖ਼ਰੀਦ ਉੱਤੇ "ਸੁਧਾਰ" ਦਾ ਸਭ ਤੋਂ ਵੱਡਾ ਖ਼ਤਰਾ; ਕਾਂਗਰਸ — ਬਚਾਅ ਵਾਲੀ ਬੋਲੀ, ਅਣਪਰਖੀ ਸਮਰੱਥਾ।</li>
+<li><strong>ਛੋਟਾ ਕਾਰੋਬਾਰ:</strong> ਭਾਜਪਾ ਹੇਠ ਕਰਜ਼ਾ/GST ਸਹੂਲਤ ਵਧਣ ਦੀ ਸੰਭਾਵਨਾ ਪਰ ਵੱਡੀ ਪੂੰਜੀ ਤੇ ਚੇਨ-ਰਿਟੇਲ ਕਰਿਆਨੇ ਦੇ ਮਾਰਜਨ ਨਿਚੋੜੇਗੀ।</li>
+<li><strong>ਉਦਯੋਗ:</strong> "ਡਬਲ-ਇੰਜਣ" ਨਿਵੇਸ਼ ਸਭ ਤੋਂ ਵੱਧ ਸੰਭਵ ਭਾਜਪਾ ਹੇਠ — ਪਰ ਵੱਡੇ ਘਰਾਣਿਆਂ ਵੱਲ ਕੇਂਦਰੀਕਰਨ ਦਾ ਜੋਖ਼ਮ।</li>
+<li><strong>ਟ੍ਰਾਂਸਪੋਰਟ:</strong> ਹਾਈਵੇ ਤੇਜ਼, ਟੋਲ ਵੀ ਤੇਜ਼।</li>
+<li><strong>ਰੀਅਲ ਅਸਟੇਟ (ਜ਼ੀਰਕਪੁਰ ਪੱਟੀ):</strong> ਕੌਰੀਡੋਰ ਜ਼ਮੀਨ ਉੱਤੇ ਪ੍ਰੀਮੀਅਮ ਤੇ ਸੱਟੇਬਾਜ਼ੀ ਉਛਾਲ।</li>
+</ul>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਇਹ ਮੇਰਾ ਮੁਲਾਂਕਣ ਹੈ, ਭਵਿੱਖਬਾਣੀ ਨਹੀਂ — ਮੈਨੀਫੈਸਟੋ ਆਉਣ ਉੱਤੇ ਹਰ ਖ਼ਾਨੇ ਨੂੰ ਪਰਖੋ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§13 · क्षेत्र मैट्रिक्स</div>
+<h2>किसे लाभ, किसे हानि</h2>
+<ul>
+<li><strong>कृषि:</strong> आप — यथास्थिति MSP रक्षा; भाजपा — केंद्रीय धन पर सुनिश्चित ख़रीद पर "सुधार" का सबसे बड़ा जोखिम; कांग्रेस — रक्षात्मक भाषा, अपरीक्षित क्षमता।</li>
+<li><strong>लघु व्यवसाय:</strong> भाजपा में ऋण/GST सुविधा बढ़ने की संभावना पर बड़ी पूँजी व चेन-रिटेल किराना मार्जिन निचोड़ेगी।</li>
+<li><strong>उद्योग:</strong> "डबल-इंजन" निवेश भाजपा में सर्वाधिक संभव — बड़े घरानों की ओर संकेंद्रण जोखिम सहित।</li>
+<li><strong>परिवहन:</strong> हाईवे तेज़, टोल भी तेज़।</li>
+<li><strong>रियल एस्टेट (ज़ीरकपुर पट्टी):</strong> कॉरिडोर भूमि पर प्रीमियम व सट्टा-उछाल।</li>
+</ul>
+<p><span class="pill jud">लेखकीय राय</span> यह मेरा आकलन है, भविष्यवाणी नहीं — घोषणापत्र आने पर हर ख़ाने को परखें।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§13 · شعبہ جاتی میٹرکس</div>
+<h2>کسے فائدہ، کسے نقصان</h2>
+<ul>
+<li><strong>زراعت:</strong> عام آدمی پارٹی — موجودہ MSP دفاع؛ بی جے پی — مرکزی فنڈ مگر یقینی خرید پر "اصلاح" کا سب سے بڑا خطرہ؛ کانگریس — دفاعی زبان، غیر آزمودہ صلاحیت۔</li>
+<li><strong>چھوٹا کاروبار:</strong> بی جے پی میں قرض/GST سہولت بڑھنے کا امکان مگر بڑا سرمایہ اور چین ریٹیل کریانہ مارجن نچوڑے گی۔</li>
+<li><strong>صنعت:</strong> "ڈبل انجن" سرمایہ کاری بی جے پی میں سب سے ممکن — بڑے گھرانوں کی طرف ارتکاز کے خطرے سمیت۔</li>
+<li><strong>ٹرانسپورٹ:</strong> ہائی وے تیز، ٹول بھی تیز۔</li>
+<li><strong>ریئل اسٹیٹ (زیرک پور پٹی):</strong> کوریڈور زمین پر پریمیم اور سٹے کا اچھال۔</li>
+</ul>
+<p><span class="pill jud">مصنف کی رائے</span> یہ میرا اندازہ ہے، پیشگوئی نہیں — منشور آنے پر ہر خانے کو پرکھیں۔</p>
+</div>
+</section>
+
+<!-- S14 INFOGRAPHIC -->
+<section class="sec" id="s14">
+<div class="lp" data-l="en">
+<div class="eyebrow">§14 · Current vs projected</div>
+<h2>Punjab now → Punjab at the 2027 vote</h2>
+</div>
+<div class="lp" data-l="pa"><div class="eyebrow">§14 · ਹੁਣ ਬਨਾਮ ਅਨੁਮਾਨ</div><h2>ਪੰਜਾਬ ਹੁਣ → ਪੰਜਾਬ 2027 ਦੀ ਵੋਟ ਵੇਲੇ</h2></div>
+<div class="lp" data-l="hi"><div class="eyebrow">§14 · अभी बनाम अनुमान</div><h2>पंजाब अभी → पंजाब 2027 के मतदान पर</h2></div>
+<div class="lp" data-l="ur"><div class="eyebrow">§14 · اب بمقابلہ تخمینہ</div><h2>پنجاب اب → پنجاب 2027 کے ووٹ پر</h2></div>
+<div class="kpis">
+  <div class="kpi"><div class="n">~₹4.48L cr</div><div class="l">Projected debt by 2027 (vs ₹2.7L cr in 2022)</div></div>
+  <div class="kpi"><div class="n">23%</div><div class="l">of revenue receipts consumed by interest, 2026-27</div></div>
+  <div class="kpi"><div class="n">18.6%</div><div class="l">BJP vote 2024 LS — its launchpad</div></div>
+  <div class="kpi"><div class="n">958/1977</div><div class="l">wards AAP won, May 2026 — its proof of life</div></div>
+  <div class="kpi"><div class="n">32%</div><div class="l">SC electorate — India's highest share</div></div>
+  <div class="kpi"><div class="n">553 km</div><div class="l">Pakistan border — the drone &amp; heroin frontier</div></div>
+</div>
+<div class="infogrid">
+  <div class="infocard now"><h4>June 2026 — now</h4>
+  <ul><li>AAP dominant but agency-squeezed; 7 of 10 RS MPs defected</li><li>SAD–Akal Takht legitimacy crisis unresolved; officiating jathedar</li><li>Farm unions estranged from both AAP and the Centre; Dallewal standoff live</li><li>BJP machinery under construction: drugs abhiyan, panna pramukh, no CM face</li><li>India–Canada thaw holding; Nijjar/Pannun cases pending</li></ul></div>
+  <div class="infocard future"><h4>Early 2027 — projected (judgment)</h4>
+  <ul><li>Four-plus-cornered contest; winning margins compress; 30–35% can take a seat</li><li>Agency tempo peaks at candidate-list season; defection wave into BJP</li><li>Beadbi/communal incident risk highest Dec–Feb; panthic vote splits 3 ways</li><li>Likeliest outcomes: AAP returned with reduced majority, or hung house with BJP kingmaker; BJP majority remains outlier</li><li>Diaspora money &amp; content on all sides; EC symmetry under test</li></ul></div>
+</div>
+<div class="lp" data-l="en"><p><span class="pill jud">AUTHOR'S JUDGMENT</span> Scenario weights, stated so you can hold me to them: AAP majority ~45%, hung assembly ~35%, Congress-led ~10%, BJP-led ~10%. Revisit after candidate lists and any Akali reunification.</p></div>
+<div class="lp" data-l="pa"><p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> ਅੰਦਾਜ਼ਨ ਭਾਰ: ਆਪ ਬਹੁਮਤ ~45%, ਲਟਕਵੀਂ ਵਿਧਾਨ ਸਭਾ ~35%, ਕਾਂਗਰਸ ~10%, ਭਾਜਪਾ ~10%। ਉਮੀਦਵਾਰ ਸੂਚੀਆਂ ਤੇ ਅਕਾਲੀ ਏਕਤਾ ਪਿੱਛੋਂ ਮੁੜ ਜਾਂਚਣਾ।</p></div>
+<div class="lp" data-l="hi"><p><span class="pill jud">लेखकीय राय</span> अनुमानित भार: आप बहुमत ~45%, त्रिशंकु ~35%, कांग्रेस ~10%, भाजपा ~10%। उम्मीदवार सूचियों व अकाली एकता के बाद पुनरीक्षण।</p></div>
+<div class="lp" data-l="ur"><p><span class="pill jud">مصنف کی رائے</span> تخمینی وزن: عام آدمی پارٹی اکثریت ~45٪، معلق اسمبلی ~35٪، کانگریس ~10٪، بی جے پی ~10٪۔ امیدوار فہرستوں اور اکالی اتحاد کے بعد نظرثانی۔</p></div>
+</section>
+
+<!-- S15 1984 -->
+<section class="sec" id="s15">
+<div class="lp" data-l="en">
+<div class="eyebrow">§15 · Memory</div>
+<h2>1984 — what must be remembered accurately</h2>
+<p><span class="pill est">ESTABLISHED</span> <strong>Operation Blue Star, 1–8 June 1984:</strong> the Indian Army's assault on Sri Darbar Sahib, Amritsar, to remove Jarnail Singh Bhindranwale's armed presence. Sri Akal Takht Sahib was destroyed by tank fire; the Sikh Reference Library burned, its manuscripts never fully accounted for. The government's White Paper acknowledged 493 civilian/"terrorist" deaths and 83 army deaths; independent and eyewitness estimates run far higher, with thousands of pilgrims present for Guru Arjan Sahib's shaheedi gurpurab. The operation's anniversary fell last week — its ghallughara smagams at Akal Takht remain the Panth's most charged annual moment.</p>
+<p><span class="pill est">ESTABLISHED</span> <strong>November 1984:</strong> after Indira Gandhi's assassination, organised mob violence against Sikhs — overwhelmingly in Delhi and other states outside Punjab. Official counts: ~2,733 killed in Delhi (Ahuja Committee), ~3,350 nationwide; survivor and civil-society estimates are higher. Congress leader Sajjan Kumar was convicted in 2018 in a reopened case; most perpetrators were never punished. Ten commissions and committees later, the wound is justice denied, not merely violence remembered.</p>
+<p><span class="pill jud">AUTHOR'S JUDGMENT</span> In 2027, every party will reach for 1984: Congress carries its guilt, BJP prosecutes Congress's guilt while courting the same memory, panthic parties claim its custody. The Gurmat response is neither amnesia nor instrumentalisation — remember the shaheeds truthfully, demand the pending prosecutions, and refuse to let grief be converted into anyone's vote-bank fuel.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§15 · ਯਾਦ</div>
+<h2>1984 — ਜੋ ਸਹੀ-ਸਹੀ ਯਾਦ ਰੱਖਣਾ ਫ਼ਰਜ਼ ਹੈ</h2>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਸਾਕਾ ਨੀਲਾ ਤਾਰਾ, 1–8 ਜੂਨ 1984:</strong> ਸ੍ਰੀ ਦਰਬਾਰ ਸਾਹਿਬ ਉੱਤੇ ਫ਼ੌਜੀ ਹਮਲਾ; ਸ੍ਰੀ ਅਕਾਲ ਤਖ਼ਤ ਸਾਹਿਬ ਟੈਂਕਾਂ ਨਾਲ ਢਾਹਿਆ ਗਿਆ; ਸਿੱਖ ਰੈਫਰੰਸ ਲਾਇਬ੍ਰੇਰੀ ਸੜੀ। ਸਰਕਾਰੀ ਵ੍ਹਾਈਟ ਪੇਪਰ ਨੇ 493 ਆਮ ਮੌਤਾਂ ਮੰਨੀਆਂ; ਆਜ਼ਾਦ ਅੰਦਾਜ਼ੇ ਕਿਤੇ ਵੱਧ ਹਨ — ਗੁਰੂ ਅਰਜਨ ਸਾਹਿਬ ਦੇ ਸ਼ਹੀਦੀ ਪੁਰਬ ਕਰਕੇ ਹਜ਼ਾਰਾਂ ਸੰਗਤਾਂ ਹਾਜ਼ਰ ਸਨ। ਘੱਲੂਘਾਰਾ ਸਮਾਗਮ ਪੰਥ ਦਾ ਸਭ ਤੋਂ ਭਾਵੁਕ ਸਾਲਾਨਾ ਪਲ ਹੈ।</p>
+<p><span class="pill est">ਸਥਾਪਿਤ</span> <strong>ਨਵੰਬਰ 1984:</strong> ਇੰਦਰਾ ਗਾਂਧੀ ਦੇ ਕਤਲ ਪਿੱਛੋਂ ਸਿੱਖਾਂ ਦਾ ਜਥੇਬੰਦ ਕਤਲੇਆਮ — ਮੁੱਖ ਤੌਰ ਉੱਤੇ ਦਿੱਲੀ ਤੇ ਪੰਜਾਬੋਂ ਬਾਹਰ। ਸਰਕਾਰੀ ਗਿਣਤੀ: ਦਿੱਲੀ ਵਿੱਚ ~2,733, ਦੇਸ਼ ਭਰ ~3,350; ਅਸਲ ਅੰਦਾਜ਼ੇ ਵੱਧ। ਸੱਜਣ ਕੁਮਾਰ ਨੂੰ 2018 ਵਿੱਚ ਸਜ਼ਾ; ਬਹੁਤੇ ਦੋਸ਼ੀ ਅੱਜ ਤੱਕ ਬਰੀ-ਬਚੇ। ਦਸ ਕਮਿਸ਼ਨਾਂ ਪਿੱਛੋਂ ਵੀ ਜ਼ਖ਼ਮ ਦਾ ਨਾਂ ਹੈ — ਇਨਸਾਫ਼ ਤੋਂ ਇਨਕਾਰ।</p>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ</span> 2027 ਵਿੱਚ ਹਰ ਪਾਰਟੀ 1984 ਵੱਲ ਹੱਥ ਵਧਾਏਗੀ। ਗੁਰਮਤਿ ਜਵਾਬ ਨਾ ਭੁੱਲਣਾ ਹੈ ਨਾ ਵੇਚਣਾ — ਸ਼ਹੀਦਾਂ ਨੂੰ ਸੱਚ ਨਾਲ ਯਾਦ ਕਰੋ, ਬਕਾਇਆ ਮੁਕੱਦਮਿਆਂ ਦੀ ਮੰਗ ਕਰੋ, ਤੇ ਦੁੱਖ ਨੂੰ ਕਿਸੇ ਦੀ ਵੋਟ-ਬੈਂਕ ਬਾਲਣ ਨਾ ਬਣਨ ਦਿਓ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§15 · स्मृति</div>
+<h2>1984 — जो सही-सही याद रखना कर्तव्य है</h2>
+<p><span class="pill est">स्थापित</span> <strong>ऑपरेशन ब्लू स्टार, 1–8 जून 1984:</strong> श्री दरबार साहिब पर सैन्य हमला; श्री अकाल तख़्त साहिब टैंकों से ध्वस्त; सिख रेफ़रेंस लाइब्रेरी जली। सरकारी श्वेत-पत्र ने 493 नागरिक मौतें मानीं; स्वतंत्र अनुमान कहीं अधिक — गुरु अर्जन साहिब के शहीदी पर्व के कारण हज़ारों श्रद्धालु उपस्थित थे।</p>
+<p><span class="pill est">स्थापित</span> <strong>नवंबर 1984:</strong> इंदिरा गांधी की हत्या के बाद सिखों का संगठित नरसंहार — मुख्यतः दिल्ली व पंजाब से बाहर। सरकारी गणना: दिल्ली ~2,733, देशभर ~3,350; वास्तविक अनुमान अधिक। सज्जन कुमार को 2018 में सज़ा; अधिकांश दोषी आज तक दंडित नहीं। दस आयोगों के बाद भी घाव का नाम है — न्याय से इनकार।</p>
+<p><span class="pill jud">लेखकीय राय</span> 2027 में हर दल 1984 की ओर हाथ बढ़ाएगा। उचित उत्तर न विस्मृति है न सौदेबाज़ी — शहीदों को सत्य से याद करें, लंबित अभियोजन माँगें, और शोक को किसी का वोट-बैंक ईंधन न बनने दें।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§15 · یادداشت</div>
+<h2>1984 — جو درست یاد رکھنا فرض ہے</h2>
+<p><span class="pill est">مستند</span> <strong>آپریشن بلیو اسٹار، 1–8 جون 1984:</strong> سری دربار صاحب پر فوجی حملہ؛ سری اکال تخت صاحب ٹینکوں سے منہدم؛ سکھ ریفرنس لائبریری جلی۔ سرکاری وائٹ پیپر نے 493 شہری اموات تسلیم کیں؛ آزاد اندازے کہیں زیادہ — گرو ارجن صاحب کے شہیدی پرب کی وجہ سے ہزاروں زائرین موجود تھے۔</p>
+<p><span class="pill est">مستند</span> <strong>نومبر 1984:</strong> اندرا گاندھی کے قتل کے بعد سکھوں کا منظم قتلِ عام — بنیادی طور پر دہلی اور پنجاب سے باہر۔ سرکاری گنتی: دہلی ~2,733، ملک بھر ~3,350؛ حقیقی اندازے زیادہ۔ سجن کمار کو 2018 میں سزا؛ بیشتر مجرم آج تک سزا سے بچے۔ دس کمیشنوں کے بعد بھی زخم کا نام ہے — انصاف سے انکار۔</p>
+<p><span class="pill jud">مصنف کی رائے</span> 2027 میں ہر جماعت 1984 کی طرف ہاتھ بڑھائے گی۔ درست جواب نہ فراموشی ہے نہ سوداگری — شہیدوں کو سچائی سے یاد کریں، زیرِ التوا مقدمات کا مطالبہ کریں، اور غم کو کسی کا ووٹ بینک ایندھن نہ بننے دیں۔</p>
+</div>
+</section>
+
+<!-- S16 GURMAT -->
+<section class="sec" id="s16">
+<div class="lp" data-l="en">
+<div class="eyebrow">§16 · Gurmat</div>
+<h2>How a Sikh walks through an election season</h2>
+<div class="gurbani">ਨਿਰਭਉ ਨਿਰਵੈਰੁ<span class="tr">Nirbhau, Nirvair — without fear, without enmity (Mool Mantar). Fearlessness before power; freedom from hatred toward any opponent. The whole political ethic of Sikhi is compressed into these two words.</span></div>
+<div class="gurbani">ਸਚਹੁ ਓਰੈ ਸਭੁ ਕੋ ਉਪਰਿ ਸਚੁ ਆਚਾਰੁ ॥<span class="tr">"Truth is higher than everything; higher still is truthful living." — Sri Guru Nanak Sahib, SGGS Ang 62. Verify before you forward; live the standard you demand of politicians.</span></div>
+<div class="gurbani">ਨਾਨਕ ਨਾਮ ਚੜ੍ਹਦੀ ਕਲਾ ਤੇਰੇ ਭਾਣੇ ਸਰਬੱਤ ਦਾ ਭਲਾ ॥<span class="tr">The Ardas concludes in sarbat da bhala — the welfare of all, not of Sikhs alone. A Sikh's politics cannot be sectarian by definition.</span></div>
+<p><span class="pill jud">AUTHOR'S JUDGMENT — applied Gurmat</span> Practical conduct this framework yields: <strong>(1) Miri with Piri's discipline</strong> — engage politics fully (Guru Hargobind Sahib's two swords sanctify civic engagement) but under spiritual discipline, never as tribal warfare. <strong>(2) Haumai check:</strong> party identification is ego's easiest costume; judge each claim on merit, including against "your" party. <strong>(3) Kirat–vand–naam as policy lens:</strong> does a policy honour honest labour, share gains widely, and keep life centred beyond consumption? That is a manifesto filter older than every manifesto. <strong>(4) The Zafarnama threshold:</strong> Guru Gobind Singh Sahib wrote that only when all other means are exhausted is it righteous to put hand to the sword — which today reads: exhaust every lawful, peaceful, institutional means (vote, RTI, courts, morcha) and reject those who romanticise violence from safe distances abroad. <strong>(5) Sikh Rehat Maryada conduct:</strong> nitnem and sangat keep judgment steady in a season designed to inflame it; refuse intoxicants — including the intoxicant of rage-content. <strong>(6) Guard the Guru's house:</strong> respond to any beadbi with sangat-led vigilance and legal pursuit, not mob justice — the dignity of the Takht is not defended by becoming what desecrators want.</p>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§16 · ਗੁਰਮਤਿ</div>
+<h2>ਚੋਣ-ਮੌਸਮ ਵਿੱਚੋਂ ਸਿੱਖ ਕਿਵੇਂ ਲੰਘੇ</h2>
+<div class="gurbani">ਨਿਰਭਉ ਨਿਰਵੈਰੁ<span class="tr">ਤਾਕਤ ਅੱਗੇ ਨਿਡਰਤਾ; ਕਿਸੇ ਵਿਰੋਧੀ ਲਈ ਵੀ ਵੈਰ ਨਹੀਂ। ਸਿੱਖੀ ਦੀ ਸਾਰੀ ਸਿਆਸੀ ਨੈਤਿਕਤਾ ਇਨ੍ਹਾਂ ਦੋ ਲਫ਼ਜ਼ਾਂ ਵਿੱਚ ਹੈ।</span></div>
+<div class="gurbani">ਸਚਹੁ ਓਰੈ ਸਭੁ ਕੋ ਉਪਰਿ ਸਚੁ ਆਚਾਰੁ ॥<span class="tr">— ਸ੍ਰੀ ਗੁਰੂ ਨਾਨਕ ਸਾਹਿਬ, ਅੰਗ 62। ਫਾਰਵਰਡ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਪਰਖੋ; ਜੋ ਮਿਆਰ ਨੇਤਾਵਾਂ ਤੋਂ ਮੰਗਦੇ ਹੋ, ਉਹ ਆਪ ਜੀਓ।</span></div>
+<div class="gurbani">ਤੇਰੇ ਭਾਣੇ ਸਰਬੱਤ ਦਾ ਭਲਾ ॥<span class="tr">ਅਰਦਾਸ ਸਰਬੱਤ ਦੇ ਭਲੇ ਉੱਤੇ ਮੁੱਕਦੀ ਹੈ — ਸਿੱਖ ਦੀ ਸਿਆਸਤ ਪਰਿਭਾਸ਼ਾ ਤੋਂ ਹੀ ਫ਼ਿਰਕੂ ਨਹੀਂ ਹੋ ਸਕਦੀ।</span></div>
+<p><span class="pill jud">ਲੇਖਕੀ ਰਾਏ — ਅਮਲੀ ਗੁਰਮਤਿ</span> (1) <strong>ਪੀਰੀ ਦੇ ਜ਼ਬਤ ਹੇਠ ਮੀਰੀ</strong> — ਸਿਆਸਤ ਵਿੱਚ ਪੂਰਾ ਹਿੱਸਾ ਲਓ ਪਰ ਕਬੀਲਾ-ਜੰਗ ਵਾਂਗ ਨਹੀਂ। (2) <strong>ਹਉਮੈ ਦੀ ਜਾਂਚ:</strong> ਪਾਰਟੀ-ਪਛਾਣ ਹਉਮੈ ਦਾ ਸੌਖਾ ਲਿਬਾਸ ਹੈ; ਹਰ ਦਾਅਵਾ ਗੁਣ ਉੱਤੇ ਪਰਖੋ — "ਆਪਣੀ" ਪਾਰਟੀ ਖ਼ਿਲਾਫ਼ ਵੀ। (3) <strong>ਕਿਰਤ-ਵੰਡ-ਨਾਮ ਨੀਤੀ-ਕਸੌਟੀ:</strong> ਕੀ ਨੀਤੀ ਹੱਕ ਦੀ ਕਿਰਤ ਦਾ ਆਦਰ ਕਰਦੀ ਹੈ, ਲਾਭ ਵੰਡਦੀ ਹੈ? (4) <strong>ਜ਼ਫ਼ਰਨਾਮੇ ਦੀ ਹੱਦ:</strong> ਜਦ ਸਾਰੇ ਹੀਲੇ ਮੁੱਕ ਜਾਣ ਤਦ ਹੀ ਤਲਵਾਰ ਜਾਇਜ਼ — ਅੱਜ ਦੇ ਅਰਥ: ਵੋਟ, RTI, ਅਦਾਲਤ, ਮੋਰਚਾ — ਹਰ ਕਾਨੂੰਨੀ ਰਾਹ ਵਰਤੋ; ਵਿਦੇਸ਼ੀ ਸੋਫ਼ਿਆਂ ਤੋਂ ਹਿੰਸਾ ਦਾ ਰੋਮਾਂਸ ਵੇਚਣ ਵਾਲਿਆਂ ਨੂੰ ਠੁਕਰਾਓ। (5) <strong>ਰਹਿਤ ਮਰਿਆਦਾ:</strong> ਨਿਤਨੇਮ ਤੇ ਸੰਗਤ ਮੱਤ ਟਿਕਾਈ ਰੱਖਦੇ ਹਨ; ਨਸ਼ਿਆਂ ਤੋਂ ਇਨਕਾਰ — ਗੁੱਸੇ-ਭੜਕਾਊ ਕੰਟੈਂਟ ਦੇ ਨਸ਼ੇ ਤੋਂ ਵੀ। (6) <strong>ਗੁਰੂ-ਘਰ ਦੀ ਰਾਖੀ:</strong> ਬੇਅਦਬੀ ਦਾ ਜਵਾਬ ਸੰਗਤੀ ਚੌਕਸੀ ਤੇ ਕਾਨੂੰਨੀ ਪੈਰਵੀ — ਭੀੜ-ਇਨਸਾਫ਼ ਨਹੀਂ।</p>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§16 · गुरमत</div>
+<h2>चुनावी मौसम में सिख आचरण</h2>
+<div class="gurbani">ਨਿਰਭਉ ਨਿਰਵੈਰੁ<span class="tr">निर्भय, निर्वैर — सत्ता के आगे निडरता; किसी विरोधी से भी वैर नहीं (मूल मंत्र)।</span></div>
+<div class="gurbani">ਸਚਹੁ ਓਰੈ ਸਭੁ ਕੋ ਉਪਰਿ ਸਚੁ ਆਚਾਰੁ ॥<span class="tr">"सत्य सबसे ऊपर है; सत्यनिष्ठ जीवन उससे भी ऊपर।" — श्री गुरु नानक साहिब, अंग 62।</span></div>
+<div class="gurbani">ਤੇਰੇ ਭਾਣੇ ਸਰਬੱਤ ਦਾ ਭਲਾ ॥<span class="tr">अरदास सरबत दा भला पर समाप्त होती है — सिख की राजनीति परिभाषा से ही सांप्रदायिक नहीं हो सकती।</span></div>
+<p><span class="pill jud">लेखकीय राय — व्यावहारिक गुरमत</span> (1) <strong>पीरी के अनुशासन में मीरी</strong> — राजनीति में पूर्ण भागीदारी, पर क़बीलाई युद्ध की तरह नहीं। (2) <strong>हउमै-जाँच:</strong> दल-पहचान अहं का सरल वेश है; हर दावा गुण पर परखें — "अपने" दल के विरुद्ध भी। (3) <strong>किरत-वंड-नाम नीति-कसौटी:</strong> क्या नीति ईमानदार श्रम का सम्मान करती है, लाभ बाँटती है? (4) <strong>ज़फ़रनामा-सीमा:</strong> सब उपाय चुकने पर ही बल उचित — आज का अर्थ: वोट, RTI, अदालत, मोर्चा — हर वैध मार्ग अपनाएँ; विदेशी सोफ़ों से हिंसा का रोमांस बेचने वालों को ठुकराएँ। (5) <strong>रहत मर्यादा:</strong> नितनेम व संगत विवेक स्थिर रखते हैं; नशे से इनकार — क्रोध-भड़काऊ कंटेंट के नशे से भी। (6) <strong>गुरु-घर की रक्षा:</strong> बेअदबी का उत्तर संगत-नेतृत्व वाली सतर्कता व क़ानूनी कार्रवाई — भीड़-न्याय नहीं।</p>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§16 · گرمت</div>
+<h2>انتخابی موسم میں سکھ کا طرزِ عمل</h2>
+<div class="gurbani">ਨਿਰਭਉ ਨਿਰਵੈਰੁ<span class="tr">نربھو، نرویر — طاقت کے آگے بے خوفی؛ کسی مخالف سے بھی بَیر نہیں (مول منتر)۔</span></div>
+<div class="gurbani">ਸਚਹੁ ਓਰੈ ਸਭੁ ਕੋ ਉਪਰਿ ਸਚੁ ਆਚਾਰੁ ॥<span class="tr">"سچ سب سے اوپر ہے؛ سچا کردار اس سے بھی اوپر۔" — سری گرو نانک صاحب، انگ 62۔</span></div>
+<div class="gurbani">ਤੇਰੇ ਭਾਣੇ ਸਰਬੱਤ ਦਾ ਭਲਾ ॥<span class="tr">ارداس سربت دا بھلا پر ختم ہوتی ہے — سکھ کی سیاست تعریف ہی سے فرقہ وارانہ نہیں ہو سکتی۔</span></div>
+<p><span class="pill jud">مصنف کی رائے — عملی گرمت</span> (1) <strong>پیری کے ضبط میں میری</strong> — سیاست میں مکمل شرکت، مگر قبائلی جنگ کی طرح نہیں۔ (2) <strong>ہومے کی جانچ:</strong> جماعتی شناخت انا کا آسان لباس ہے؛ ہر دعویٰ میرٹ پر پرکھیں — "اپنی" جماعت کے خلاف بھی۔ (3) <strong>کرت-ونڈ-نام کسوٹی:</strong> کیا پالیسی ایماندار محنت کا احترام کرتی ہے، فائدہ بانٹتی ہے؟ (4) <strong>ظفرنامہ کی حد:</strong> جب سب حیلے ختم ہو جائیں تب ہی طاقت جائز — آج کا مطلب: ووٹ، آر ٹی آئی، عدالت، مورچہ — ہر قانونی راستہ اپنائیں؛ بیرونی صوفوں سے تشدد کا رومانس بیچنے والوں کو مسترد کریں۔ (5) <strong>رہت مریادا:</strong> نتنیم اور سنگت عقل کو مستحکم رکھتے ہیں؛ نشے سے انکار — غصہ بھڑکانے والے مواد کے نشے سے بھی۔ (6) <strong>گرو گھر کی حفاظت:</strong> بے ادبی کا جواب سنگت کی نگرانی اور قانونی پیروی — ہجومی انصاف نہیں۔</p>
+</div>
+</section>
+
+<!-- S17 CITIZEN PLAYBOOK -->
+<section class="sec" id="s17">
+<div class="lp" data-l="en">
+<div class="eyebrow">§17 · The citizen's playbook</div>
+<h2>How Punjab gets public-first governance — regardless of winner</h2>
+<ul>
+<li><strong>Issue charters before candidates.</strong> Village/mohalla sabhas should publish a written 10-point local charter (water, school, nasha, roads) and make every candidate sign or refuse on camera. The signing is leverage for five years of follow-up.</li>
+<li><strong>Candidate scorecards, not party scorecards.</strong> Pull each candidate's affidavit from the ECI portal (assets, cases, education at affidavit.eci.gov.in); ADR's myneta.info aggregates it. Share constituency scorecards in sangat and WhatsApp groups in Punjabi.</li>
+<li><strong>Booth vigilance as seva.</strong> Become a polling agent or volunteer booth-level observer; verify family voter entries at voters.eci.gov.in after each revision; report MCC violations with timestamped video on cVIGIL.</li>
+<li><strong>Refuse the polarisation script.</strong> When a beadbi or communal clip arrives: pause, check date/location, ask cui bono, report — do not forward. The forwarding finger is the cheapest weapon in anyone's information war.</li>
+<li><strong>Follow the money.</strong> Meta and Google ad libraries show who is paying for Punjab political ads, from where. Diaspora-funded blitzes are visible to anyone who looks.</li>
+<li><strong>RTI and the debt dashboard.</strong> File and publicise RTIs on subsidy targeting, de-addiction staffing, beadbi-case status. Pin every party on one number: what will the debt be in 2032 under your manifesto?</li>
+<li><strong>Post-poll vigilance.</strong> The defection window after a hung result is when public mandates are bought. Loud, immediate, peaceful public attention on every MLA's movements is the only real anti-defection law Punjab has.</li>
+</ul>
+</div>
+<div class="lp" data-l="pa">
+<div class="eyebrow">§17 · ਨਾਗਰਿਕ ਦਾ ਪੈਂਤੜਾ</div>
+<h2>ਜਿੱਤੇ ਕੋਈ ਵੀ — ਲੋਕ-ਪਹਿਲ ਰਾਜ ਕਿਵੇਂ ਮਿਲੇ</h2>
+<ul>
+<li><strong>ਉਮੀਦਵਾਰਾਂ ਤੋਂ ਪਹਿਲਾਂ ਮੁੱਦਾ-ਚਾਰਟਰ:</strong> ਪਿੰਡ/ਮੁਹੱਲਾ ਸਭਾ 10-ਨੁਕਾਤੀ ਲਿਖਤੀ ਚਾਰਟਰ ਬਣਾਵੇ (ਪਾਣੀ, ਸਕੂਲ, ਨਸ਼ਾ, ਸੜਕਾਂ) ਤੇ ਹਰ ਉਮੀਦਵਾਰ ਕੈਮਰੇ ਅੱਗੇ ਦਸਤਖ਼ਤ ਕਰੇ ਜਾਂ ਇਨਕਾਰ।</li>
+<li><strong>ਪਾਰਟੀ ਨਹੀਂ, ਉਮੀਦਵਾਰ ਸਕੋਰਕਾਰਡ:</strong> affidavit.eci.gov.in ਤੇ myneta.info ਤੋਂ ਹਲਫ਼ਨਾਮੇ (ਜਾਇਦਾਦ, ਕੇਸ, ਪੜ੍ਹਾਈ) ਕੱਢੋ; ਪੰਜਾਬੀ ਵਿੱਚ ਹਲਕਾ-ਸਕੋਰਕਾਰਡ ਸੰਗਤ ਤੇ ਗਰੁੱਪਾਂ ਵਿੱਚ ਵੰਡੋ।</li>
+<li><strong>ਬੂਥ-ਚੌਕਸੀ = ਸੇਵਾ:</strong> ਪੋਲਿੰਗ ਏਜੰਟ ਬਣੋ; voters.eci.gov.in ਉੱਤੇ ਪਰਿਵਾਰਕ ਐਂਟਰੀਆਂ ਜਾਂਚੋ; ਉਲੰਘਣਾ cVIGIL ਉੱਤੇ ਦਰਜ ਕਰੋ।</li>
+<li><strong>ਧਰੁਵੀਕਰਨ ਸਕ੍ਰਿਪਟ ਠੁਕਰਾਓ:</strong> ਬੇਅਦਬੀ/ਫ਼ਿਰਕੂ ਕਲਿੱਪ ਆਵੇ — ਰੁਕੋ, ਤਾਰੀਖ਼-ਥਾਂ ਜਾਂਚੋ, ਪੁੱਛੋ ਫ਼ਾਇਦਾ ਕਿਸਨੂੰ, ਰਿਪੋਰਟ ਕਰੋ — ਫਾਰਵਰਡ ਨਾ ਕਰੋ।</li>
+<li><strong>ਪੈਸੇ ਦਾ ਪਿੱਛਾ ਕਰੋ:</strong> Meta/Google ਐਡ ਲਾਇਬ੍ਰੇਰੀਆਂ ਦੱਸਦੀਆਂ ਹਨ ਕਿ ਪੰਜਾਬ ਦੇ ਸਿਆਸੀ ਇਸ਼ਤਿਹਾਰਾਂ ਦਾ ਭੁਗਤਾਨ ਕੌਣ, ਕਿੱਥੋਂ ਕਰ ਰਿਹਾ ਹੈ।</li>
+<li><strong>RTI ਤੇ ਕਰਜ਼ਾ-ਸਵਾਲ:</strong> ਹਰ ਪਾਰਟੀ ਨੂੰ ਇੱਕ ਅੰਕ ਉੱਤੇ ਟਿਕਾਓ — ਤੁਹਾਡੇ ਮੈਨੀਫੈਸਟੋ ਹੇਠ 2032 ਵਿੱਚ ਕਰਜ਼ਾ ਕਿੰਨਾ ਹੋਵੇਗਾ?</li>
+<li><strong>ਚੋਣਾਂ ਪਿੱਛੋਂ ਚੌਕਸੀ:</strong> ਲਟਕਵੇਂ ਨਤੀਜੇ ਮਗਰੋਂ ਦਲ-ਬਦਲੀ ਦੀ ਖਿੜਕੀ ਵਿੱਚ ਹੀ ਜਨਾਦੇਸ਼ ਖ਼ਰੀਦੇ ਜਾਂਦੇ ਹਨ — ਹਰ ਵਿਧਾਇਕ ਉੱਤੇ ਉੱਚੀ, ਫੌਰੀ, ਸ਼ਾਂਤ ਜਨਤਕ ਨਜ਼ਰ ਹੀ ਅਸਲ ਦਲ-ਬਦਲੀ ਕਾਨੂੰਨ ਹੈ।</li>
+</ul>
+</div>
+<div class="lp" data-l="hi">
+<div class="eyebrow">§17 · नागरिक की रणनीति</div>
+<h2>जीते कोई भी — जन-प्रथम शासन कैसे मिले</h2>
+<ul>
+<li><strong>उम्मीदवारों से पहले मुद्दा-चार्टर:</strong> गाँव/मोहल्ला सभा 10-सूत्रीय लिखित चार्टर बनाए (जल, स्कूल, नशा, सड़कें) और हर उम्मीदवार कैमरे पर हस्ताक्षर करे या इनकार।</li>
+<li><strong>दल नहीं, उम्मीदवार स्कोरकार्ड:</strong> affidavit.eci.gov.in व myneta.info से हलफ़नामे (संपत्ति, मुक़दमे, शिक्षा) निकालें; क्षेत्रीय स्कोरकार्ड समूहों में बाँटें।</li>
+<li><strong>बूथ-सतर्कता = सेवा:</strong> पोलिंग एजेंट बनें; voters.eci.gov.in पर पारिवारिक प्रविष्टियाँ जाँचें; उल्लंघन cVIGIL पर दर्ज करें।</li>
+<li><strong>ध्रुवीकरण स्क्रिप्ट ठुकराएँ:</strong> बेअदबी/सांप्रदायिक क्लिप आए — रुकें, तिथि-स्थान जाँचें, पूछें लाभ किसे, रिपोर्ट करें — फ़ॉरवर्ड न करें।</li>
+<li><strong>पैसे का पीछा करें:</strong> Meta/Google विज्ञापन लाइब्रेरी बताती हैं कि पंजाब के राजनीतिक विज्ञापनों का भुगतान कौन, कहाँ से कर रहा है।</li>
+<li><strong>RTI व ऋण-प्रश्न:</strong> हर दल को एक अंक पर टिकाएँ — आपके घोषणापत्र के अंतर्गत 2032 में क़र्ज़ कितना होगा?</li>
+<li><strong>चुनाव-बाद सतर्कता:</strong> त्रिशंकु परिणाम के बाद दल-बदल की खिड़की में ही जनादेश ख़रीदे जाते हैं — हर विधायक पर तत्काल, शांत सार्वजनिक दृष्टि ही असली दल-बदल क़ानून है।</li>
+</ul>
+</div>
+<div class="lp" data-l="ur">
+<div class="eyebrow">§17 · شہری کی حکمتِ عملی</div>
+<h2>جیتے کوئی بھی — عوام اول حکمرانی کیسے ملے</h2>
+<ul>
+<li><strong>امیدواروں سے پہلے ایشو چارٹر:</strong> گاؤں/محلہ سبھا 10 نکاتی تحریری چارٹر بنائے (پانی، اسکول، نشہ، سڑکیں) اور ہر امیدوار کیمرے پر دستخط کرے یا انکار۔</li>
+<li><strong>جماعت نہیں، امیدوار اسکور کارڈ:</strong> affidavit.eci.gov.in اور myneta.info سے حلف نامے (اثاثے، مقدمات، تعلیم) نکالیں؛ حلقہ اسکور کارڈ گروپوں میں بانٹیں۔</li>
+<li><strong>بوتھ نگرانی = سیوا:</strong> پولنگ ایجنٹ بنیں؛ voters.eci.gov.in پر خاندانی اندراجات جانچیں؛ خلاف ورزی cVIGIL پر درج کریں۔</li>
+<li><strong>پولرائزیشن اسکرپٹ مسترد کریں:</strong> بے ادبی/فرقہ وارانہ کلپ آئے — رکیں، تاریخ-مقام جانچیں، پوچھیں فائدہ کسے، رپورٹ کریں — فارورڈ نہ کریں۔</li>
+<li><strong>پیسے کا پیچھا کریں:</strong> Meta/Google اشتہاری لائبریریاں بتاتی ہیں کہ پنجاب کے سیاسی اشتہارات کی ادائیگی کون، کہاں سے کر رہا ہے۔</li>
+<li><strong>آر ٹی آئی اور قرض کا سوال:</strong> ہر جماعت کو ایک عدد پر ٹکائیں — آپ کے منشور کے تحت 2032 میں قرضہ کتنا ہوگا؟</li>
+<li><strong>انتخابات کے بعد نگرانی:</strong> معلق نتیجے کے بعد انحراف کی کھڑکی میں ہی مینڈیٹ خریدے جاتے ہیں — ہر رکن اسمبلی پر فوری، پرامن عوامی نظر ہی اصل اینٹی ڈیفیکشن قانون ہے۔</li>
+</ul>
+</div>
+</section>
+
+<!-- S18 SOURCES -->
+<section class="sec" id="s18">
+<div class="lp show" data-l="all" style="display:block">
+<div class="eyebrow">§18 · Sources &amp; method</div>
+<h2>Sources</h2>
+<p style="font-size:.9rem;color:var(--mut)">Primary retrieved sources for this briefing (paraphrased throughout; figures cross-checked where possible). Confidence pills mark: ESTABLISHED = multiply-sourced fact; CONTESTED = live factual/political dispute, both narratives given; AUTHOR'S JUDGMENT = the author's labelled assessment.</p>
+<ul style="font-size:.86rem">
+<li>Aaj Tak, 9 June 2026 — BJP's Punjab plan, Shah's command, drugs abhiyan, Bittu deployment: <a href="https://www.aajtak.in/india/punjab/story/punjab-assembly-elections-mission-amit-shah-strategy-ntc-mkg-rpti-2574424-2026-06-09">aajtak.in</a></li>
+<li>The Week (Pratul Sharma), 29 May 2026 — "Can the BJP plant its flag in the final border state": <a href="https://www.theweek.in/voices/columns/pratul-sharma/2026/05/29/punjab-2027-can-the-bjp-plant-its-flag-in-the-final-border-state.html">theweek.in</a></li>
+<li>ThePrint — Punjab municipal poll results, May 2026 (AAP 958/1977 wards): <a href="https://theprint.in/politics/punjab-municipal-polls-aap-retains-its-base-congress-distant-second/2945524/">theprint.in</a></li>
+<li>The Tribune — ED actions in Punjab (Arora arrest, Mittal raids, leaders under scanner); Sukhbir–Akal Takht coverage; Giani Gargaj appointment: <a href="https://www.tribuneindia.com">tribuneindia.com</a></li>
+<li>Punjab Today — Budget 2026-27 analysis (interest ₹28,755 cr; power subsidy ₹15,550 cr): <a href="https://punjabtodaynews.com/punjab-budget-2026-five-questions/">punjabtodaynews.com</a></li>
+<li>KBS Sidhu (former Special Chief Secretary, Punjab) — fiscal crisis and debt trajectory: <a href="https://kbssidhu.substack.com">kbssidhu.substack.com</a></li>
+<li>ECI — results 2012/2017/2022/2024: <a href="https://results.eci.gov.in">results.eci.gov.in</a>; voter services: <a href="https://voters.eci.gov.in">voters.eci.gov.in</a>; candidate affidavits: <a href="https://affidavit.eci.gov.in">affidavit.eci.gov.in</a></li>
+<li>India–Canada timeline (Nijjar, expulsions, G7 2025, High Commissioners restored Aug 2025) — Reuters/CBC/MEA statements as retrieved.</li>
+<li>1984: Government of India White Paper (1984); Ahuja Committee figures; Delhi HC judgment convicting Sajjan Kumar (2018).</li>
+<li>Gurbani: Sri Guru Granth Sahib, Ang 1 (Mool Mantar), Ang 62; Ardas (Panth-approved text); Zafarnama, Sri Guru Gobind Singh Sahib.</li>
+</ul>
+<p style="font-size:.82rem;color:var(--mut)">Method: web research conducted 10 June 2026; secondary figures (water-table decline, diaspora size) are widely reported ranges, not single-source precision. This is a citizen's analysis, not legal or investment advice. Errors mine; corrections welcome at arvindersingh.me.</p>
+</div>
+</section>
+
+</div><!-- /wrap -->
+
+<footer><div class="wrap">
+PUNJAB · 2027 — a citizen's briefing · Built on the arvindersingh.me editorial framework · ਸਰਬੱਤ ਦਾ ਭਲਾ
+</div></footer>
+
+<script>
+function setLang(l){
+  document.body.setAttribute('data-lang', l);
+  document.querySelectorAll('.lp').forEach(function(d){
+    var dl = d.getAttribute('data-l');
+    d.classList.toggle('show', dl === l || dl === 'all');
+  });
+  document.documentElement.dir = (l === 'ur') ? 'rtl' : 'ltr';
+  document.documentElement.lang = l;
+  document.querySelectorAll('.langs button').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-lang') === l);
+  });
+}
+setLang('en');
+
+/* Charts */
+var GRID = '#2a2d34', TICK = '#a6abb5';
+Chart.defaults.color = TICK;
+Chart.defaults.borderColor = GRID;
+Chart.defaults.font.family = "'Inter', sans-serif";
+var C = {aap:'#2bb673', inc:'#29a8e0', sad:'#5b7fd0', bjp:'#ff7a18', ind:'#8b8f98', bsp:'#3a5bd0', amber:'#e8a13a', red:'#d05050'};
+
+new Chart(document.getElementById('c1'), {
+  type:'bar',
+  data:{ labels:['AAP','Congress','SAD','BJP'],
+    datasets:[
+      {label:'2022 Assembly', data:[42.0,23.0,18.4,6.6], backgroundColor:'rgba(232,161,58,.85)'},
+      {label:'2024 Lok Sabha', data:[26.0,26.3,13.4,18.6], backgroundColor:'rgba(122,140,216,.85)'}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{beginAtZero:true,max:50,title:{display:true,text:'Vote share %'}}},
+    plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('c2'), {
+  type:'line',
+  data:{ labels:['2012','2017','2022'],
+    datasets:[
+      {label:'AAP', data:[null,20,92], borderColor:C.aap, backgroundColor:C.aap, pointRadius:5, tension:.15},
+      {label:'Congress', data:[46,77,18], borderColor:C.inc, backgroundColor:C.inc, pointRadius:5, tension:.15},
+      {label:'SAD', data:[56,15,3], borderColor:C.sad, backgroundColor:C.sad, pointRadius:5, tension:.15},
+      {label:'BJP', data:[12,3,2], borderColor:C.bjp, backgroundColor:C.bjp, pointRadius:5, tension:.15}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{y:{beginAtZero:true,max:100,title:{display:true,text:'Seats (of 117)'}}},
+    plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('c3'), {
+  type:'doughnut',
+  data:{ labels:['AAP 958','Congress 397','Independents 251','SAD 192','BJP 172','BSP 7'],
+    datasets:[{ data:[958,397,251,192,172,7],
+      backgroundColor:[C.aap,C.inc,C.ind,C.sad,C.bjp,C.bsp], borderColor:'#0e0f12', borderWidth:2}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('c4'), {
+  type:'line',
+  data:{ labels:['2017','2022','2025','2027 (proj.)'],
+    datasets:[
+      {label:'Debt (₹ lakh crore)', data:[2.1,2.7,3.8,4.48], borderColor:C.red, backgroundColor:C.red, pointRadius:6, pointStyle:'rectRot', tension:.2, yAxisID:'y'},
+      {label:"Interest (₹ '000 crore/yr)", data:[11.6,18.0,25.0,28.8], borderColor:C.amber, backgroundColor:C.amber, pointRadius:5, borderDash:[6,4], tension:.2, yAxisID:'y1'}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    scales:{
+      y:{beginAtZero:true,title:{display:true,text:'₹ lakh crore'}},
+      y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},title:{display:true,text:"₹ '000 crore"}}
+    },
+    plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('c5'), {
+  type:'bar',
+  data:{ labels:['Interest payments','Education','Power subsidy','Agriculture'],
+    datasets:[{label:'₹ crore (2026-27 budget)', data:[28755,16987,15550,13784],
+      backgroundColor:['rgba(208,80,80,.85)','rgba(63,174,106,.85)','rgba(232,161,58,.85)','rgba(122,140,216,.85)']}]},
+  options:{responsive:true,maintainAspectRatio:false, indexAxis:'y',
+    scales:{x:{beginAtZero:true}},
+    plugins:{legend:{display:false}}}
+});
+</script>
+</body>
+</html>
