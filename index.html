@@ -1,976 +1,288 @@
 <!DOCTYPE html>
-<html lang="en" class="light">
-    <!-- NAV:START -->
-<nav class="site-nav" aria-label="Site navigation">
-  <ul>
-    <li><a href="/index.html">Arvinder Singh — Cybersecurity Delivery Partner</a></li>
-    <li>
-      <details><summary>Articles</summary>
-        <ul>
-          <li><a href="/articles/india-deforestation-events.html">Counting the Felled — India&#x27;s Forests, the Shield We&#x27;re Removing, and What&#x27;s Planned Next</a></li>
-          <li><a href="/articles/ffmpeg-ytdlp-bench-manual.html">FFmpeg &amp; yt-dlp — The Bench Manual</a></li>
-          <li><a href="/articles/punjab-2027-sitrep.html">Punjab 2027 — Sitrep &amp; Strategic Briefing</a></li>
-          <li><a href="/articles/whatsapp-vs-signal.html">The Illusion of Privacy: What WhatsApp Doesn&#x27;t Tell You</a></li>
-          <li><a href="/articles/ai-threat-velocity-vs-remediation.html">The Velocity Gap — AI&#x27;s Asymmetric Impact on Threat Vectors and Vulnerability Remediation</a></li>
-          <li><a href="/articles/rajesh-exports-sebi.html">The ₹15 Lakh Crore Question: Inside the Rajesh Exports Case — arvindersingh.me</a></li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details><summary>Games</summary>
-        <ul>
-          <li><a href="/games/animal-dice-v3.html">ਡੰਗਰ DICE</a></li>
-        </ul>
-      </details>
-    </li>
-    <li>
-      <details><summary>Sikhi</summary>
-        <ul>
-          <li><a href="/sikhi/sikh-quiz.html">Sikh History &amp; Rehit Maryada Quiz</a></li>
-        </ul>
-      </details>
-    </li>
-  </ul>
-</nav>
-<!-- NAV:END -->
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arvinder Singh — Cybersecurity Delivery Partner</title>
-    <meta name="description" content="Arvinder Singh — 17+ years in cybersecurity leadership, delivery, IAM/PAM, AI-powered SOC operations, and strategic service delivery across 25+ accounts.">
-    <meta name="keywords" content="Arvinder Singh, cybersecurity, delivery partner, IAM, PAM, SOC, Copilot for Security, TCS Ignio, GenAI, risk management, TCS, Accenture, DXC">
-    <link rel="icon" href="https://placehold.co/32x32/6366f1/ffffff?text=AS" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Arvinder Singh | Cybersecurity Delivery Partner</title>
+  <meta name="description" content="Arvinder Singh: senior Cybersecurity Delivery Partner with 17+ years leading enterprise information security programs." />
+  <link rel="canonical" href="https://arvindersingh.me/" />
+  <meta property="og:title" content="Arvinder Singh | Cybersecurity Delivery Partner" />
+  <meta property="og:url" content="https://arvindersingh.me/" />
+  <meta name="theme-color" content="#0a0f1d" />
 
-    <style>
-        /* ─── CSS Variables ─── */
+  <!-- Apply saved/system theme before paint to avoid a flash -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.classList.toggle("dark", dark);
+      } catch (e) {}
+    })();
+  </script>
 
-        .site-nav ul { list-style: none; display: flex; gap: 1rem; padding: 0; flex-wrap: wrap; }
-.site-nav a { color: var(--link, #58A6FF); text-decoration: none; }
-.site-nav summary { cursor: pointer; }
-        :root {
-            --bg-color: #f8fafc;
-            --text-color: #334155;
-            --text-muted: #64748b;
-            --primary-accent: #6366f1;
-            --secondary-accent: #3b82f6;
-            --card-bg: #ffffff;
-            --border-color: #e2e8f0;
-            --skill-bg: #e0e7ff;
-            --skill-text: #4338ca;
-            --cert-bg: #f0f4f8;
-            --cert-border: #3b82f6;
-            --header-from: #1e3a8a;
-            --header-to: #1e40af;
-            --footer-bg: #1e293b;
-            --link-color: #2563eb;
-            --link-hover-color: #1e40af;
-            --nav-bg: rgba(255,255,255,0.93);
-            --nav-shadow: 0 1px 12px rgba(0,0,0,0.09);
-            --achievement-bg: #eef2ff;
-            --achievement-text: #4338ca;
-            --achievement-border: #c7d2fe;
-            --tools-badge-bg: #f1f5f9;
-            --tools-badge-text: #475569;
-            --tools-badge-border: #cbd5e1;
-            --ai-badge-bg: #faf5ff;
-            --ai-badge-text: #6d28d9;
-            --ai-badge-border: #ddd6fe;
-        }
-        html.dark {
-            --bg-color: #1a202c; --text-color: #e2e8f0; --text-muted: #94a3b8;
-            --primary-accent: #818cf8; --secondary-accent: #6366f1;
-            --card-bg: #2d3748; --border-color: #4a5568;
-            --skill-bg: #374151; --skill-text: #a5b4fc;
-            --cert-bg: #2d3748; --cert-border: #6366f1;
-            --header-from: #1e3a8a; --header-to: #172554;
-            --footer-bg: #0f172a; --link-color: #a5b4fc; --link-hover-color: #818cf8;
-            --nav-bg: rgba(26,32,44,0.95); --nav-shadow: 0 1px 12px rgba(0,0,0,0.3);
-            --achievement-bg: #1e1b4b; --achievement-text: #a5b4fc; --achievement-border: #3730a3;
-            --tools-badge-bg: #374151; --tools-badge-text: #cbd5e1; --tools-badge-border: #4b5563;
-            --ai-badge-bg: #2e1065; --ai-badge-text: #c4b5fd; --ai-badge-border: #5b21b6;
-        }
-        html.theme-forest {
-            --bg-color: #f0fdf4; --text-color: #166534; --text-muted: #4ade80;
-            --primary-accent: #15803d; --secondary-accent: #22c55e;
-            --card-bg: #ffffff; --border-color: #dcfce7;
-            --skill-bg: #dcfce7; --skill-text: #166534;
-            --cert-bg: #ecfdf5; --cert-border: #22c55e;
-            --header-from: #14532d; --header-to: #166534;
-            --footer-bg: #0c4a6e; --link-color: #16a34a; --link-hover-color: #15803d;
-            --nav-bg: rgba(240,253,244,0.95); --nav-shadow: 0 1px 12px rgba(21,128,61,0.12);
-            --achievement-bg: #dcfce7; --achievement-text: #14532d; --achievement-border: #86efac;
-            --tools-badge-bg: #f0fdf4; --tools-badge-text: #166534; --tools-badge-border: #bbf7d0;
-            --ai-badge-bg: #ecfdf5; --ai-badge-text: #064e3b; --ai-badge-border: #6ee7b7;
-        }
-        html.theme-ocean {
-            --bg-color: #e0f2fe; --text-color: #0369a1; --text-muted: #38bdf8;
-            --primary-accent: #0284c7; --secondary-accent: #0ea5e9;
-            --card-bg: #ffffff; --border-color: #bfdbfe;
-            --skill-bg: #bfdbfe; --skill-text: #0369a1;
-            --cert-bg: #dbeafe; --cert-border: #0ea5e9;
-            --header-from: #0369a1; --header-to: #075985;
-            --footer-bg: #082f49; --link-color: #0ea5e9; --link-hover-color: #0284c7;
-            --nav-bg: rgba(224,242,254,0.95); --nav-shadow: 0 1px 12px rgba(2,132,199,0.12);
-            --achievement-bg: #dbeafe; --achievement-text: #1e40af; --achievement-border: #93c5fd;
-            --tools-badge-bg: #e0f2fe; --tools-badge-text: #0369a1; --tools-badge-border: #7dd3fc;
-            --ai-badge-bg: #ede9fe; --ai-badge-text: #4338ca; --ai-badge-border: #a5b4fc;
-        }
-        html.theme-sunset {
-            --bg-color: #fff7ed; --text-color: #9a3412; --text-muted: #fb923c;
-            --primary-accent: #ea580c; --secondary-accent: #f97316;
-            --card-bg: #ffffff; --border-color: #fed7aa;
-            --skill-bg: #fed7aa; --skill-text: #9a3412;
-            --cert-bg: #ffedd5; --cert-border: #f97316;
-            --header-from: #c2410c; --header-to: #9a3412;
-            --footer-bg: #7c2d12; --link-color: #ea580c; --link-hover-color: #c2410c;
-            --nav-bg: rgba(255,247,237,0.95); --nav-shadow: 0 1px 12px rgba(234,88,12,0.12);
-            --achievement-bg: #ffedd5; --achievement-text: #7c2d12; --achievement-border: #fdba74;
-            --tools-badge-bg: #fff7ed; --tools-badge-text: #9a3412; --tools-badge-border: #fcd34d;
-            --ai-badge-bg: #fdf4ff; --ai-badge-text: #7e22ce; --ai-badge-border: #e9d5ff;
-        }
-        html.theme-mystic {
-            --bg-color: #f5f3ff; --text-color: #5b21b6; --text-muted: #a78bfa;
-            --primary-accent: #7c3aed; --secondary-accent: #8b5cf6;
-            --card-bg: #ffffff; --border-color: #ddd6fe;
-            --skill-bg: #ddd6fe; --skill-text: #5b21b6;
-            --cert-bg: #ede9fe; --cert-border: #8b5cf6;
-            --header-from: #6d28d9; --header-to: #5b21b6;
-            --footer-bg: #3b0764; --link-color: #8b5cf6; --link-hover-color: #7c3aed;
-            --nav-bg: rgba(245,243,255,0.95); --nav-shadow: 0 1px 12px rgba(124,58,237,0.12);
-            --achievement-bg: #ede9fe; --achievement-text: #4c1d95; --achievement-border: #c4b5fd;
-            --tools-badge-bg: #f5f3ff; --tools-badge-text: #5b21b6; --tools-badge-border: #ddd6fe;
-            --ai-badge-bg: #fdf4ff; --ai-badge-text: #86198f; --ai-badge-border: #f0abfc;
-        }
-        html.theme-highcontrast {
-            --bg-color: #000; --text-color: #fff; --text-muted: #ccc;
-            --primary-accent: #00ff00; --secondary-accent: #00cc00;
-            --card-bg: #1a1a1a; --border-color: #333;
-            --skill-bg: #222; --skill-text: #00ff00;
-            --cert-bg: #111; --cert-border: #00ff00;
-            --header-from: #005500; --header-to: #003300;
-            --footer-bg: #000; --link-color: #00ff00; --link-hover-color: #00cc00;
-            --nav-bg: rgba(0,0,0,0.97); --nav-shadow: 0 1px 12px rgba(0,255,0,0.2);
-            --achievement-bg: #001100; --achievement-text: #00ff00; --achievement-border: #006600;
-            --tools-badge-bg: #111; --tools-badge-text: #ccc; --tools-badge-border: #333;
-            --ai-badge-bg: #0a0020; --ai-badge-text: #cc99ff; --ai-badge-border: #440088;
-        }
-        html.theme-monochrome {
-            --bg-color: #f0f0f0; --text-color: #1a1a1a; --text-muted: #666;
-            --primary-accent: #444; --secondary-accent: #888;
-            --card-bg: #fff; --border-color: #ccc;
-            --skill-bg: #e0e0e0; --skill-text: #333;
-            --cert-bg: #e8e8e8; --cert-border: #888;
-            --header-from: #333; --header-to: #111;
-            --footer-bg: #111; --link-color: #444; --link-hover-color: #222;
-            --nav-bg: rgba(240,240,240,0.95); --nav-shadow: 0 1px 12px rgba(0,0,0,0.1);
-            --achievement-bg: #e0e0e0; --achievement-text: #111; --achievement-border: #aaa;
-            --tools-badge-bg: #ebebeb; --tools-badge-text: #444; --tools-badge-border: #bbb;
-            --ai-badge-bg: #f0f0f0; --ai-badge-text: #333; --ai-badge-border: #999;
-        }
-        html.theme-sepia {
-            --bg-color: #fdf6e3; --text-color: #3b2f1e; --text-muted: #9c7c5a;
-            --primary-accent: #7a4e2c; --secondary-accent: #a07a5c;
-            --card-bg: #fffcf5; --border-color: #e0d3b8;
-            --skill-bg: #ecdec8; --skill-text: #4a3520;
-            --cert-bg: #f5efe1; --cert-border: #a07a5c;
-            --header-from: #6b3f1e; --header-to: #4a2c10;
-            --footer-bg: #3a2510; --link-color: #7a4e2c; --link-hover-color: #5a3518;
-            --nav-bg: rgba(253,246,227,0.95); --nav-shadow: 0 1px 12px rgba(122,78,44,0.12);
-            --achievement-bg: #f5ece0; --achievement-text: #4a2c10; --achievement-border: #c4a882;
-            --tools-badge-bg: #fdf6e3; --tools-badge-text: #5a3c20; --tools-badge-border: #d4b896;
-            --ai-badge-bg: #f8f0ff; --ai-badge-text: #5b21b6; --ai-badge-border: #d8b4fe;
-        }
-        html.theme-teal {
-            --bg-color: #e0f7fa; --text-color: #004d40; --text-muted: #4db6ac;
-            --primary-accent: #00695c; --secondary-accent: #00bcd4;
-            --card-bg: #fff; --border-color: #b2ebf2;
-            --skill-bg: #b2ebf2; --skill-text: #004d40;
-            --cert-bg: #e0f2f7; --cert-border: #00bcd4;
-            --header-from: #004d40; --header-to: #003330;
-            --footer-bg: #00251a; --link-color: #00838f; --link-hover-color: #00695c;
-            --nav-bg: rgba(224,247,250,0.95); --nav-shadow: 0 1px 12px rgba(0,77,64,0.12);
-            --achievement-bg: #ccfbf1; --achievement-text: #064e3b; --achievement-border: #6ee7b7;
-            --tools-badge-bg: #e0f7fa; --tools-badge-text: #004d40; --tools-badge-border: #80deea;
-            --ai-badge-bg: #ede9fe; --ai-badge-text: #4c1d95; --ai-badge-border: #c4b5fd;
-        }
-
-        /* ─── Base ─── */
-        *, *::before, *::after { box-sizing: border-box; }
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
-            scroll-behavior: smooth;
-        }
-
-        /* ─── Sticky Nav ─── */
-        #sticky-nav {
-            position: sticky; top: 0; z-index: 100;
-            background: var(--nav-bg);
-            box-shadow: var(--nav-shadow);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: background 0.3s, box-shadow 0.3s;
-        }
-        .nav-link {
-            color: var(--text-color); font-size: 0.82rem; font-weight: 500;
-            padding: 0.4rem 0.65rem; border-radius: 6px;
-            transition: background 0.2s, color 0.2s; white-space: nowrap;
-        }
-        .nav-link:hover { background: var(--skill-bg); color: var(--primary-accent); }
-        #themeSelector {
-            background-color: var(--card-bg); color: var(--text-color);
-            border: 1px solid var(--border-color); border-radius: 7px;
-            padding: 0.35rem 0.65rem; font-size: 0.8rem;
-            font-family: 'DM Sans', sans-serif; cursor: pointer;
-            transition: background 0.3s, color 0.3s, border 0.3s;
-        }
-        #themeSelector:focus { outline: 2px solid var(--primary-accent); }
-        #nav-links { display: none; flex-direction: column; padding: 0.5rem 1rem 1rem; gap: 0.2rem; }
-        #nav-links.open { display: flex; }
-        @media (min-width: 640px) {
-            #nav-links { display: flex !important; flex-direction: row; padding: 0; gap: 0; }
-            #hamburger { display: none !important; }
-        }
-
-        /* ─── Header ─── */
-        .header-bg { background: linear-gradient(135deg, var(--header-from) 0%, var(--header-to) 100%); }
-
-        /* ─── Sections ─── */
-        .section-styled {
-            background-color: var(--card-bg); padding: 1.75rem;
-            border-radius: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.07);
-            margin-bottom: 2rem; transition: background 0.3s;
-        }
-        @media (min-width: 640px) { .section-styled { padding: 2.25rem; } }
-
-        .section-title {
-            color: var(--text-color);
-            border-bottom: 3px solid var(--primary-accent);
-            padding-bottom: 0.65rem; margin-bottom: 1.75rem;
-            display: flex; align-items: center; gap: 0.65rem;
-            font-family: 'DM Serif Display', serif;
-            font-size: clamp(1.35rem, 3.5vw, 1.75rem); font-weight: 400;
-        }
-        .section-title svg { flex-shrink: 0; fill: none; stroke: var(--primary-accent); stroke-width: 2; }
-
-        h1, h2 { font-family: 'DM Serif Display', serif; }
-
-        /* ─── Key Achievements Banner ─── */
-        .achievements-row {
-            display: flex; flex-wrap: wrap; gap: 0.65rem;
-            margin-bottom: 1.25rem;
-        }
-        .achievement-chip {
-            background: var(--achievement-bg);
-            color: var(--achievement-text);
-            border: 1px solid var(--achievement-border);
-            border-radius: 8px; padding: 0.55rem 0.9rem;
-            display: flex; flex-direction: column;
-            min-width: 120px; flex: 1;
-            transition: background 0.3s, color 0.3s, border 0.3s;
-        }
-        .achievement-chip .stat { font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
-        .achievement-chip .stat-label { font-size: 0.7rem; font-weight: 500; opacity: 0.8; margin-top: 0.15rem; }
-        /* AI/GenAI highlighted chip */
-        .achievement-chip.ai-chip {
-            background: var(--ai-badge-bg);
-            color: var(--ai-badge-text);
-            border-color: var(--ai-badge-border);
-        }
-
-        /* ─── Experience Cards ─── */
-        .experience-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem; padding: 1.5rem;
-            margin-bottom: 1.25rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s, border 0.3s;
-        }
-        @media (min-width: 640px) { .experience-card { padding: 1.75rem; } }
-        .experience-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); }
-        .experience-card h3 {
-            color: var(--primary-accent);
-            font-size: clamp(0.95rem, 2.5vw, 1.2rem);
-            font-weight: 700; line-height: 1.3;
-        }
-        .card-header { display: flex; align-items: flex-start; gap: 0.9rem; margin-bottom: 1rem; flex-wrap: wrap; }
-        .company-logo {
-            width: 48px; height: 48px; object-fit: contain;
-            border-radius: 6px; flex-shrink: 0;
-            border: 1px solid var(--border-color);
-            background: #fff; padding: 3px;
-        }
-        .card-header-text { flex: 1; min-width: 0; }
-
-        /* ─── Skills ─── */
-        .skill-item {
-            background-color: var(--skill-bg); color: var(--skill-text);
-            font-size: 0.8rem; padding: 0.3rem 0.85rem; border-radius: 9999px;
-            font-weight: 600; display: inline-block;
-            transition: transform 0.2s, opacity 0.2s, background 0.3s, color 0.3s;
-        }
-        .skill-item:hover { transform: translateY(-2px); opacity: 0.85; }
-
-        /* ─── Tools & Tech Badges ─── */
-        .tools-category { margin-bottom: 1.25rem; }
-        .tools-category-label {
-            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
-            text-transform: uppercase; color: var(--text-muted);
-            margin-bottom: 0.5rem;
-        }
-        .tools-wrap { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-        .tool-badge {
-            background: var(--tools-badge-bg); color: var(--tools-badge-text);
-            border: 1px solid var(--tools-badge-border);
-            font-size: 0.78rem; font-weight: 500;
-            padding: 0.28rem 0.7rem; border-radius: 6px;
-            transition: background 0.2s, transform 0.2s;
-        }
-        .tool-badge:hover { transform: translateY(-1px); }
-        .tool-badge.ai {
-            background: var(--ai-badge-bg); color: var(--ai-badge-text);
-            border-color: var(--ai-badge-border); font-weight: 600;
-        }
-
-        /* ─── Certifications ─── */
-        .certification-item {
-            background-color: var(--cert-bg);
-            border-left: 4px solid var(--cert-border);
-            border-radius: 0 0.65rem 0.65rem 0;
-            padding: 1rem 1.1rem;
-            display: flex; align-items: center; gap: 0.75rem;
-            transition: transform 0.2s, box-shadow 0.2s, background 0.3s, border 0.3s;
-        }
-        .certification-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .certification-item svg { flex-shrink: 0; stroke: var(--primary-accent); fill: none; }
-        .certification-item a {
-            color: var(--text-color); font-weight: 600; font-size: 0.9rem; transition: color 0.2s;
-        }
-        .certification-item a:hover { color: var(--link-hover-color); text-decoration: underline; }
-
-        /* ─── Lists ─── */
-        .bullet-list { list-style: disc; padding-left: 1.35rem; }
-        .bullet-list li { margin-bottom: 0.4rem; line-height: 1.65; font-size: 0.9rem; }
-        .sub-bullet-list { list-style: circle; padding-left: 1.15rem; margin-top: 0.3rem; }
-        .sub-bullet-list li { margin-bottom: 0.25rem; font-size: 0.85rem; color: var(--text-muted); }
-
-        /* ─── AI highlight pill ─── */
-        .ai-pill {
-            display: inline-block;
-            background: var(--ai-badge-bg); color: var(--ai-badge-text);
-            border: 1px solid var(--ai-badge-border);
-            font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;
-            padding: 0.1rem 0.5rem; border-radius: 99px; margin-left: 0.4rem;
-            vertical-align: middle; white-space: nowrap;
-        }
-
-        /* ─── Footer ─── */
-        .footer-bg { background-color: var(--footer-bg); }
-
-        /* ─── Scroll to top ─── */
-        #scrollToTopBtn {
-            position: fixed; bottom: 1.5rem; right: 1.5rem;
-            background-color: var(--primary-accent); color: white;
-            width: 42px; height: 42px; border-radius: 50%;
-            display: none; align-items: center; justify-content: center;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.22); cursor: pointer; z-index: 999;
-            transition: background 0.3s, transform 0.2s; border: none;
-        }
-        #scrollToTopBtn:hover { transform: translateY(-2px); }
-        #scrollToTopBtn.visible { display: flex; }
-
-        /* ─── Helpers ─── */
-        .text-muted { color: var(--text-muted); }
-        .education-link { color: var(--primary-accent); transition: color 0.2s; }
-        .education-link:hover { color: var(--link-hover-color); text-decoration: underline; }
-        .contact-link { color: var(--link-color); transition: color 0.2s; }
-        .contact-link:hover { color: var(--link-hover-color); }
-        .divider { border: none; border-top: 1px solid var(--border-color); margin: 1.1rem 0; }
-
-        /* ─── CV Download button ─── */
-        .cv-btn {
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            background: rgba(255,255,255,0.15);
-            border: 1.5px solid rgba(255,255,255,0.5);
-            color: white; font-weight: 600; font-size: 0.88rem;
-            padding: 0.55rem 1.2rem; border-radius: 8px;
-            transition: background 0.2s, border 0.2s, transform 0.2s;
-            text-decoration: none; backdrop-filter: blur(4px);
-            margin-top: 1.1rem;
-        }
-        .cv-btn:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); }
-    </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Compiled by the GitHub Action (Tailwind CLI) from src/input.css -->
+  <link rel="stylesheet" href="/assets/styles.css" />
 </head>
-<body class="antialiased">
+<body>
 
-    <!-- ─── Header ─── -->
-    <header class="header-bg text-white py-10 px-4 sm:py-16">
-        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-8">
-            <div class="text-center sm:text-left">
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-normal mb-2 leading-tight">Arvinder Singh</h1>
-                <p class="text-xl sm:text-2xl font-light opacity-90">Cybersecurity Delivery Partner</p>
-                <p class="text-sm sm:text-base mt-1 opacity-70">Noida, Uttar Pradesh, India &nbsp;·&nbsp; 17+ Years Experience</p>
-                <!-- CV Download Button — replace href with your actual CV URL -->
-                <a href="#" class="cv-btn" title="Update this link with your CV file URL">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Download CV / Resume
-                </a>
-            </div>
-            <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-[6px] border-white/80 shadow-2xl flex-shrink-0">
-                <img src="https://raw.githubusercontent.com/arvinderss/website/main/assets/arvinder-profile-picture.png"
-                     alt="Arvinder Singh" class="w-full h-full object-cover" loading="lazy"
-                     onerror="this.src='https://placehold.co/176x176/6366f1/ffffff?text=AS'">
-            </div>
-        </div>
-    </header>
+<!-- ============ HEADER ============ -->
+<header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <a href="#top" class="flex flex-col leading-tight">
+      <span class="text-base font-bold text-slate-900 dark:text-white">Arvinder Singh</span>
+      <span class="text-xs text-slate-500 dark:text-slate-400">Cybersecurity Delivery Partner</span>
+    </a>
 
-    <!-- ─── Sticky Nav ─── -->
-    <nav id="sticky-nav" aria-label="Page sections">
-        <div class="max-w-5xl mx-auto px-4 flex items-center justify-between py-2">
-            <div class="flex items-center gap-1 flex-1 min-w-0">
-                <button id="hamburger" aria-label="Toggle navigation"
-                        class="sm:hidden p-2 rounded-md flex-shrink-0"
-                        style="color:var(--text-color);background:var(--skill-bg);"
-                        onclick="document.getElementById('nav-links').classList.toggle('open')">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                </button>
-                <div id="nav-links" class="sm:flex sm:flex-row sm:items-center sm:gap-0.5">
-                    <a href="#about"          class="nav-link">About</a>
-                    <a href="#skills"         class="nav-link">Skills</a>
-                    <a href="#tools"          class="nav-link">Tools</a>
-                    <a href="#experience"     class="nav-link">Experience</a>
-                    <a href="#certifications" class="nav-link">Certifications</a>
-                    <a href="#education"      class="nav-link">Education</a>
-                    <a href="#contact"        class="nav-link">Contact</a>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 flex-shrink-0 pl-2">
-                <label for="themeSelector" class="text-xs font-medium hidden sm:block" style="color:var(--text-muted)">Theme:</label>
-                <select id="themeSelector" aria-label="Select Theme">
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                    <option value="theme-forest">Forest</option>
-                    <option value="theme-ocean">Ocean</option>
-                    <option value="theme-sunset">Sunset</option>
-                    <option value="theme-mystic">Mystic</option>
-                    <option value="theme-highcontrast">High Contrast</option>
-                    <option value="theme-monochrome">Monochrome</option>
-                    <option value="theme-sepia">Sepia</option>
-                    <option value="theme-teal">Teal</option>
-                </select>
-            </div>
-        </div>
+    <nav aria-label="Primary" class="hidden items-center gap-1 lg:flex">
+      <a class="nav-link" href="#about">About</a>
+      <a class="nav-link" href="#skills">Skills</a>
+      <a class="nav-link" href="#experience">Experience</a>
+      <a class="nav-link" href="#certifications">Certifications</a>
+      <a class="nav-link" href="#portfolio">Portfolio</a>
+      <a class="nav-link" href="#contact">Contact</a>
     </nav>
 
-    <!-- ─── Main ─── -->
-    <main class="max-w-5xl mx-auto py-8 px-4 sm:px-6">
+    <div class="flex items-center gap-2">
+      <button id="theme-toggle" type="button" aria-label="Toggle dark mode"
+        class="relative grid h-10 w-10 place-items-center rounded-lg border border-slate-200 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
+        <svg class="h-5 w-5 transition-all duration-300 rotate-0 scale-100 dark:-rotate-90 dark:scale-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+        </svg>
+        <svg class="absolute h-5 w-5 transition-all duration-300 rotate-90 scale-0 dark:rotate-0 dark:scale-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+        </svg>
+      </button>
+      <button id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"
+        class="grid h-10 w-10 place-items-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </div>
 
-        <!-- ── About ── -->
-        <section id="about" class="section-styled">
-            <h2 class="section-title">
-                <svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-                About Me
-            </h2>
-            <p class="text-base sm:text-lg leading-relaxed mb-4">
-                A highly accomplished Cybersecurity and IT service delivery leader with over <strong>17 years</strong> of extensive experience spanning cybersecurity operations, governance, risk management, and strategic service delivery. Currently serving as <strong>Delivery Partner at TCS</strong>, overseeing <strong>25+ client accounts</strong> and a team of <strong>~500 resources</strong> — driving cybersecurity revenue growth, spearheading large-scale security programs, and pioneering adoption of AI-powered tools including <strong>Microsoft Copilot for Security</strong> and <strong>TCS Ignio</strong> for next-generation SOC operations.
-            </p>
-            <p class="text-base sm:text-lg leading-relaxed">
-                Career journey spans leadership roles at <strong>Accenture, DXC Technology, SoftwareONE, Dell, Convergys,</strong> and <strong>GE Money</strong>, with deep specialization in Identity & Access Management (IAM), Privilege Access Management (PAM), Managed Security Services (MSS), and cloud security. Adept at risk mitigation, threat intelligence, security operations management, and crafting business-aligned cybersecurity strategies that enhance organizational resilience. Passionate about mentoring security professionals, driving security automation, and delivering AI-led transformation in cybersecurity delivery.
-            </p>
-        </section>
+  <nav id="mobile-menu" aria-label="Mobile" class="hidden border-t border-slate-200 dark:border-slate-800 lg:hidden">
+    <div class="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
+      <a class="nav-link" href="#about">About</a>
+      <a class="nav-link" href="#skills">Skills</a>
+      <a class="nav-link" href="#experience">Experience</a>
+      <a class="nav-link" href="#certifications">Certifications</a>
+      <a class="nav-link" href="#portfolio">Portfolio</a>
+      <a class="nav-link" href="#contact">Contact</a>
+    </div>
+  </nav>
+</header>
 
-        <!-- ── Core Competencies ── -->
-        <section id="skills" class="section-styled">
-            <h2 class="section-title">
-                <svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>
-                Core Competencies
-            </h2>
-            <div class="flex flex-wrap gap-2">
-                <span class="skill-item">Cybersecurity Strategy</span>
-                <span class="skill-item">Risk Management</span>
-                <span class="skill-item">Threat Intelligence</span>
-                <span class="skill-item">Security Operations (SOC)</span>
-                <span class="skill-item">IAM &amp; PAM</span>
-                <span class="skill-item">Cloud Security</span>
-                <span class="skill-item">Compliance &amp; Governance</span>
-                <span class="skill-item">Business Continuity</span>
-                <span class="skill-item">Incident Response</span>
-                <span class="skill-item">AI-Powered Security</span>
-                <span class="skill-item">Security Automation</span>
-                <span class="skill-item">Workforce Planning</span>
-                <span class="skill-item">Digital Transformation</span>
-                <span class="skill-item">Leadership &amp; Mentoring</span>
-                <span class="skill-item">Client Engagement</span>
-                <span class="skill-item">IT Service Management</span>
-                <span class="skill-item">Cost Optimization</span>
-                <span class="skill-item">Vendor Management</span>
-                <span class="skill-item">SIEM</span>
-                <span class="skill-item">Zero Trust Security</span>
-                <span class="skill-item">Data Protection</span>
-                <span class="skill-item">GenAI Adoption</span>
-            </div>
-        </section>
+<main id="top">
 
-        <!-- ── Tools & Technologies ── -->
-        <section id="tools" class="section-styled">
-            <h2 class="section-title">
-                <svg width="26" height="26" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                Tools &amp; Technologies
-            </h2>
+<!-- ============ HERO ============ -->
+<section class="section grid items-center gap-10 pt-14 md:grid-cols-[1.4fr_1fr]">
+  <div>
+    <span class="badge">
+      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      Delhi NCR, India
+    </span>
+    <h1 class="mt-5 text-4xl font-extrabold sm:text-5xl lg:text-6xl">Arvinder Singh</h1>
+    <p class="mt-3 text-xl font-semibold text-indigo-600 dark:text-indigo-400">Cybersecurity Delivery Partner</p>
+    <p class="mt-5 max-w-xl text-lg leading-relaxed">
+      I lead enterprise information security programs from contract to steady state, pairing governance and risk discipline with delivery teams that hit their numbers for global clients.
+    </p>
 
-            <div class="tools-category">
-                <p class="tools-category-label">AI &amp; Automation <span class="ai-pill">GenAI</span></p>
-                <div class="tools-wrap">
-                    <span class="tool-badge ai">Microsoft Copilot for Security</span>
-                    <span class="tool-badge ai">TCS Ignio (AIOps / Orchestration)</span>
-                    <span class="tool-badge ai">GenAI-powered Workflow Automation</span>
-                    <span class="tool-badge">RPA</span>
-                    <span class="tool-badge">Excel VBA / Scripting</span>
-                    <span class="tool-badge">PowerShell</span>
-                </div>
-            </div>
+    <div class="mt-8 flex flex-wrap items-center gap-3">
+      <!-- Primary CTA: same-domain file download -->
+      <a class="btn-primary" href="/resume-arvinder-singh.pdf" download>
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16"/></svg>
+        Download resume
+        <span class="chip-format">PDF • ATS-Friendly</span>
+      </a>
+      <!-- Secondary: external -->
+      <a class="btn-ghost" href="https://www.linkedin.com/in/arvinder-singh" target="_blank" rel="noopener noreferrer">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9.75h4V21H3zM9.5 9.75h3.8v1.6h.06c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.77 2.65 4.77 6.1V21h-4v-5.1c0-1.22-.02-2.78-1.7-2.78-1.7 0-1.96 1.33-1.96 2.69V21h-4z"/></svg>
+        LinkedIn
+      </a>
+      <a class="link-inline ml-1" href="#contact">Get in touch</a>
+    </div>
+  </div>
 
-            <div class="tools-category">
-                <p class="tools-category-label">Identity &amp; Access Management</p>
-                <div class="tools-wrap">
-                    <span class="tool-badge">SailPoint IdentityIQ</span>
-                    <span class="tool-badge">Oracle IDM</span>
-                    <span class="tool-badge">CA Identity</span>
-                    <span class="tool-badge">Aveksa</span>
-                    <span class="tool-badge">Azure Active Directory</span>
-                    <span class="tool-badge">Ping Directory</span>
-                    <span class="tool-badge">ADFS</span>
-                    <span class="tool-badge">PingFederate</span>
-                    <span class="tool-badge">Azure SSO</span>
-                </div>
-            </div>
+  <div class="mx-auto w-full max-w-xs md:max-w-sm">
+    <div class="relative">
+      <div class="absolute -inset-3 rounded-3xl bg-gradient-to-br from-indigo-500/25 to-blue-500/10 blur-2xl" aria-hidden="true"></div>
+      <img src="/assets/portrait.jpg" alt="Portrait of Arvinder Singh" width="480" height="560"
+        class="relative aspect-[6/7] w-full rounded-2xl border border-slate-200 object-cover shadow-xl dark:border-slate-800 bg-slate-200 dark:bg-slate-800" />
+    </div>
+  </div>
+</section>
 
-            <div class="tools-category">
-                <p class="tools-category-label">Privileged Access Management</p>
-                <div class="tools-wrap">
-                    <span class="tool-badge">CyberArk</span>
-                    <span class="tool-badge">Centrify</span>
-                    <span class="tool-badge">Thycotic</span>
-                    <span class="tool-badge">Hitachi PAM</span>
-                    <span class="tool-badge">CA PAM</span>
-                    <span class="tool-badge">CA SSO / SiteMinder</span>
-                </div>
-            </div>
+<!-- ============ KPI STRIP ============ -->
+<section aria-label="Impact highlights" class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+  <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div class="card !p-5"><p class="text-3xl font-extrabold text-slate-900 dark:text-white">17+</p><p class="mt-1 text-sm">Years enterprise InfoSec &amp; delivery</p></div>
+    <div class="card !p-5"><p class="text-3xl font-extrabold text-slate-900 dark:text-white">50+</p><p class="mt-1 text-sm">Team members led</p></div>
+    <div class="card !p-5"><p class="text-3xl font-extrabold text-slate-900 dark:text-white">30%</p><p class="mt-1 text-sm">YoY portfolio &amp; revenue growth</p></div>
+    <div class="card !p-5"><p class="text-3xl font-extrabold text-slate-900 dark:text-white">Fortune 500</p><p class="mt-1 text-sm">Delivery &amp; governance at TCS, Accenture, DXC</p></div>
+  </div>
+</section>
 
-            <div class="tools-category">
-                <p class="tools-category-label">MFA &amp; Authentication</p>
-                <div class="tools-wrap">
-                    <span class="tool-badge">Azure MFA</span>
-                    <span class="tool-badge">RSA ID Access</span>
-                    <span class="tool-badge">Cisco Duo</span>
-                    <span class="tool-badge">Symantec VIP</span>
-                    <span class="tool-badge">PingId</span>
-                    <span class="tool-badge">One Identity</span>
-                </div>
-            </div>
+<!-- ============ ABOUT ============ -->
+<section id="about" class="section">
+  <span class="badge">About</span>
+  <h2 class="section-title">Security delivery that stands up to audit and to the P&amp;L</h2>
+  <div class="mt-6 max-w-3xl space-y-4 text-lg leading-relaxed">
+    <p>I run large, multi-region cybersecurity engagements: security operations, identity, risk and compliance, and managed services. My focus is predictable delivery, clear governance, and clients who renew.</p>
+    <p>Across TCS, Accenture and DXC I have built teams, turned around underperforming accounts, and grown portfolios while keeping controls and reporting audit-ready. Read my <a class="link-inline" href="#experience">experience</a> or <a class="link-inline" href="/resume-arvinder-singh.pdf" download>download the resume</a>.</p>
+  </div>
+</section>
 
-            <div class="tools-category">
-                <p class="tools-category-label">Secrets &amp; Key Management</p>
-                <div class="tools-wrap">
-                    <span class="tool-badge">Azure KMS</span>
-                    <span class="tool-badge">Cipher Trust KMS</span>
-                    <span class="tool-badge">Thales Luna HSM</span>
-                </div>
-            </div>
+<!-- ============ SKILLS ============ -->
+<section id="skills" class="section pt-0">
+  <span class="badge">Skills</span>
+  <h2 class="section-title">What I bring to an engagement</h2>
+  <div class="mt-8 grid gap-5 md:grid-cols-3">
+    <div class="card">
+      <h3 class="text-lg font-semibold">Delivery &amp; leadership</h3>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="chip">Program governance</span><span class="chip">P&amp;L ownership</span><span class="chip">Account growth</span><span class="chip">Team building</span><span class="chip">Stakeholder management</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="text-lg font-semibold">Security domains</h3>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="chip">Managed security services</span><span class="chip">SOC operations</span><span class="chip">IAM</span><span class="chip">Risk &amp; compliance</span><span class="chip">Incident response</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3 class="text-lg font-semibold">Frameworks &amp; standards</h3>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="chip">ISO 27001</span><span class="chip">NIST CSF</span><span class="chip">SOC 2</span><span class="chip">ITIL</span><span class="chip">PCI DSS</span>
+      </div>
+    </div>
+  </div>
+</section>
 
-            <div class="tools-category">
-                <p class="tools-category-label">ITSM, Reporting &amp; Analytics</p>
-                <div class="tools-wrap">
-                    <span class="tool-badge">ServiceNow</span>
-                    <span class="tool-badge">Microsoft Power BI</span>
-                    <span class="tool-badge">Workday</span>
-                    <span class="tool-badge">SharePoint</span>
-                    <span class="tool-badge">SQL</span>
-                    <span class="tool-badge">Microsoft Excel</span>
-                    <span class="tool-badge">LANDesk</span>
-                </div>
-            </div>
+<!-- ============ EXPERIENCE ============ -->
+<section id="experience" class="section pt-0">
+  <span class="badge">Experience</span>
+  <h2 class="section-title">Where I've delivered</h2>
+  <div class="mt-8 grid gap-5">
+    <!-- Replace titles, dates and bullets with your real history -->
+    <article class="card">
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 class="text-xl font-semibold">Cybersecurity Delivery Partner</h3>
+        <span class="chip">DXC Technology</span>
+      </div>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Add dates &bull; Delhi NCR</p>
+      <ul class="mt-4 list-disc space-y-1.5 pl-5">
+        <li>Own delivery, governance and growth for a multi-client security portfolio.</li>
+        <li>Lead 50+ engineers, analysts and managers across regions.</li>
+      </ul>
+      <div class="mt-4 flex flex-wrap gap-2"><span class="chip">Governance</span><span class="chip">Revenue growth</span><span class="chip">Managed services</span></div>
+    </article>
+    <article class="card">
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 class="text-xl font-semibold">Security Delivery Lead</h3>
+        <span class="chip">Accenture</span>
+      </div>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Add dates</p>
+      <ul class="mt-4 list-disc space-y-1.5 pl-5">
+        <li>Delivered enterprise security programs for Fortune 500 clients.</li>
+        <li>Added a measurable result here, such as a cost saving or an SLA improvement.</li>
+      </ul>
+      <div class="mt-4 flex flex-wrap gap-2"><span class="chip">Risk &amp; compliance</span><span class="chip">SOC</span></div>
+    </article>
+    <article class="card">
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 class="text-xl font-semibold">Information Security Consultant</h3>
+        <span class="chip">Tata Consultancy Services</span>
+      </div>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Add dates</p>
+      <ul class="mt-4 list-disc space-y-1.5 pl-5">
+        <li>Started in enterprise InfoSec operations and grew into program and delivery leadership.</li>
+      </ul>
+      <div class="mt-4 flex flex-wrap gap-2"><span class="chip">InfoSec operations</span><span class="chip">IAM</span></div>
+    </article>
+  </div>
+</section>
 
-            <div class="tools-category" style="margin-bottom:0">
-                <p class="tools-category-label">Cloud &amp; Infrastructure</p>
-                <div class="tools-wrap">
-                    <span class="tool-badge">Microsoft Azure</span>
-                    <span class="tool-badge">Microsoft Sentinel</span>
-                    <span class="tool-badge">Microsoft Defender</span>
-                    <span class="tool-badge">Azure Security Center</span>
-                    <span class="tool-badge">Citrix</span>
-                    <span class="tool-badge">VMware</span>
-                </div>
-            </div>
-        </section>
+<!-- ============ CERTIFICATIONS ============ -->
+<section id="certifications" class="section pt-0">
+  <span class="badge">Certifications</span>
+  <h2 class="section-title">Credentials</h2>
+  <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Replace with your actual certifications -->
+    <div class="card"><h3 class="font-semibold">Certification name</h3><p class="mt-1 text-sm">Issuing body</p><div class="mt-3 flex gap-2"><span class="chip">Year</span><span class="chip">ID / verify link</span></div></div>
+    <div class="card"><h3 class="font-semibold">Certification name</h3><p class="mt-1 text-sm">Issuing body</p><div class="mt-3 flex gap-2"><span class="chip">Year</span></div></div>
+    <div class="card"><h3 class="font-semibold">Certification name</h3><p class="mt-1 text-sm">Issuing body</p><div class="mt-3 flex gap-2"><span class="chip">Year</span></div></div>
+  </div>
+</section>
 
-        <!-- ── Experience ── -->
-        <section id="experience" class="section-styled">
-            <h2 class="section-title">
-                <svg width="26" height="26" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-                Experience
-            </h2>
+<!-- ============ PORTFOLIO ============ -->
+<section id="portfolio" class="section pt-0">
+  <span class="badge">Portfolio</span>
+  <h2 class="section-title">Selected work</h2>
+  <div class="mt-8 grid gap-5 md:grid-cols-2">
+    <!-- Replace with real projects or case studies -->
+    <article class="card">
+      <h3 class="text-lg font-semibold">Account turnaround</h3>
+      <p class="mt-2">Stabilised a struggling security account and returned it to growth. Describe scope, outcome and your role.</p>
+      <div class="mt-4 flex flex-wrap gap-2"><span class="chip">Delivery</span><span class="chip">Governance</span></div>
+      <a class="link-inline mt-4" href="#contact">Ask for details</a>
+    </article>
+    <article class="card">
+      <h3 class="text-lg font-semibold">Managed security program</h3>
+      <p class="mt-2">Built a 24x7 managed security service for a global client. Add team size, tooling and results.</p>
+      <div class="mt-4 flex flex-wrap gap-2"><span class="chip">SOC</span><span class="chip">Managed services</span></div>
+      <a class="link-inline mt-4" href="#contact">Ask for details</a>
+    </article>
+  </div>
+</section>
 
-            <!-- TCS -->
-            <div class="experience-card">
-                <div class="card-header">
-                    <img src="https://raw.githubusercontent.com/arvinderss/website/main/assets/TCS.png"
-                         alt="TCS Logo" class="company-logo" loading="lazy" onerror="this.style.display='none'">
-                    <div class="card-header-text">
-                        <h3>Delivery Partner — Cybersecurity Practice</h3>
-                        <p class="font-semibold text-sm mt-0.5" style="color:var(--text-color)">Tata Consultancy Services</p>
-                        <p class="text-xs mt-0.5 text-muted">September 2024 – Present &nbsp;·&nbsp; Noida, UP, India</p>
-                    </div>
-                </div>
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="section pt-0">
+  <div class="rounded-2xl border border-slate-200 bg-white p-8 dark:border-slate-800/80 dark:bg-slate-900/60 sm:p-12">
+    <span class="badge">Contact</span>
+    <h2 class="section-title">Let's talk about your security program</h2>
+    <p class="mt-4 max-w-xl text-lg">Open to conversations on delivery leadership, security partnerships and advisory roles.</p>
+    <div class="mt-7 flex flex-wrap items-center gap-3">
+      <a class="btn-primary" href="mailto:hello@arvindersingh.me">Email me</a>
+      <a class="btn-ghost" href="https://www.linkedin.com/in/arvinder-singh" target="_blank" rel="noopener noreferrer">Connect on LinkedIn</a>
+      <a class="link-inline" href="/resume-arvinder-singh.pdf" download>Resume (PDF)</a>
+    </div>
+  </div>
+</section>
 
-                <!-- Key Achievements -->
-                <div class="achievements-row">
-                    <div class="achievement-chip">
-                        <span class="stat">25+</span>
-                        <span class="stat-label">Client Accounts</span>
-                    </div>
-                    <div class="achievement-chip">
-                        <span class="stat">~500</span>
-                        <span class="stat-label">Resources Managed</span>
-                    </div>
-                    <div class="achievement-chip ai-chip">
-                        <span class="stat">AI-Led SOC</span>
-                        <span class="stat-label">Copilot + Ignio Adoption</span>
-                    </div>
-                    <div class="achievement-chip">
-                        <span class="stat">End-to-End</span>
-                        <span class="stat-label">Delivery Ownership</span>
-                    </div>
-                </div>
+</main>
 
-                <ul class="bullet-list">
-                    <li>Orchestrated initiatives driving cybersecurity revenue growth and optimizing resource allocation across <strong>25+ client accounts</strong>, with ownership of a delivery workforce of <strong>~500 resources</strong> spanning security operations, IAM/PAM, cloud security, and managed security services.</li>
-                    <li>Managed overall service delivery ensuring stringent alignment with business objectives and SLAs, cultivating robust client relationships through proactive engagement and executive-level reporting.</li>
-                    <li><strong>Led the adoption of Microsoft Copilot for Security</strong> across SOC operations, enabling AI-assisted alert triage, automated incident summarization, and contextual threat analysis — delivering measurable improvements in analyst productivity and Mean Time to Respond (MTTR). <span class="ai-pill">AI / GenAI</span></li>
-                    <li><strong>Championed deployment of TCS Ignio</strong>, TCS's proprietary AI/GenAI-powered AIOps and orchestration platform, to automate SOC runbooks, incident response workflows, and repetitive security operations tasks — significantly reducing manual intervention, accelerating automated remediation, and freeing analyst capacity for higher-value threat hunting activities. <span class="ai-pill">AI / GenAI</span></li>
-                    <li>Developed and tracked revenue forecasts to consistently meet and exceed financial targets; collaborated with offshore teams to ensure flawless program execution and timely delivery.</li>
-                    <li>Partnered with sales and presales teams to define project scope, effort estimates, and alignment with Statement of Work (SoW) for new engagements.</li>
-                    <li>Planned and oversaw strategic resource allocation, onboarding, and workforce ramp-up aligned to dynamic project demands — bridging internal talent and external sourcing to meet evolving skill requirements.</li>
-                    <li>Mentored and guided employees fostering a culture of trust, continuous learning, and collaboration; actively identifying and developing future cybersecurity leaders and supporting targeted upskilling in AI-driven security tooling.</li>
-                </ul>
-            </div>
+<footer class="border-t border-slate-200 py-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+  &copy; <span id="year"></span> Arvinder Singh. All rights reserved.
+</footer>
 
-            <!-- Accenture -->
-            <div class="experience-card">
-                <div class="card-header">
-                    <img src="https://raw.githubusercontent.com/arvinderss/website/main/assets/accenture.webp"
-                         alt="Accenture Logo" class="company-logo" loading="lazy" onerror="this.style.display='none'">
-                    <div class="card-header-text">
-                        <h3>Security Delivery Associate Manager</h3>
-                        <p class="font-semibold text-sm mt-0.5" style="color:var(--text-color)">Accenture</p>
-                        <p class="text-xs mt-0.5 text-muted">May 2020 – September 2024 &nbsp;·&nbsp; Noida, UP, India &nbsp;·&nbsp; 4 yrs 4 mos</p>
-                    </div>
-                </div>
+<script>
+  var root = document.documentElement;
+  var media = window.matchMedia("(prefers-color-scheme: dark)");
 
-                <div class="achievements-row">
-                    <div class="achievement-chip">
-                        <span class="stat">~50</span>
-                        <span class="stat-label">Resource Skill Pool</span>
-                    </div>
-                    <div class="achievement-chip">
-                        <span class="stat">15%</span>
-                        <span class="stat-label">Delivery Efficiency Gain</span>
-                    </div>
-                    <div class="achievement-chip">
-                        <span class="stat">Multi-Client</span>
-                        <span class="stat-label">End-to-End IAM/PAM Delivery</span>
-                    </div>
-                </div>
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var dark = root.classList.toggle("dark");
+    try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch (e) {}
+  });
 
-                <ul class="bullet-list">
-                    <li>Managed a skill pool of <strong>~50 resources</strong> dedicated to Managed Security Services, delivering a <strong>15% improvement</strong> in project delivery efficiency through optimized team structure and automation.</li>
-                    <li>Led teams supporting Run, Support, and Enhancement services across:
-                        <ul class="sub-bullet-list">
-                            <li><strong>Directory Services:</strong> On-prem / Hybrid / Azure Active Directory, Ping Directory</li>
-                            <li><strong>PAM:</strong> CyberArk, Centrify, Thycotic, Hitachi PAM</li>
-                            <li><strong>SSO:</strong> ADFS, Azure SSO, PingFederate</li>
-                            <li><strong>MFA:</strong> Azure MFA, Symantec VIP, PingId, RSA ID Access, Cisco Duo, One Identity</li>
-                            <li><strong>Secrets Management:</strong> Azure KMS, Cipher Trust KMS, Thales Luna HSM</li>
-                        </ul>
-                    </li>
-                    <li>Supported solutioning reviews, provided effort estimations for new clients, and implemented automation via scripts and integrations to reduce recurring operational overhead.</li>
-                    <li>Functioned as project lead alongside PMO for multiple clients — overseeing end-to-end deliveries across Directory Services, IdM, Networking, Wintel, and Vulnerability Management.</li>
-                    <li>Drove capability building through targeted recruitments, training programs, and upskilling/reskilling initiatives aligned to evolving client technology stacks.</li>
-                </ul>
-            </div>
+  // Follow system changes until the user picks a theme manually
+  media.addEventListener("change", function (e) {
+    try { if (localStorage.getItem("theme")) return; } catch (err) {}
+    root.classList.toggle("dark", e.matches);
+  });
 
-            <!-- DXC -->
-            <div class="experience-card">
-                <div class="card-header">
-                    <img src="https://raw.githubusercontent.com/arvinderss/website/main/assets/DXC.png"
-                         alt="DXC Technology Logo" class="company-logo" loading="lazy" onerror="this.style.display='none'">
-                    <div class="card-header-text">
-                        <h3>Senior Professional Information Security Engineer</h3>
-                        <p class="font-semibold text-sm mt-0.5" style="color:var(--text-color)">DXC Technology</p>
-                        <p class="text-xs mt-0.5 text-muted">October 2016 – May 2020 &nbsp;·&nbsp; Noida, UP, India &nbsp;·&nbsp; 3 yrs 7 mos</p>
-                    </div>
-                </div>
+  var menu = document.getElementById("mobile-menu");
+  var btn = document.getElementById("menu-toggle");
+  function setMenu(open) {
+    menu.classList.toggle("hidden", !open);
+    btn.setAttribute("aria-expanded", String(open));
+  }
+  btn.addEventListener("click", function () { setMenu(menu.classList.contains("hidden")); });
+  menu.addEventListener("click", function (e) { if (e.target.tagName === "A") setMenu(false); });
 
-                <div class="achievements-row">
-                    <div class="achievement-chip">
-                        <span class="stat">IAM + PAM</span>
-                        <span class="stat-label">Technical Specialization</span>
-                    </div>
-                    <div class="achievement-chip">
-                        <span class="stat">RPA-Led</span>
-                        <span class="stat-label">Access Admin Automation</span>
-                    </div>
-                    <div class="achievement-chip">
-                        <span class="stat">Multi-Tool</span>
-                        <span class="stat-label">KPI & Compliance Dashboards</span>
-                    </div>
-                </div>
-
-                <ul class="bullet-list">
-                    <li>Specialized in Privilege Access Management with hands-on ownership of team performance, operations, scheduling, and SLA adherence.</li>
-                    <li>Managed identity and access using <strong>SailPoint, Oracle IDM, CA Identity, CA PAM, CA SSO/SiteMinder</strong>; ensured identity governance and compliance via SailPoint and Aveksa.</li>
-                    <li>Developed standard KPI Reports and Compliance Dashboards using <strong>ServiceNow</strong>, integrating data from SailPoint, Aveksa, and Workday — visualized via <strong>Power BI</strong>.</li>
-                    <li>Automated Access Administration and Identity Management tasks using <strong>RPA and scripting</strong>, achieving substantial and measurable efficiency gains in recurring operational workloads.</li>
-                    <li>Implemented Kaizen plans for continuous improvement and process reengineering across security service delivery.</li>
-                    <li>Led focus areas: Service Level optimization, Business Process Automation, Incident Reduction, and Performance Management.</li>
-                </ul>
-            </div>
-
-            <!-- SoftwareONE -->
-            <div class="experience-card">
-                <div class="card-header">
-                    <img src="https://raw.githubusercontent.com/arvinderss/website/main/assets/softwareone.png"
-                         alt="SoftwareONE Logo" class="company-logo" loading="lazy" onerror="this.style.display='none'">
-                    <div class="card-header-text">
-                        <h3>Service Delivery Lead</h3>
-                        <p class="font-semibold text-sm mt-0.5" style="color:var(--text-color)">SoftwareONE</p>
-                        <p class="text-xs mt-0.5 text-muted">May 2014 – October 2016 &nbsp;·&nbsp; Gurugram, Haryana, India &nbsp;·&nbsp; 2 yrs 5 mos</p>
-                    </div>
-                </div>
-
-                <div class="achievements-row">
-                    <div class="achievement-chip">
-                        <span class="stat">Zero</span>
-                        <span class="stat-label">Repeat Escalations</span>
-                    </div>
-                    <div class="achievement-chip">
-                        <span class="stat">SLA+</span>
-                        <span class="stat-label">Quality & CSAT Ownership</span>
-                    </div>
-                </div>
-
-                <ul class="bullet-list">
-                    <li>Held full ownership of Quality, SLA adherence, and customer satisfaction under SAM projects, targeting and achieving zero repeat escalations through rigorous RCA and corrective action management.</li>
-                    <li>Managed escalations by conducting thorough Root Cause Analysis (RCA) and implementing both corrective and proactive measures.</li>
-                    <li>Developed robust reporting models for new services, performance KPIs, and resource utilization scores.</li>
-                    <li>Automated services and reporting using <strong>Excel, SQL, and SharePoint</strong>, enhancing operational efficiency across delivery teams.</li>
-                    <li>Provided support to Project Leads, Services Managers, and SAM consultants in developing SAM project expertise and creating service documentation aligned to SOW.</li>
-                </ul>
-            </div>
-
-            <!-- Dell -->
-            <div class="experience-card">
-                <div class="card-header">
-                    <img src="https://raw.githubusercontent.com/arvinderss/website/main/assets/dell.png"
-                         alt="Dell Logo" class="company-logo" loading="lazy" onerror="this.style.display='none'">
-                    <div class="card-header-text">
-                        <h3>Call Routing &amp; Scheduling Sr. Associate</h3>
-                        <p class="font-semibold text-sm mt-0.5" style="color:var(--text-color)">Dell</p>
-                        <p class="text-xs mt-0.5 text-muted">October 2009 – February 2014 &nbsp;·&nbsp; Punjab, India &nbsp;·&nbsp; 4 yrs 4 mos</p>
-                    </div>
-                </div>
-
-                <div class="achievements-row">
-                    <div class="achievement-chip">
-                        <span class="stat">WFM + SQL</span>
-                        <span class="stat-label">Real-Time Analytics</span>
-                    </div>
-                    <div class="achievement-chip">
-                        <span class="stat">Multi-LOB</span>
-                        <span class="stat-label">Forecasting & Scheduling</span>
-                    </div>
-                </div>
-
-                <ul class="bullet-list">
-                    <li>Managed Service Level, Queue Management, WFM, Forecasting, and Scheduling in collaboration with Ops Leads for Real-Time Management across multiple Lines of Business.</li>
-                    <li>Conducted real-time reporting and analysis on LOB performance using <strong>SQL and Excel</strong>; published reports via email, Excel, and SharePoint.</li>
-                    <li>Performed Workforce Management based on forecast volume and trend analysis to maintain optimal headcount and acceptable service levels.</li>
-                    <li>Devised daily targets from forecasted projections; published hourly through annual productivity, attendance, and outage reports; maintained historical KPI scorecards for LOBs, TMs, and Agents.</li>
-                    <li>Provided technical support for Dell laptop, desktop, AIO systems, printers, and TVs. Managed escalations and parts dispatch.</li>
-                </ul>
-            </div>
-
-            <!-- Convergys -->
-            <div class="experience-card">
-                <div class="card-header">
-                    <img src="https://raw.githubusercontent.com/arvinderss/website/main/assets/convergys.png"
-                         alt="Convergys Logo" class="company-logo" loading="lazy" onerror="this.style.display='none'">
-                    <div class="card-header-text">
-                        <h3>Network Services Technician</h3>
-                        <p class="font-semibold text-sm mt-0.5" style="color:var(--text-color)">Convergys</p>
-                        <p class="text-xs mt-0.5 text-muted">October 2007 – October 2009 &nbsp;·&nbsp; Gurugram, Haryana, India &nbsp;·&nbsp; 2 yrs</p>
-                    </div>
-                </div>
-
-                <div class="achievements-row">
-                    <div class="achievement-chip">
-                        <span class="stat">Global</span>
-                        <span class="stat-label">US · India · Philippines</span>
-                    </div>
-                    <div class="achievement-chip">
-                        <span class="stat">IT Assets</span>
-                        <span class="stat-label">License &amp; Procurement Mgmt</span>
-                    </div>
-                </div>
-
-                <ul class="bullet-list">
-                    <li>Managed Incident Management, issue resolution, and software installation for employees across <strong>America, India, and Philippines</strong>.</li>
-                    <li>Oversaw IT Asset Management and drove Software License Compliance globally; coordinated with hardware/software vendors for procurement.</li>
-                    <li>Managed New Hire Onboarding including Active Directory, Citrix, and PeopleSoft profile creation; deployed and configured VM Machines and Citrix Environments for WAH users.</li>
-                    <li>Maintained historical data on SQL databases; designed reporting templates and automated processes using <strong>Excel VBA</strong>.</li>
-                </ul>
-            </div>
-
-            <!-- GE Money -->
-            <div class="experience-card" style="margin-bottom:0">
-                <div class="card-header">
-                    <img src="https://raw.githubusercontent.com/arvinderss/website/main/assets/GE.png"
-                         alt="GE Money Logo" class="company-logo" loading="lazy" onerror="this.style.display='none'">
-                    <div class="card-header-text">
-                        <h3>Process Associate</h3>
-                        <p class="font-semibold text-sm mt-0.5" style="color:var(--text-color)">GE Money</p>
-                        <p class="text-xs mt-0.5 text-muted">July 2006 – September 2007 &nbsp;·&nbsp; Gurugram, Haryana, India &nbsp;·&nbsp; 1 yr 2 mos</p>
-                    </div>
-                </div>
-
-                <ul class="bullet-list">
-                    <li>Assisted customers with credit card payment processes and provided consultation on debt management.</li>
-                    <li>Created detailed team performance reports; maintained historical KPI data to support business planning.</li>
-                    <li>Led meetings with Team Managers and Business Owners to discuss performance and identify improvement opportunities.</li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- ── Certifications ── -->
-        <section id="certifications" class="section-styled">
-            <h2 class="section-title">
-                <svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-                Certifications
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <div class="certification-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-                    <a href="https://www.isc2.org/Certifications/CC" target="_blank" rel="noopener noreferrer">Certified in Cybersecurity (CC) — ISC²</a>
-                </div>
-                <div class="certification-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-                    <a href="https://www.isaca.org/credentialing/cism" target="_blank" rel="noopener noreferrer">CISM — Certified Information Security Manager (2018)</a>
-                </div>
-                <div class="certification-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-                    <a href="https://learn.microsoft.com/en-us/certifications/security-compliance-identity-fundamentals/" target="_blank" rel="noopener noreferrer">Microsoft SC-900: Security, Compliance &amp; Identity Fundamentals</a>
-                </div>
-                <div class="certification-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-                    <a href="https://www.forgerock.com/" target="_blank" rel="noopener noreferrer">ForgeRock Directory Services Core Skills</a>
-                </div>
-                <div class="certification-item">
-                    <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-                    <a href="https://www.axelos.com/certifications/itil-certifications" target="_blank" rel="noopener noreferrer">ITIL Foundation (2011)</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- ── Education ── -->
-        <section id="education" class="section-styled">
-            <h2 class="section-title">
-                <svg width="26" height="26" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                Education
-            </h2>
-            <div class="experience-card" style="margin-bottom:0.75rem">
-                <h3 class="font-bold" style="color:var(--primary-accent);font-size:1.05rem">
-                    <a href="https://www.ptu.ac.in/" target="_blank" rel="noopener noreferrer" class="education-link">B.Sc., Computer Science</a>
-                </h3>
-                <p class="font-semibold text-sm mt-1" style="color:var(--text-color)">Punjab Technical University</p>
-                <!-- Note: overlaps with Dell start (2009) — completed while working, which reflects strong work ethic -->
-                <p class="text-xs mt-0.5 text-muted">2008 – 2011 &nbsp;·&nbsp; <em>Completed while working at Dell (2009–2011)</em></p>
-            </div>
-            <div class="experience-card" style="margin-bottom:0">
-                <h3 class="font-bold" style="color:var(--primary-accent);font-size:1.05rem">
-                    <a href="https://kvsangathan.nic.in/" target="_blank" rel="noopener noreferrer" class="education-link">Class 12th</a>
-                </h3>
-                <p class="font-semibold text-sm mt-1" style="color:var(--text-color)">Kendriya Vidyalaya</p>
-                <p class="text-xs mt-0.5 text-muted">1999 – 2002</p>
-            </div>
-        </section>
-
-        <!-- ── Contact ── -->
-        <section id="contact" class="section-styled">
-            <h2 class="section-title">
-                <svg width="26" height="26" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                Contact
-            </h2>
-            <div class="experience-card" style="margin-bottom:0">
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center gap-3">
-                        <svg class="contact-link flex-shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-                        <a href="https://www.linkedin.com/in/arvinderss" target="_blank" rel="noopener noreferrer" class="contact-link hover:underline font-medium text-sm sm:text-base">linkedin.com/in/arvinderss</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ─── Scroll to Top ─── -->
-    <button id="scrollToTopBtn" aria-label="Scroll to top">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-    </button>
-
-    <!-- ─── Footer ─── -->
-    <footer class="footer-bg text-white py-8 px-4 text-center">
-        <div class="max-w-5xl mx-auto">
-            <p class="text-sm">&copy; 2025 Arvinder Singh. All rights reserved.</p>
-            <p class="text-xs mt-2 opacity-50">Built with HTML &amp; Tailwind CSS.</p>
-        </div>
-    </footer>
-
-    <script>
-        // ─── Theme ───
-        const themeSelector = document.getElementById('themeSelector');
-        const htmlEl = document.documentElement;
-        const allThemes = ['light','dark','theme-forest','theme-ocean','theme-sunset','theme-mystic','theme-highcontrast','theme-monochrome','theme-sepia','theme-teal'];
-
-        function applyTheme(name) {
-            htmlEl.classList.remove(...allThemes);
-            htmlEl.classList.add(name);
-            localStorage.setItem('theme', name);
-            themeSelector.value = name;
-        }
-
-        const saved = localStorage.getItem('theme');
-        if (saved && allThemes.includes(saved)) applyTheme(saved);
-        else if (window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
-        else applyTheme('light');
-
-        themeSelector.addEventListener('change', e => applyTheme(e.target.value));
-
-        // ─── Scroll to Top ───
-        const scrollBtn = document.getElementById('scrollToTopBtn');
-        window.addEventListener('scroll', () => {
-            scrollBtn.classList.toggle('visible', window.scrollY > 300);
-        }, { passive: true });
-        scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-        // ─── Close mobile nav on link click ───
-        document.querySelectorAll('#nav-links .nav-link').forEach(link => {
-            link.addEventListener('click', () => document.getElementById('nav-links').classList.remove('open'));
-        });
-    </script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
