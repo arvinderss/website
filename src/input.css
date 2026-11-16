@@ -50,6 +50,23 @@
     @apply inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700
            dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300;
   }
+  /* Logo strip & timeline */
+  .logo-tile {
+    @apply grid h-16 w-16 place-items-center rounded-xl border border-slate-200 bg-white p-2 shadow-sm grayscale transition
+           hover:grayscale-0 hover:-translate-y-0.5 dark:border-slate-700 sm:h-20 sm:w-20;
+  }
+  .logo-tile img { @apply h-full w-full object-contain; }
+  .timeline-logo {
+    @apply absolute -left-[3.05rem] top-5 grid h-10 w-10 place-items-center overflow-hidden rounded-full border-4 border-slate-50 bg-white p-1 shadow
+           dark:border-[#0a0f1d];
+  }
+  .timeline-logo img { @apply h-full w-full object-contain; }
+  /* Credential cards */
+  .cred { @apply block hover:border-indigo-400 dark:hover:border-indigo-500; }
+  .cred-verify {
+    @apply mt-3 inline-flex items-center gap-1 text-sm font-medium text-blue-600 group-hover:underline dark:text-blue-400;
+  }
+  .cred-verify::after { content: "↗"; }
   /* Brief builder */
   .step-label { @apply flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100; }
   .step-num {
