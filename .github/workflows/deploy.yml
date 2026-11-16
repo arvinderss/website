@@ -27,7 +27,8 @@ jobs:
       - name: Build Tailwind CSS
         run: |
           mkdir -p dist/assets
-          npx --yes @tailwindcss/cli@4 -i src/input.css -o dist/assets/styles.css --minify
+          npm install --no-save --no-package-lock tailwindcss@4 @tailwindcss/cli@4
+          npx @tailwindcss/cli -i src/input.css -o dist/assets/styles.css --minify
 
       - name: Assemble site
         run: |
