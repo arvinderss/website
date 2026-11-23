@@ -66,6 +66,7 @@
       <a class="nav-link" href="#career">Career</a>
       <a class="nav-link" href="#credentials">Credentials</a>
       <a class="nav-link" href="#work">Work</a>
+      <a class="nav-link" href="#projects">Projects</a>
       <a class="nav-link" href="#contact">Contact</a>
     </nav>
 
@@ -94,6 +95,7 @@
       <a class="nav-link" href="#career">Career</a>
       <a class="nav-link" href="#credentials">Credentials</a>
       <a class="nav-link" href="#work">Work</a>
+      <a class="nav-link" href="#projects">Projects</a>
       <a class="nav-link" href="#contact">Contact</a>
     </div>
   </nav>
@@ -390,6 +392,92 @@
     </figure>
   </div>
   <p class="mt-4 text-sm"><a class="link-inline" href="https://www.linkedin.com/in/arvinderss/details/recommendations/" target="_blank" rel="noopener noreferrer">Read all 10 recommendations on LinkedIn &rarr;</a></p>
+</section>
+
+<!-- ============ SIDE PROJECTS ============ -->
+<section id="projects" class="section pt-0">
+  <span class="badge">Side projects</span>
+  <h2 class="section-title">What I build after hours</h2>
+  <p class="mt-4 max-w-3xl text-lg">Built on evenings and weekends, alongside a full-time role, using AI-assisted development (vibe coding). Same principles as my day job: privacy by design, no data leaving the device, and things that keep working offline.</p>
+
+  <h3 class="proj-group">Privacy-first apps</h3>
+  <div class="mt-4 grid gap-5 md:grid-cols-2">
+    <article class="card proj">
+      <div class="proj-head"><h4 class="proj-title">Tel · ਤੇਲ: offline fuel &amp; mileage tracker</h4><span class="proj-tag">Android</span></div>
+      <p class="mt-2">Log a fill-up in seconds and see mileage, cost per km and spending trends. The app has no internet permission at all, and CI fails the build if one ever appears. Data stays in a CSV file on the phone.</p>
+      <div class="proj-foot"><span class="chip">Kotlin</span><span class="chip">Room</span><span class="chip">CI</span><a class="proj-link" href="https://github.com/arvinderss/tel/releases" target="_blank" rel="noopener noreferrer">Download v1.1.13</a></div>
+    </article>
+    <article class="card proj">
+      <div class="proj-head"><h4 class="proj-title">LanCam: phone as a 4K Wi-Fi camera</h4><span class="proj-tag">Android</span></div>
+      <p class="mt-2">Turns an Android phone into a 4K H.265 network camera for OBS and other tools. It streams only on the home network and disconnects any device from outside it. No cloud, no analytics.</p>
+      <div class="proj-foot"><span class="chip">Camera2</span><span class="chip">RTSP</span><span class="chip">H.265</span><a class="proj-link" href="https://github.com/arvinderss/lan-cam" target="_blank" rel="noopener noreferrer">GitHub</a></div>
+    </article>
+    <article class="card proj">
+      <div class="proj-head"><h4 class="proj-title">Pothi Sahib: offline Gurbani reader</h4><span class="proj-tag">Web &amp; Android</span></div>
+      <p class="mt-2">The whole app, including 138,063 lines of scripture across all 32 Banian, is one ~14.6 MB HTML file. No network calls and nothing to install. It runs the same on any phone or computer browser.</p>
+      <div class="proj-foot"><span class="chip">Single-file app</span><span class="chip">Offline</span><span class="ml-auto flex gap-4"><a class="proj-link" href="https://arvinderss.github.io/gurbani/" target="_blank" rel="noopener noreferrer">Live</a><a class="proj-link" href="https://github.com/arvinderss/gurbani" target="_blank" rel="noopener noreferrer">GitHub</a></span></div>
+    </article>
+    <article class="card proj">
+      <div class="proj-head"><h4 class="proj-title">Gurbani Kosh: verified scripture library</h4><span class="proj-tag">Data platform</span></div>
+      <p class="mt-2">The verified text source behind Pothi Sahib. Every text is fingerprinted (SHA-256) and saved in versions that can't be changed, and its licence is recorded, with a read-only public API. Milestone 1 is complete.</p>
+      <div class="proj-foot"><span class="chip">TypeScript</span><span class="chip">Data integrity</span><a class="proj-link" href="https://github.com/arvinderss/pothisahib" target="_blank" rel="noopener noreferrer">GitHub</a></div>
+    </article>
+  </div>
+
+  <h3 class="proj-group">Security &amp; research writing</h3>
+  <ul class="mt-4 grid gap-3 md:grid-cols-2">
+    <li><a class="card proj-row group" href="/articles/ai-threat-velocity-vs-remediation.html"><span class="proj-title group-hover:underline">The Velocity Gap</span><span class="mt-1 block text-sm">How AI speeds up attacks faster than teams can fix vulnerabilities.</span></a></li>
+    <li><a class="card proj-row group" href="/articles/whatsapp-vs-signal.html"><span class="proj-title group-hover:underline">The Illusion of Privacy</span><span class="mt-1 block text-sm">WhatsApp's privacy claims compared with Signal's design, technically and legally.</span></a></li>
+    <li><a class="card proj-row group" href="/articles/india-deforestation-events.html"><span class="proj-title group-hover:underline">Counting the Felled</span><span class="mt-1 block text-sm">India's deforestation and what it costs everyday life, with every figure confidence-rated.</span></a></li>
+    <li><a class="card proj-row group" href="/articles/ffmpeg-ytdlp-bench-manual.html"><span class="proj-title group-hover:underline">FFmpeg &amp; yt-dlp: The Bench Manual</span><span class="mt-1 block text-sm">An interactive course covering 594 filters, with a 129-question quiz bank.</span></a></li>
+  </ul>
+
+  <h3 class="proj-group">Heritage &amp; community</h3>
+  <div class="mt-4 grid gap-5 md:grid-cols-2">
+    <article class="card proj">
+      <div class="proj-head"><h4 class="proj-title">Sikhi Soul: manuscript art library</h4><span class="proj-tag">Open archive</span></div>
+      <p class="mt-2">Ornament, calligraphy and binding art from historic Sikh manuscripts (16th–19th century), redrawn as scalable vector graphics and free for everyone, with sources and licences tracked.</p>
+      <div class="proj-foot"><span class="chip">SVG</span><span class="chip">CC BY-SA</span><span class="ml-auto flex gap-4"><a class="proj-link" href="https://arvinderss.github.io/sikhisoul/" target="_blank" rel="noopener noreferrer">Live</a><a class="proj-link" href="https://github.com/arvinderss/sikhisoul" target="_blank" rel="noopener noreferrer">GitHub</a></span></div>
+    </article>
+    <article class="card proj">
+      <div class="proj-head"><h4 class="proj-title">aud: audio fault finder</h4><span class="proj-tag">CLI tool</span></div>
+      <p class="mt-2">Tells you what is wrong with a recording and where in the chain it likely comes from. Every finding cites the measurement behind it.</p>
+      <div class="proj-foot"><span class="chip">Python</span><span class="chip">DSP</span><a class="proj-link" href="https://github.com/arvinderss/aud" target="_blank" rel="noopener noreferrer">GitHub</a></div>
+    </article>
+    <article class="card proj">
+      <div class="proj-head"><h4 class="proj-title">Sikh History &amp; Rehit Maryada Quiz</h4><span class="proj-tag">Web</span></div>
+      <p class="mt-2">An interactive quiz on Sikh history and the Rehat Maryada (the Sikh code of conduct).</p>
+      <div class="proj-foot"><a class="proj-link" href="/sikhi/sikh-quiz.html">Play</a></div>
+    </article>
+  </div>
+
+  <h3 class="proj-group">Just for fun</h3>
+  <div class="mt-4 grid gap-5 md:grid-cols-2">
+    <article class="card proj">
+      <div class="proj-head"><h4 class="proj-title">ਡੰਗਰ Dice: Animal Dice Adventure</h4><span class="proj-tag">Game</span></div>
+      <p class="mt-2">A multiplayer dice game for kids, played around one device on a table, with turn timers and score or round limits. No external calls.</p>
+      <div class="proj-foot"><a class="proj-link" href="/games/animal-dice-v3.html">Play</a></div>
+    </article>
+    <article class="card proj">
+      <div class="proj-head"><h4 class="proj-title">arvindersingh.me: this site</h4><span class="proj-tag">Web</span></div>
+      <p class="mt-2">Static site with a 30-second brief builder and a resume PDF that is generated from this page on every deploy.</p>
+      <div class="proj-foot"><span class="chip">Tailwind</span><span class="chip">GitHub Actions</span><a class="proj-link" href="https://github.com/arvinderss/website" target="_blank" rel="noopener noreferrer">GitHub</a></div>
+    </article>
+  </div>
+
+  <h3 class="proj-group">In progress</h3>
+  <div class="mt-4 grid gap-5 md:grid-cols-2">
+    <article class="card proj border-dashed">
+      <div class="proj-head"><h4 class="proj-title">SadakWatch: road-defect reporting from dashcams</h4><span class="proj-wip">In progress</span></div>
+      <p class="mt-2">Turns moving vehicles into road-condition sensors: dashcam detections are tagged with GPS location and routed to the authority responsible for that road.</p>
+      <div class="proj-foot"><span class="chip">Go</span><span class="chip">Computer vision</span><a class="proj-link" href="https://github.com/arvinderss/sadakwatch" target="_blank" rel="noopener noreferrer">GitHub</a></div>
+    </article>
+    <article class="card proj border-dashed">
+      <div class="proj-head"><h4 class="proj-title">Ordervisor: grocery price comparison</h4><span class="proj-wip">In progress</span></div>
+      <p class="mt-2">Compares prices across Zepto, Blinkit, BigBasket and others, then hands off to the retailer's own app to check out.</p>
+      <div class="proj-foot"><span class="chip">React Native</span><span class="proj-private">Private repo</span></div>
+    </article>
+  </div>
 </section>
 
 <!-- ============ CONTACT ============ -->

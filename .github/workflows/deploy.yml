@@ -35,6 +35,7 @@ jobs:
           cp index.html dist/
           [ -d assets ] && cp -r assets/. dist/assets/ || true
           [ -f CNAME ] && cp CNAME dist/ || true
+          for d in articles games sikhi; do [ -d $d ] && cp -r $d dist/; done
           touch dist/.nojekyll
 
       - name: Generate resume PDF from site content
